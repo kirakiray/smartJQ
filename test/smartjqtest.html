@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../src/smartjq.js"></script>
+
+    <!--            <script src="jquery-3.1.1.js"></script>-->
+    <!--    <script src="jquery-2.2.0.min.js"></script>-->
+    <!--    <script src="zepto.js"></script>-->
+    <!--    <script src="../src/recordjq.js"></script>-->
+
+</head>
+
+<body>
+    <div class="ceshi">ceshi</div>
+    <div id="tar">
+        <div class="test1">test1</div>
+        <div class="test">test2
+            <div class="haha">haha1</div>
+        </div>
+        <div class="test1">test3
+            <div class="haha">haha2</div>
+        </div>
+    </div>
+</body>
+<script>
+    var ele = $('.test1');
+
+    var ceshi = $('.ceshi');
+    ceshi[0].kaka = "kakaluote";
+
+    //    ele.after(ceshi);
+
+    $('<div>shele</div>').appendTo(ele);
+</script>
+
+</html>
