@@ -175,11 +175,6 @@
         },
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
-            // @--fn:append
-            // @--fn:prepend
-            // @--fn:after
-            // @--fn:before
-
             //最后的id
             var lastid = targets.length - 1;
 
