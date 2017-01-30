@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>smartJQ test</title>
+    <link rel="stylesheet" href="qunit-1.15.0.css" />
+    <style>
+        .test_group {
+            margin-top: 50px;
+        }
+    </style>
+    <script src="qunit-1.15.0.js"></script>
+    <script src="../src/smartjq.js"></script>
+    <!--    <script src="jquery-3.1.1.js"></script>-->
+</head>
+
+<body>
+    <h1 id="qunit-header">smartJQ test</h1>
+    <h2 id="qunit-banner"></h2>
+    <ol id="qunit-tests"></ol>
+
+
+    <!--
+    <div class="test_group">
+        <div id="tar1">
+            <div class="tar1_test1" style="font-size:13px;">test1</div>
+            <div class="tar1_test2">test2</div>
+            <div class="tar1_test3">test3</div>
+            <div class="tar1_test3">test3</div>
+        </div>
+        <script>
+            QUnit.test("css", function(assert) {
+                //测试获取样式
+                var t1f = $('.tar1_test1').css('font-size');
+                assert.ok(t1f == "13px", 'css get fontSize');
+
+                //设置样式
+                $('.tar1_test2').css('font-size', "14px");
+                var t2f = $('.tar1_test2').css('font-size');
+                assert.ok((t2f == "14px"), 'css set fontSize');
+
+                //object设置样式
+                $('.tar1_test3').css({
+                    "font-size": "15px",
+                    "line-height": "20px"
+                });
+                var t3f = $('.tar1_test3').css('font-size');
+                var t3l = $('.tar1_test3').css('line-height');
+                assert.ok((t3f == "15px") && (t3l == "20px"), 'css obj set color');
+
+                //获取第二个元素样式
+                assert.ok($('.tar1_test3')[1].style['font-size'] == "15px", 'the second element is no problem');
+                assert.ok($($('.tar1_test3')[1]).css('font-size') == "15px", 'the second element is no problem');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar2">
+            <div class="tar2_test1" kaka="luote"></div>
+            <div class="tar2_test2"></div>
+            <div class="tar2_test3"></div>
+            <div class="tar2_test3"></div>
+        </div>
+        <script>
+            QUnit.test("attr", function(assert) {
+                //获取属性测试
+                var t1a = $('.tar2_test1').attr('kaka');
+                assert.ok(t1a == "luote", 'attr get');
+
+                //设置属性
+                $('.tar2_test2').attr('fake', "u2");
+                var t2a = $('.tar2_test2').attr('fake');
+                assert.ok(t2a == "u2", 'attr set');
+
+                //object设置属性
+                $('.tar2_test3').attr({
+                    "beau": "tiful",
+                    "cong": "ratulate"
+                });
+                assert.ok($('.tar2_test3').attr('beau') == "tiful" && $('.tar2_test3').attr('cong') == "ratulate", "attr obj set");
+
+                //第二个元素属性
+                assert.ok($($('.tar2_test3')[1]).attr('beau') == "tiful", "the second element is no problem");
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar3">
+            <div class="tar3_test" a1="true"></div>
+            <div class="tar3_test" a1="true"></div>
+        </div>
+        <script>
+            QUnit.test("removeAttr", function(assert) {
+                var tar3_test = $('.tar3_test');
+
+                //确认个数
+                assert.ok(tar3_test.length == 2, 'count ok!');
+
+                //去除属性
+                tar3_test.removeAttr('a1');
+                assert.ok(tar3_test[0].getAttribute('a1') == undefined && tar3_test[1].getAttribute('a1') == undefined, "removeOK");
+            });
+        </script>
+    </div>
+-->
+
+
+
+    <div class="test_group">
+        <div class="tar4_fade"></div>
+        <div id="tar4">
+            <div class="tar4_test1"></div>
+            <div class="tar4_test2"></div>
+            <div class="tar4_test3"></div>
+            <div class="tar4_test3"></div>
+        </div>
+        <script>
+            QUnit.test("element control", function(assert) {
+                var tar4_fade = $('.tar4_fade');
+                tar4_fade[0].kaka = "fa";
+
+                $('.tar4_test3').append(tar4_fade);
+
+                //判断个数
+                assert.ok($('.tar4_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4_fade')[1].kaka == "fa", 'element data ok!');
+            });
+        </script>
+    </div>
+
+
+
+    <!--
+    <div class="test_group">
+        <div id="tar">
+        </div>
+        <script>
+            QUnit.test("attr", function(assert) {
+                assert.ok(true, 'base');
+            });
+        </script>
+    </div>
+-->
+
+</body>
+
+</html>

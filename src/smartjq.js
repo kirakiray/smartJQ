@@ -68,7 +68,7 @@
 
     //克隆节点
     var cloneEle = function(ele) {
-        var par = document.createElement(tar == 'div');
+        var par = document.createElement('div');
         par.innerHTML = ele.outerHTML;
         return par.children[0];
     };
@@ -109,16 +109,16 @@
                     arg1($);
                 }, false);
                 break;
-            case "object":
+            case "array":
+                pushto(arg1, this);
+                break;
+            default:
                 if (arg1.nodeType) {
                     this.push(arg1);
                 } else if (arg1 instanceof smartyJQ) {
                     return arg1;
                 }
-                break;
-            case "array":
-                pushto(arg1, this);
-                break;
+
         }
     };
 
@@ -145,14 +145,40 @@
             }
             return this;
         },
+        attr: function(name, value) {
+            var _this = this;
+            switch (getType(name)) {
+                case "string":
+                    if (value == undefined) {
+                        return _this[0].getAttribute(name);
+                    } else {
+                        each(_this, function(i, tar) {
+                            tar.setAttribute(name, value);
+                        });
+                    }
+                    break;
+                case "object":
+                    each(name, function(k, v) {
+                        each(_this, function(i, tar) {
+                            tar.setAttribute(k, v);
+                        });
+                    });
+                    break
+            }
+            return _this;
+        },
+        removeAttr: function(name) {
+            each(this, function(i, tar) {
+                tar.removeAttribute(name);
+            });
+            return this;
+        },
         //添加元素公用的方法
-        _embChild: function(ele, targets, func) {
+        _ec: function(ele, targets, func) {
             // @--fn:append
             // @--fn:prepend
             // @--fn:after
             // @--fn:before
-            // @--fn:appendTo
-            // @--fn:prependTo
 
             //最后的id
             var lastid = targets.length - 1;
@@ -186,19 +212,27 @@
         //元素操作
         append: function(ele) {
             //判断类型
-            this._embChild(ele, this, function(e, tar) {
+            this._ec(ele, this, function(e, tar) {
                 tar.appendChild(e);
             });
             return this;
         },
+        appendTo: function(tars) {
+            this.append.call(tars, this);
+            return this;
+        },
         prepend: function(ele) {
-            this._embChild(ele, this, function(e, tar) {
+            this._ec(ele, this, function(e, tar) {
                 tar.insertBefore(e, tar.firstChild);
             });
             return this;
         },
+        prependTo: function(tars) {
+            this.prependTo.call(tars, this);
+            return this;
+        },
         after: function(ele) {
-            this._embChild(ele, this, function(e, tar) {
+            this._ec(ele, this, function(e, tar) {
                 var parnode = tar.parentNode;
                 if (parnode.lastChild == tar) {
                     parnode.appendChild(e);
@@ -208,22 +242,18 @@
             });
             return this;
         },
+        insertAfter: function(tars) {
+            this.after.call(tars, this);
+            return this;
+        },
         before: function(ele) {
-            this._embChild(ele, this, function(e, tar) {
+            this._ec(ele, this, function(e, tar) {
                 tar.parentNode.insertBefore(e, tar);
             });
             return this;
         },
-        appendTo: function(tars) {
-            this._embChild(this, tars, function(e, tar) {
-                tar.appendChild(e);
-            });
-            return this;
-        },
-        prependTo: function(tars) {
-            this._embChild(this, tars, function(e, tar) {
-                tar.insertBefore(e, tar.firstChild);
-            });
+        insertBefore: function(tars) {
+            this.before.call(tars, this);
             return this;
         },
         empty: function() {
@@ -248,28 +278,6 @@
                 });
             });
             return new smartyJQ(eles);
-        },
-        attr: function(name, value) {
-            var tar = this[0];
-            switch (getType(name)) {
-                case "string":
-                    if (value == undefined) {
-                        return tar && tar.getAttribute(name);
-                    } else {
-                        tar && tar.setAttribute(name, value);
-                    }
-                    break;
-                case "object":
-                    each(name, function(k, v) {
-                        tar && tar.setAttribute(k, v);
-                    });
-                    break
-            }
-            return this;
-        },
-        removeAttr: function(name) {
-            var tar = this[0];
-            tar && tar.removeAttribute(name);
         },
         each: function(func) {
             each(this, function(i, e) {
