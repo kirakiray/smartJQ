@@ -37,7 +37,7 @@
             }
         })();
         return function(obj, func) {
-            if (obj.length) {
+            if ('length' in obj) {
                 arreach(obj, func);
             } else if (getType(obj) == "object") {
                 for (var i in obj) {
@@ -48,8 +48,15 @@
     })();
 
     //查找元素的方法
-    var findEles = function(owner, prop) {
-        return owner.querySelectorAll(prop);
+    var findEles = function(owner, expr) {
+        return owner.querySelectorAll(expr);
+    };
+
+    //判断元素是否符合条件
+    var judgeEle = function(ele, expr) {
+        var fadeParent = document.createElement('div');
+        fadeParent.appendChild(ele.cloneNode(false));
+        return findEles(fadeParent, expr).length ? true : false;
     };
 
     //合并数组
@@ -64,13 +71,6 @@
         var par = document.createElement('div');
         par.innerHTML = str;
         return par.children;
-    };
-
-    //克隆节点
-    var cloneEle = function(ele) {
-        var par = document.createElement('div');
-        par.innerHTML = ele.outerHTML;
-        return par.children[0];
     };
 
     //main
@@ -173,6 +173,28 @@
             });
             return this;
         },
+        addClass: function(name) {
+            each(this, function(i, e) {
+                e.classList.add(name);
+            });
+            return this;
+        },
+        removeClass: function(name) {
+            each(this, function(i, e) {
+                e.classList.remove(name);
+            });
+            return this;
+        },
+        toggleClass: function(name) {
+            each(this, function(i, e) {
+                e.classList.toggle(name);
+            });
+            return this;
+        },
+        hasClass: function(name) {
+            var tar = this[0];
+            return tar ? tar.classList.value.search(name) > -1 : false;
+        },
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
             //最后的id
@@ -184,10 +206,9 @@
                     if (i == lastid) {
                         func(e, tar);
                     } else {
-                        func(cloneEle(e), tar);
+                        func(e.cloneNode(true), tar);
                     }
                 });
-                pubfun = null;
             }
 
             //判断类型
@@ -195,17 +216,21 @@
                 each(ele, function(i, e) {
                     pubfun(e);
                 });
+                pubfun = null;
             } else if (ele.nodeType) {
                 pubfun(ele);
+                pubfun = null;
             } else if (getType(ele) == "string") {
                 var eles = transToEles(ele);
                 each(eles, function(i, e) {
                     pubfun(e);
                 });
+                pubfun = null;
             }
         },
         //元素操作
         append: function(ele) {
+            //@use---fn._ec
             //判断类型
             this._ec(ele, this, function(e, tar) {
                 tar.appendChild(e);
@@ -213,20 +238,24 @@
             return this;
         },
         appendTo: function(tars) {
+            //@use---fn.append
             this.append.call(tars, this);
             return this;
         },
         prepend: function(ele) {
+            //@use---fn._ec
             this._ec(ele, this, function(e, tar) {
                 tar.insertBefore(e, tar.firstChild);
             });
             return this;
         },
         prependTo: function(tars) {
-            this.prependTo.call(tars, this);
+            //@use---fn.prepend
+            this.prepend.call(tars, this);
             return this;
         },
         after: function(ele) {
+            //@use---fn._ec
             this._ec(ele, this, function(e, tar) {
                 var parnode = tar.parentNode;
                 if (parnode.lastChild == tar) {
@@ -238,18 +267,26 @@
             return this;
         },
         insertAfter: function(tars) {
+            //@use---fn.after
             this.after.call(tars, this);
             return this;
         },
         before: function(ele) {
+            //@use---fn._ec
             this._ec(ele, this, function(e, tar) {
                 tar.parentNode.insertBefore(e, tar);
             });
             return this;
         },
         insertBefore: function(tars) {
+            //@use---fn.before
             this.before.call(tars, this);
             return this;
+        },
+        clone: function() {
+            return this.map(function(i, e) {
+                return e.cloneNode(true);
+            });
         },
         empty: function() {
             each(this, function(i, e) {
@@ -274,9 +311,72 @@
             });
             return new smartyJQ(eles);
         },
+        get: function(index) {
+            return this[index] || transtoarray(this);
+        },
+        map: function(callback) {
+            var arr = [];
+            each(this, function(i, e) {
+                arr.push(callback(i, e));
+            });
+            return new smartyJQ(arr);
+        },
+        slice: function() {
+
+        },
+        filter: function(expr) {
+            var eles = this.map(function(e) {
+
+            });
+        },
+        not: function(expr) {
+
+        },
+        parent: function(expr) {
+            var eles = [];
+            each(this, function(i, e) {
+                if (expr) {
+                    if (judgeEle(e.parentNode, expr)) {
+                        eles.push(e.parentNode);
+                    }
+                } else {
+                    eles.push(e.parentNode);
+                }
+            });
+            return new smartyJQ(eles);
+        },
         each: function(func) {
             each(this, function(i, e) {
                 func.call(e, i, e);
+            });
+            return this;
+        },
+        index: function(ele) {
+            var owner, tar;
+            if (!ele) {
+                tar = this[0];
+                owner = transtoarray(tar.parentNode.children);
+            } else if (ele.nodeType) {
+                tar = ele;
+                owner = this;
+            } else if (ele instanceof smartyJQ) {
+                tar = ele[0];
+                owner = this;
+            } else if (getType(ele) == "string") {
+                tar = this[0];
+                owner = $(ele);
+            }
+            return owner.indexOf(tar);
+        },
+        hide: function() {
+            each(this, function(i, e) {
+                e.style['display'] = "none";
+            });
+            return this;
+        },
+        show: function() {
+            each(this, function(i, e) {
+                e.style['display'] = "";
             });
             return this;
         }

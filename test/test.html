@@ -14,6 +14,7 @@
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
     <!--    <script src="jquery-3.1.1.js"></script>-->
+    <!--    <script src="zepto.js"></script>-->
 </head>
 
 <body>
@@ -22,13 +23,13 @@
     <ol id="qunit-tests"></ol>
 
 
-    <!--
+
     <div class="test_group">
         <div id="tar1">
-            <div class="tar1_test1" style="font-size:13px;">test1</div>
-            <div class="tar1_test2">test2</div>
-            <div class="tar1_test3">test3</div>
-            <div class="tar1_test3">test3</div>
+            <div class="tar1_test1" style="font-size:13px;"></div>
+            <div class="tar1_test2"></div>
+            <div class="tar1_test3"></div>
+            <div class="tar1_test3"></div>
         </div>
         <script>
             QUnit.test("css", function(assert) {
@@ -109,7 +110,7 @@
             });
         </script>
     </div>
--->
+
 
 
 
@@ -139,7 +140,164 @@
 
 
 
+    <div class="test_group">
+        <div id="tar5">
+            <div class="tar5_a1"></div>
+            <div class="tar5_a1">
+                <div class="tar5_a1_c"></div>
+            </div>
+            <div class="tar5_a1">
+                <div class="tar5_a1_c"></div>
+            </div>
+            <div class="tar5_a2"></div>
+        </div>
+        <script>
+            QUnit.test("find", function(assert) {
+                assert.ok($('#tar5').find('.tar5_a1').length == 3, 'count ok');
+                assert.ok($('#tar5').find('.tar5_a1').find('.tar5_a1_c').length == 2, 'count ok2');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar6">
+            <ul>
+                <div class="tar6_foo"></div>
+                <div class="tar6_bar"></div>
+                <div class="tar6_baz"></div>
+            </ul>
+            <ul>
+                <div class="tar6_baz"></div>
+                <div class="tar6_foo" id="tar6_foo_2"></div>
+                <div class="tar6_bar"></div>
+            </ul>
+        </div>
+        <script>
+            QUnit.test("index", function(assert) {
+                assert.ok($('.tar6_baz').index() == 2, 'get index ok');
+
+                assert.ok($('#tar6 div').index($('.tar6_foo')[1]) == 4, 'element index ok');
+
+                assert.ok($('#tar6 div').index($('#tar6_foo_2')) == 4, "$element index ok");
+
+                assert.ok($('#tar6 div').index($('.tar6_bar')) == 1, "$element index ok 2");
+
+                assert.ok($('#tar6_foo_2').index('#tar6 div') == 4, "index string ok");
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar7">
+        </div>
+        <script>
+            QUnit.test("class Function", function(assert) {
+                //hasclass是否生效
+                assert.ok($('#tar7').hasClass('haha') == false, 'hasClass');
+
+                //添加class
+                $('#tar7').addClass('haha');
+                assert.ok($('#tar7').hasClass('haha'), 'addClass');
+
+                $('#tar7').removeClass('haha');
+                assert.ok($('#tar7').hasClass('haha') == false, 'removeClass');
+
+                $('#tar7').toggleClass('haha');
+                assert.ok($('#tar7').hasClass('haha'), 'toggleClass 1 ok');
+
+                $('#tar7').toggleClass('haha');
+                assert.ok($('#tar7').hasClass('haha') == false, 'toggleClass 2 ok');
+
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar8">
+            <div class="tar8_ele" haha="1"></div>
+            <div class="tar8_ele" haha="2"></div>
+        </div>
+        <script>
+            QUnit.test("map", function(assert) {
+                var tar8data = $('.tar8_ele').map(function(i, e) {
+                    console.log(arguments);
+                    return i;
+                });
+                assert.ok(tar8data.length, 'map count ok');
+                assert.ok(!!tar8data.addClass, 'function ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tarx8">
+            <div class="tarx8_con haha">
+                <div class="tarx8_ch"></div>
+            </div>
+            <div class="tarx8_con haha">
+                <div class="tarx8_ch"></div>
+            </div>
+            <div class="tarx8_con">
+                <div class="tarx8_ch"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("parent", function(assert) {
+                assert.ok($('.tarx8_ch').parent().length == 3, 'parent count ok');
+
+                assert.ok($('.tarx8_ch').parent('.haha').length == 2, 'parent filter ok');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div id="tarx9">
+            <div class="tarx9_ele1"></div>
+            <div class="tarx9_ele1"></div>
+            <div class="tarx9_ele2">
+                <div>haha</div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("clone", function(assert) {
+                var tarx9_ele1 = $('.tarx9_ele1').clone();
+                $('#tarx9').append(tarx9_ele1);
+                assert.ok($('.tarx9_ele1').length == 4, 'clone count ok');
+
+                //设置事件
+                //                $('.tarx9_ele2 div').bind('click', function() {
+                //                    console.log('haha');
+                //                });
+                //
+                //                var tarx9_ele2 = $('.tarx9_ele2').clone(true);
+                //                $('#tarx9').append(tarx9_ele2);
+            });
+        </script>
+    </div>
+
+
+
+
+
+
     <!--
+
     <div class="test_group">
         <div id="tar">
         </div>
@@ -149,6 +307,7 @@
             });
         </script>
     </div>
+
 -->
 
 </body>
