@@ -317,7 +317,8 @@
         map: function(callback) {
             var arr = [];
             each(this, function(i, e) {
-                arr.push(callback(i, e));
+                var resulte = callback(i, e);
+                (resulte != undefined) && arr.push(resulte);
             });
             return new smartyJQ(arr);
         },
@@ -325,25 +326,34 @@
 
         },
         filter: function(expr) {
-            var eles = this.map(function(e) {
-
-            });
+            //@use---fn.map
+            switch (getType(expr)) {
+                case "string":
+                    return this.map(function(i, e) {
+                        if (judgeEle(e, expr)) {
+                            return e;
+                        }
+                    });
+                case "function":
+                    return this.map(function(i, e) {
+                        return expr(i, e) && e;
+                    });
+            }
         },
         not: function(expr) {
 
         },
         parent: function(expr) {
-            var eles = [];
-            each(this, function(i, e) {
+            //@use---fn.map
+            return this.map(function(i, e) {
                 if (expr) {
                     if (judgeEle(e.parentNode, expr)) {
-                        eles.push(e.parentNode);
+                        return e.parentNode;
                     }
                 } else {
-                    eles.push(e.parentNode);
+                    return e.parentNode;
                 }
-            });
-            return new smartyJQ(eles);
+            })
         },
         each: function(func) {
             each(this, function(i, e) {

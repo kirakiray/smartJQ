@@ -13,7 +13,7 @@
     </style>
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
-    <!--    <script src="jquery-3.1.1.js"></script>-->
+    <!--            <script src="jquery-3.1.1.js"></script>-->
     <!--    <script src="zepto.js"></script>-->
 </head>
 
@@ -242,6 +242,28 @@
 
 
 
+
+    <div class="test_group">
+        <div id="tar9">
+            <div class="tar9_ele haha"></div>
+            <div class="tar9_ele" kk="true"></div>
+            <div class="tar9_ele haha"></div>
+        </div>
+        <script>
+            QUnit.test("filter", function(assert) {
+                assert.ok($('.tar9_ele').filter('.haha').length == 2, 'count ok');
+
+                assert.ok($('.tar9_ele').filter(function(i, e) {
+                    return e.getAttribute('kk');
+                }).length == 1, "filter function ok");
+            });
+        </script>
+    </div>
+
+
+
+
+
     <div class="test_group">
         <div id="tarx8">
             <div class="tarx8_con haha">
@@ -266,6 +288,7 @@
 
 
 
+    <!--
     <div class="test_group">
         <div id="tarx9">
             <div class="tarx9_ele1"></div>
@@ -291,6 +314,7 @@
         </script>
     </div>
 
+-->
 
 
 
