@@ -13,14 +13,35 @@
     </style>
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
-    <!--            <script src="jquery-3.1.1.js"></script>-->
-    <!--    <script src="zepto.js"></script>-->
+    <!--    <script src="jquery-3.1.1.js"></script>-->
+    <!--                <script src="zepto.js"></script>-->
 </head>
 
 <body>
     <h1 id="qunit-header">smartJQ test</h1>
     <h2 id="qunit-banner"></h2>
     <ol id="qunit-tests"></ol>
+
+    <div class="test_group">
+        <div id="tar0">
+            <div class="tar0_ele"></div>
+            <div class="tar0_ele"></div>
+            <div class="tar0_ele"></div>
+        </div>
+        <script>
+            QUnit.test("core", function(assert) {
+                assert.ok($('.tar0_ele').length, 'length ok');
+
+                //获取成数组类型
+                var arr = $('.tar0_ele').get();
+                //确认arr不是$对象
+                assert.ok(!arr.addClass, 'is array');
+
+                //转换对象测试
+                assert.ok(!!$(arr).addClass, 'is $');
+            });
+        </script>
+    </div>
 
 
 
@@ -198,8 +219,8 @@
 
 
     <div class="test_group">
-        <div id="tar7">
-        </div>
+        <div id="tar7" class="haha2"></div>
+        <!--        <div id="tar7"></div>-->
         <script>
             QUnit.test("class Function", function(assert) {
                 //hasclass是否生效
@@ -231,7 +252,7 @@
         <script>
             QUnit.test("map", function(assert) {
                 var tar8data = $('.tar8_ele').map(function(i, e) {
-                    console.log(arguments);
+                    assert.ok(this.nodeType, "isNode");
                     return i;
                 });
                 assert.ok(tar8data.length, 'map count ok');
@@ -246,19 +267,80 @@
     <div class="test_group">
         <div id="tar9">
             <div class="tar9_ele haha"></div>
-            <div class="tar9_ele" kk="true"></div>
+            <div class="tar9_ele" kk="1"></div>
             <div class="tar9_ele haha"></div>
+            <div class="tar9_ele"></div>
+            <div class="tar9_ele haha" kk="2"></div>
         </div>
         <script>
             QUnit.test("filter", function(assert) {
-                assert.ok($('.tar9_ele').filter('.haha').length == 2, 'count ok');
+                assert.ok($('.tar9_ele').filter('.haha').length == 3, 'count ok');
 
                 assert.ok($('.tar9_ele').filter(function(i, e) {
                     return e.getAttribute('kk');
-                }).length == 1, "filter function ok");
+                }).length == 2, "filter function ok");
+
             });
         </script>
     </div>
+
+
+
+    <div class="test_group">
+        <div id="tar10">
+            <div class="tar10_ele haha"></div>
+            <div class="tar10_ele kaka"></div> 
+            <div class="tar10_ele haha"></div>
+        </div>
+        <script>
+            QUnit.test("not", function(assert) {
+                assert.ok($('.tar10_ele').not('.haha').length == 1, 'not ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar11">
+            <div class="tar11_ele" a="10"></div>
+            <div class="tar11_ele" a="20"></div>
+            <div class="tar11_ele" a="30"></div>
+            <div class="tar11_ele" a="40"></div>
+            <div class="tar11_ele" a="50"></div>
+        </div>
+        <script>
+            QUnit.test("slice", function(assert) {
+                assert.ok($('.tar11_ele').slice(1, 2).attr('a') == 20, 'slice ok');
+                assert.ok($('.tar11_ele').slice(1).length == 4, 'slice length ok');
+                assert.ok($('.tar11_ele').slice(-2).length == 2, 'slice length2 ok');
+                assert.ok($('.tar11_ele').slice(5).length == 0, 'slice length3 ok');
+                assert.ok($('.tar11_ele').slice(-2, 5).length == 2, 'slice length4 ok');
+                assert.ok($('.tar11_ele').slice(-2, 100).length == 2, 'slice length5 ok');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div id="tar12">
+            <div class="tar12_ele" a="10"></div>
+            <div class="tar12_ele" a="20"></div>
+            <div class="tar12_ele" a="30"></div>
+            <div class="tar12_ele" a="40"></div>
+            <div class="tar12_ele" a="50"></div>
+        </div>
+        <script>
+            QUnit.test("eq", function(assert) {
+                assert.ok($('.tar12_ele').eq(1).attr('a') == 20, 'index ok');
+                assert.ok($('.tar12_ele').eq(-1).attr('a') == 50, 'index2 ok');
+                assert.ok($('.tar12_ele').eq(-2).attr('a') == 40, 'index3 ok');
+            });
+        </script>
+    </div>
+
 
 
 

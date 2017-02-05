@@ -60,7 +60,7 @@
     };
 
     //合并数组
-    var pushto = function(arr1, arr2) {
+    var merge = function(arr1, arr2) {
         each(arr1, function(i, e) {
             arr2.push(e);
         });
@@ -82,7 +82,7 @@
             case "string":
                 if (/</.test(arg1)) {
                     //带有生成对象的类型
-                    pushto(transToEles(arg1), this);
+                    merge(transToEles(arg1), this);
                 } else {
                     //查找元素
                     var eles = [];
@@ -101,7 +101,7 @@
                     } else {
                         eles = findEles(document, arg1);
                     }
-                    pushto(eles, this);
+                    merge(eles, this);
                 }
                 break;
             case "function":
@@ -110,7 +110,7 @@
                 }, false);
                 break;
             case "array":
-                pushto(arg1, this);
+                merge(arg1, this);
                 break;
             default:
                 if (arg1.nodeType) {
@@ -193,7 +193,7 @@
         },
         hasClass: function(name) {
             var tar = this[0];
-            return tar ? tar.classList.value.search(name) > -1 : false;
+            return tar ? transtoarray(tar.classList).indexOf(name) > -1 : false;
         },
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
@@ -309,7 +309,7 @@
                     }
                 });
             });
-            return new smartyJQ(eles);
+            return $(eles);
         },
         get: function(index) {
             return this[index] || transtoarray(this);
@@ -317,13 +317,17 @@
         map: function(callback) {
             var arr = [];
             each(this, function(i, e) {
-                var resulte = callback(i, e);
+                var resulte = callback.call(e, i, e);
                 (resulte != undefined) && arr.push(resulte);
             });
-            return new smartyJQ(arr);
+            return $(arr);
         },
-        slice: function() {
-
+        slice: function(start, end) {
+            return $([].slice.call(this, start, end));
+        },
+        eq: function(i) {
+            //@use---fn.slice
+            return this.slice(i, i + 1 || undefined);
         },
         filter: function(expr) {
             //@use---fn.map
@@ -336,12 +340,15 @@
                     });
                 case "function":
                     return this.map(function(i, e) {
-                        return expr(i, e) && e;
+                        return expr.call(e, i, e) ? e : undefined;
                     });
             }
         },
         not: function(expr) {
-
+            //@use---fn.filter
+            return this.filter(function(i, e) {
+                return !judgeEle(e, expr);
+            });
         },
         parent: function(expr) {
             //@use---fn.map
@@ -392,9 +399,11 @@
         }
     });
 
+    //在$上的方法
     extend(smartyJQ, {
         extend: extend,
-        each: each
+        each: each,
+        merge: merge
     });
 
     //init
