@@ -13,8 +13,8 @@
     </style>
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
-    <!--    <script src="jquery-3.1.1.js"></script>-->
-    <!--                <script src="zepto.js"></script>-->
+<!--            <script src="jquery-3.1.1.js"></script>-->
+    <!--                    <script src="zepto.js"></script>-->
 </head>
 
 <body>
@@ -181,6 +181,31 @@
     </div>
 
 
+    <div class="test_group">
+        <div id="tar5x_1">
+            <div class="tar5x_1_ele">
+                <div class="tar5x_1_ele_c1"></div>
+                <div class="tar5x_1_ele_c2"></div>
+                <div class="tar5x_1_ele_c3"></div>
+            </div>
+            <div class="tar5x_1_ele">
+                <div class="tar5x_1_ele_c3"></div>
+                <div class="tar5x_1_ele_c2"></div>
+                <div class="tar5x_1_ele_c3"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("children", function(assert) {
+
+                assert.ok($('.tar5x_1_ele').children().length == 6, 'count 6 ok');
+                assert.ok($('.tar5x_1_ele').children('.tar5x_1_ele_c3').length == 3, 'count 3 ok');
+                assert.ok($('.tar5x_1_ele').children('.tar5x_1_ele_c2').length == 2, 'count 2 ok');
+                assert.ok($('.tar5x_1_ele').children('.tar5x_1_ele_c1').length == 1, 'count 1 ok');
+            });
+        </script>
+    </div>
+
+
 
 
 
@@ -289,7 +314,7 @@
     <div class="test_group">
         <div id="tar10">
             <div class="tar10_ele haha"></div>
-            <div class="tar10_ele kaka"></div> 
+            <div class="tar10_ele kaka"></div>
             <div class="tar10_ele haha"></div>
         </div>
         <script>
@@ -347,28 +372,65 @@
 
 
     <div class="test_group">
-        <div id="tarx8">
-            <div class="tarx8_con haha">
-                <div class="tarx8_ch"></div>
+        <div id="tar13">
+            <div class="tar13_con haha">
+                <div class="tar13_ch"></div>
             </div>
-            <div class="tarx8_con haha">
-                <div class="tarx8_ch"></div>
+            <div class="tar13_con haha">
+                <div class="tar13_ch"></div>
             </div>
-            <div class="tarx8_con">
-                <div class="tarx8_ch"></div>
+            <div class="tar13_con">
+                <div class="tar13_ch"></div>
+                <div class="tar13_ch"></div>
             </div>
         </div>
         <script>
             QUnit.test("parent", function(assert) {
-                assert.ok($('.tarx8_ch').parent().length == 3, 'parent count ok');
+                assert.ok($('.tar13_ch').parent().length == 3, 'parent count ok');
 
-                assert.ok($('.tarx8_ch').parent('.haha').length == 2, 'parent filter ok');
+                assert.ok($('.tar13_ch').parent('.haha').length == 2, 'parent filter ok');
             });
         </script>
     </div>
 
 
 
+    <div class="test_group">
+        <div id="tar14">
+            <div class="tar14_ele1">
+                <div class="tar14_ele_c1"></div>
+                <div class="tar14_ele_c1"></div>
+            </div>
+            <div class="tar14_ele2">
+                <div class="tar14_ele_c1"></div>
+            </div>
+            <div class="tar14_ele1">
+                <div class="tar14_ele_c1"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("parents", function(assert) {
+                assert.ok($('.tar14_ele_c1').parents().length == 7, 'parents ok');
+                assert.ok($('.tar14_ele_c1').parents('.tar14_ele1').length == 2, 'parents ok');
+            });
+        </script>
+    </div>
+
+
+
+    <!--
+
+    <div class="test_group">
+        <div id="tar">
+        </div>
+        <script>
+            QUnit.test("attr", function(assert) {
+                assert.ok(true, 'base');
+            });
+        </script>
+    </div>
+
+-->
 
     <!--
     <div class="test_group">
@@ -401,20 +463,6 @@
 
 
 
-
-    <!--
-
-    <div class="test_group">
-        <div id="tar">
-        </div>
-        <script>
-            QUnit.test("attr", function(assert) {
-                assert.ok(true, 'base');
-            });
-        </script>
-    </div>
-
--->
 
 </body>
 

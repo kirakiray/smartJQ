@@ -1,7 +1,7 @@
 (function(glo) {
     "use strict";
     //function
-    var transtoarray = function(arrobj) {
+    var makeArray = function(arrobj) {
         return Array.prototype.slice.call(arrobj);
     };
 
@@ -23,7 +23,7 @@
         var arreach = (function() {
             if ([].forEach) {
                 return function(arrobj, func) {
-                    arrobj = transtoarray(arrobj);
+                    arrobj = makeArray(arrobj);
                     arrobj.forEach(function(e, i) {
                         func(i, e);
                     });
@@ -98,7 +98,7 @@
                                 }
                             });
                         });
-                    } else {
+                    } else if (!arg2) {
                         eles = findEles(document, arg1);
                     }
                     merge(eles, this);
@@ -193,7 +193,7 @@
         },
         hasClass: function(name) {
             var tar = this[0];
-            return tar ? transtoarray(tar.classList).indexOf(name) > -1 : false;
+            return tar ? makeArray(tar.classList).indexOf(name) > -1 : false;
         },
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
@@ -286,7 +286,7 @@
         clone: function() {
             return this.map(function(i, e) {
                 return e.cloneNode(true);
-            });
+            }); 
         },
         empty: function() {
             each(this, function(i, e) {
@@ -311,8 +311,21 @@
             });
             return $(eles);
         },
+        children: function(expr) {
+            var eles = [];
+            each(this, function(i, e) {
+                e.nodeType && each(e.children, function(i, e) {
+                    if (expr) {
+                        judgeEle(e, expr) && eles.push(e);
+                    } else {
+                        eles.push(e);
+                    }
+                });
+            });
+            return $(eles);
+        },
         get: function(index) {
-            return this[index] || transtoarray(this);
+            return this[index] || makeArray(this);
         },
         map: function(callback) {
             var arr = [];
@@ -330,19 +343,24 @@
             return this.slice(i, i + 1 || undefined);
         },
         filter: function(expr) {
-            //@use---fn.map
+            var arr = [];
             switch (getType(expr)) {
                 case "string":
-                    return this.map(function(i, e) {
+                    each(this, function(i, e) {
                         if (judgeEle(e, expr)) {
-                            return e;
+                            arr.push(e);
                         }
                     });
+                    break;
                 case "function":
-                    return this.map(function(i, e) {
-                        return expr.call(e, i, e) ? e : undefined;
+                    each(this, function(i, e) {
+                        var result = expr.call(e, i, e);
+                        if (result) {
+                            arr.push(e);
+                        }
                     });
             }
+            return $(arr);
         },
         not: function(expr) {
             //@use---fn.filter
@@ -352,15 +370,42 @@
         },
         parent: function(expr) {
             //@use---fn.map
-            return this.map(function(i, e) {
-                if (expr) {
-                    if (judgeEle(e.parentNode, expr)) {
-                        return e.parentNode;
+            var arr = [];
+            if (expr) {
+                each(this, function(i, e) {
+                    var parentNode = e.parentNode;
+                    if (judgeEle(parentNode, expr) && arr.indexOf(parentNode) == -1) {
+                        arr.push(parentNode);
                     }
-                } else {
-                    return e.parentNode;
-                }
-            })
+                });
+            } else {
+                each(this, function(i, e) {
+                    var parentNode = e.parentNode;
+                    if (arr.indexOf(parentNode) == -1) {
+                        arr.push(parentNode);
+                    }
+                });
+            }
+            return $(arr);
+        },
+        parents: function(selector) {
+            //@use---fn.filter
+            var arr = [],
+                tars = this;
+            while (tars.length > 0) {
+                var newtars = [];
+                each(tars, function(i, e) {
+                    var parentNode = e.parentNode;
+                    if (parentNode && parentNode != document && arr.indexOf(parentNode) < 0) {
+                        arr.push(parentNode);
+                        if (newtars.indexOf() < 0) {
+                            newtars.push(parentNode);
+                        }
+                    }
+                });
+                tars = newtars;
+            };
+            return selector ? $(arr).filter(selector) : $(arr);
         },
         each: function(func) {
             each(this, function(i, e) {
@@ -372,7 +417,7 @@
             var owner, tar;
             if (!ele) {
                 tar = this[0];
-                owner = transtoarray(tar.parentNode.children);
+                owner = makeArray(tar.parentNode.children);
             } else if (ele.nodeType) {
                 tar = ele;
                 owner = this;
@@ -403,7 +448,9 @@
     extend(smartyJQ, {
         extend: extend,
         each: each,
-        merge: merge
+        makeArray: makeArray,
+        merge: merge,
+        type: getType
     });
 
     //init
