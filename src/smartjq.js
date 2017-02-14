@@ -10,6 +10,14 @@
         return Object.prototype.toString.call(value).toLowerCase().replace(/(\[object )|(])/g, '');
     };
 
+    //判断是否空对象
+    var isEmptyObject = function(obj) {
+        for (var i in obj) {
+            return false;
+        }
+        return true;
+    };
+
     //合并对象
     var extend = function(def, opt) {
         for (var i in opt) {
@@ -73,6 +81,18 @@
         return par.children;
     };
 
+    var smartEvent = function() {
+
+    };
+    smartEvent.prototype = {
+        on: function() {},
+        off: function() {},
+        bind: function() {},
+        unbind: function() {},
+        one: function() {},
+        trigger: function() {}
+    };
+
     //main
     function smartyJQ(arg1, arg2) {
         //根据参数不同，做不同处理
@@ -106,7 +126,7 @@
                 break;
             case "function":
                 document.addEventListener('DOMContentLoaded', function() {
-                    arg1($);
+                    arg1($)
                 }, false);
                 break;
             case "array":
@@ -286,7 +306,7 @@
         clone: function() {
             return this.map(function(i, e) {
                 return e.cloneNode(true);
-            }); 
+            });
         },
         empty: function() {
             each(this, function(i, e) {
@@ -441,22 +461,52 @@
                 e.style['display'] = "";
             });
             return this;
-        }
-    });
+        },
+        data: function(name, value) {
+            switch (getType(name)) {
+                case "string":
+                    if (value == undefined) {
+                        var tar = this[0];
+                        if (!tar) {
+                            return;
+                        }
+                        var smartData = tar.__sdata || (tar.__sdata = {});
 
-    //在$上的方法
-    extend(smartyJQ, {
-        extend: extend,
-        each: each,
-        makeArray: makeArray,
-        merge: merge,
-        type: getType
+                        return smartData[name] || tar.dataset[name];
+                    } else {
+                        each(this, function(i, tar) {
+                            var smartData = tar.__sdata || (tar.__sdata = {});
+                            smartData[name] = value;
+                        });
+                    }
+                    break;
+                case "object":
+                    each(this, function(i, tar) {
+                        var smartData = tar.__sdata || (tar.__sdata = {});
+                        each(name, function(name, value) {
+                            smartData[name] = value;
+                        });
+                    });
+                    break;
+            }
+        }
     });
 
     //init
     var $ = function(selector, context) {
         return new smartyJQ(selector, context);
     };
+    $.fn = $.prototype = smartyJQ.fn;
+
+    //在$上的方法
+    extend($, {
+        extend: extend,
+        each: each,
+        makearray: makeArray,
+        merge: merge,
+        type: getType
+    });
+
     glo.$ = $;
     glo.smartyJQ = smartyJQ;
 

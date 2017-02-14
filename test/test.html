@@ -13,8 +13,8 @@
     </style>
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
-<!--            <script src="jquery-3.1.1.js"></script>-->
-    <!--                    <script src="zepto.js"></script>-->
+    <!--    <script src="jquery-3.1.1.js"></script>-->
+    <!--                        <script src="zepto.js"></script>-->
 </head>
 
 <body>
@@ -412,6 +412,41 @@
             QUnit.test("parents", function(assert) {
                 assert.ok($('.tar14_ele_c1').parents().length == 7, 'parents ok');
                 assert.ok($('.tar14_ele_c1').parents('.tar14_ele1').length == 2, 'parents ok');
+            });
+        </script>
+    </div>
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar15"></div>
+        <div id="tar15_2" data-cao="300"></div>
+        <script>
+            QUnit.test("data , removeData", function(assert) {
+
+                assert.ok($('#tar15').data('haha') == undefined, 'data get data  ok');
+
+                $('#tar15').data('haha', 100)
+                assert.ok($('#tar15').data('haha') == 100, 'data set ok');
+                assert.ok($('#tar15').attr('data-haha') == undefined, 'data no attr');
+
+                $('#tar15,#tar15_2').data({
+                    haha: 200,
+                    kaka: "luote"
+                });
+                assert.ok($('#tar15').data('haha') == 200, 'data change ok');
+                assert.ok($('#tar15').data('kaka') == 'luote', 'object data ok');
+
+                assert.ok($('#tar15_2').data('cao') == 300, 'attr data ok');
+                assert.ok($('#tar15_2').data('haha') == 200, 'data ok 2');
+
+                $('#tar15_2').data('cao', "400")
+                assert.ok($('#tar15_2').data('cao') == 400, 'data ok 3');
+                assert.ok($('#tar15_2').attr('data-cao') == 300, 'attr data ok 2');
+
+                //                console.log($('#tar15_2').data());
             });
         </script>
     </div>
