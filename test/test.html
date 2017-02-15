@@ -446,6 +446,9 @@
                 assert.ok($('#tar15_2').data('cao') == 400, 'data ok 3');
                 assert.ok($('#tar15_2').attr('data-cao') == 300, 'attr data ok 2');
 
+                $('#tar15_2').removeData('cao')
+                assert.ok($('#tar15_2').data('cao') == 300, 'data ok 4');
+
                 //                console.log($('#tar15_2').data());
             });
         </script>

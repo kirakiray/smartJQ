@@ -19,10 +19,13 @@
     };
 
     //合并对象
-    var extend = function(def, opt) {
-        for (var i in opt) {
-            def[i] = opt[i];
-        }
+    var extend = function(def) {
+        var args = makeArray(arguments).slice(1);
+        each(args, function(i, opt) {
+            for (var i in opt) {
+                def[i] = opt[i];
+            }
+        });
         return def;
     };
 
@@ -79,18 +82,6 @@
         var par = document.createElement('div');
         par.innerHTML = str;
         return par.children;
-    };
-
-    var smartEvent = function() {
-
-    };
-    smartEvent.prototype = {
-        on: function() {},
-        off: function() {},
-        bind: function() {},
-        unbind: function() {},
-        one: function() {},
-        trigger: function() {}
     };
 
     //main
@@ -488,7 +479,19 @@
                         });
                     });
                     break;
+                case "undefined":
+                    var tar = this[0];
+                    var smartData = tar.__sdata || (tar.__sdata = {});
+                    return extend({}, tar.dataset, smartData);
             }
+            return this;
+        },
+        removeData: function(name) {
+            each(this, function(i, tar) {
+                var smartData = tar.__sdata || (tar.__sdata = {});
+                delete smartData[name];
+            });
+            return this;
         }
     });
 
