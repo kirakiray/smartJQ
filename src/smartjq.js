@@ -1,5 +1,8 @@
 (function(glo) {
     "use strict";
+    //common
+    var SMARTKEY = "_s_" + new Date().getTime();
+
     //function
     var makeArray = function(arrobj) {
         return Array.prototype.slice.call(arrobj);
@@ -11,19 +14,19 @@
     };
 
     //判断是否空对象
-    var isEmptyObject = function(obj) {
-        for (var i in obj) {
-            return false;
-        }
-        return true;
-    };
+    //    var isEmptyObject = function(obj) {
+    //        for (var i in obj) {
+    //            return false;
+    //        }
+    //        return true;
+    //    };
 
     //合并对象
     var extend = function(def) {
         var args = makeArray(arguments).slice(1);
         each(args, function(i, opt) {
-            for (var i in opt) {
-                def[i] = opt[i];
+            for (var key in opt) {
+                def[key] = opt[key];
             }
         });
         return def;
@@ -34,8 +37,7 @@
         var arreach = (function() {
             if ([].forEach) {
                 return function(arrobj, func) {
-                    arrobj = makeArray(arrobj);
-                    arrobj.forEach(function(e, i) {
+                    makeArray(arrobj).forEach(function(e, i) {
                         func(i, e);
                     });
                 };
@@ -58,6 +60,14 @@
         };
     })();
 
+    //合并数组
+    var merge = function(arr1, arr2) {
+        each(arr1, function(i, e) {
+            arr2.push(e);
+        });
+    };
+
+
     //查找元素的方法
     var findEles = function(owner, expr) {
         return owner.querySelectorAll(expr);
@@ -70,13 +80,6 @@
         return findEles(fadeParent, expr).length ? true : false;
     };
 
-    //合并数组
-    var merge = function(arr1, arr2) {
-        each(arr1, function(i, e) {
-            arr2.push(e);
-        });
-    };
-
     //转换字符串到html对象
     var transToEles = function(str) {
         var par = document.createElement('div');
@@ -87,6 +90,10 @@
     //main
     function smartyJQ(arg1, arg2) {
         //根据参数不同，做不同处理
+        if (arg2 && arg1 instanceof smartyJQ) {
+            return arg1;
+        }
+
         //只有一个参数的情况
         var a1type = getType(arg1);
         switch (a1type) {
@@ -211,39 +218,21 @@
             //最后的id
             var lastid = targets.length - 1;
 
-            //公用循环方法
-            var pubfun = function(e) {
-                each(targets, function(i, tar) {
+            each($(ele), function(i, e) {
+                each($(targets), function(i, tar) {
                     if (i == lastid) {
                         func(e, tar);
                     } else {
                         func(e.cloneNode(true), tar);
                     }
                 });
-            }
-
-            //判断类型
-            if (ele instanceof smartyJQ) {
-                each(ele, function(i, e) {
-                    pubfun(e);
-                });
-                pubfun = null;
-            } else if (ele.nodeType) {
-                pubfun(ele);
-                pubfun = null;
-            } else if (getType(ele) == "string") {
-                var eles = transToEles(ele);
-                each(eles, function(i, e) {
-                    pubfun(e);
-                });
-                pubfun = null;
-            }
+            });
         },
         //元素操作
         append: function(ele) {
             //@use---fn._ec
             //判断类型
-            this._ec(ele, this, function(e, tar) {
+            prototypeObj._ec(ele, this, function(e, tar) {
                 tar.appendChild(e);
             });
             return this;
@@ -255,7 +244,7 @@
         },
         prepend: function(ele) {
             //@use---fn._ec
-            this._ec(ele, this, function(e, tar) {
+            prototypeObj._ec(ele, this, function(e, tar) {
                 tar.insertBefore(e, tar.firstChild);
             });
             return this;
@@ -267,7 +256,7 @@
         },
         after: function(ele) {
             //@use---fn._ec
-            this._ec(ele, this, function(e, tar) {
+            prototypeObj._ec(ele, this, function(e, tar) {
                 var parnode = tar.parentNode;
                 if (parnode.lastChild == tar) {
                     parnode.appendChild(e);
@@ -284,7 +273,7 @@
         },
         before: function(ele) {
             //@use---fn._ec
-            this._ec(ele, this, function(e, tar) {
+            prototypeObj._ec(ele, this, function(e, tar) {
                 tar.parentNode.insertBefore(e, tar);
             });
             return this;
@@ -293,11 +282,6 @@
             //@use---fn.before
             this.before.call(tars, this);
             return this;
-        },
-        clone: function() {
-            return this.map(function(i, e) {
-                return e.cloneNode(true);
-            });
         },
         empty: function() {
             each(this, function(i, e) {
@@ -454,6 +438,7 @@
             return this;
         },
         data: function(name, value) {
+            var smartData;
             switch (getType(name)) {
                 case "string":
                     if (value == undefined) {
@@ -461,19 +446,19 @@
                         if (!tar) {
                             return;
                         }
-                        var smartData = tar.__sdata || (tar.__sdata = {});
+                        smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
 
                         return smartData[name] || tar.dataset[name];
                     } else {
                         each(this, function(i, tar) {
-                            var smartData = tar.__sdata || (tar.__sdata = {});
+                            smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
                             smartData[name] = value;
                         });
                     }
                     break;
                 case "object":
                     each(this, function(i, tar) {
-                        var smartData = tar.__sdata || (tar.__sdata = {});
+                        smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
                         each(name, function(name, value) {
                             smartData[name] = value;
                         });
@@ -481,17 +466,126 @@
                     break;
                 case "undefined":
                     var tar = this[0];
-                    var smartData = tar.__sdata || (tar.__sdata = {});
+                    smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
                     return extend({}, tar.dataset, smartData);
             }
             return this;
         },
         removeData: function(name) {
             each(this, function(i, tar) {
-                var smartData = tar.__sdata || (tar.__sdata = {});
+                var smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
                 delete smartData[name];
             });
             return this;
+        },
+        //模拟事件触发器
+        _tr: function(tar, eventName, oriEvent) {
+            var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
+            var smartEventObj = smartEventData[eventName];
+
+            var newArr = [];
+            each(smartEventObj, function(i, callObj) {
+                callObj.f({
+                    currentTarget: "",
+                    data: callObj.d,
+                    delegateTarget: "",
+                    isDefaultPrevented: function() {},
+                    isImmediatePropagationStopped: function() {},
+                    namespace: "",
+                    pageX: "",
+                    pageY: "",
+                    preventDefault: function() {},
+                    relatedTarget: function() {},
+                    result: "",
+                    stopImmediatePropagation: function() {},
+                    stopPropagation: function() {},
+                    target: "",
+                    timeStamp: "",
+                    type: "",
+                    which: ""
+                });
+                if (!callObj.o) {
+                    newArr.push(callObj);
+                }
+            });
+            smartEventData[eventName] = smartEventObj = newArr;
+        },
+        //注册事件
+        on: function(arg1, arg2, arg3, arg4, isOne) {
+            var event, selectors, data, callback, _this = this;
+            switch (arg1) {
+                case "string":
+                    var eventArr = arg1.split(" ");
+
+                    //判断第二个参数是否字符串，是的话就是目标
+                    if (getType(arg2) == 'function') {
+                        callback = arg2;
+                    } else if (getType(arg2) == "string") {
+                        // selectors = findEles(tar, arg2);
+                        if (getType(arg3) == "function") {
+                            callback = arg3;
+                        } else {
+                            data = arg3;
+                            callback = arg4;
+                        }
+                    }
+
+                    each(eventArr, function(i, eventName) {
+                        //判断空
+                        if (!eventName) return;
+
+                        each(_this, function(i, tar) {
+                            //事件寄宿对象
+                            var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
+                            var smartEventObj = smartEventData[eventName];
+
+                            if (getType(arg2) == "string") {
+                                selectors = findEles(tar, arg2);
+                            }
+
+                            if (!smartEventObj) {
+                                //设定事件对象
+                                smartEventObj = (smartEventData[eventName] = []);
+
+                                //判断是否支持该事件
+                                if (("on" + eventName) in tar) {
+                                    //绑定事件
+                                    tar.addEventListener(eventName, function(oriEvent) {
+                                        prototypeObj._tr(tar, eventName, oriEvent);
+                                    });
+                                }
+                            }
+
+                            //添加callback
+                            smartEventObj.push({
+                                //主体funciton
+                                f: callback,
+                                //数据data
+                                d: data,
+                                // 是否执行一次
+                                o: isOne
+                            });
+                        });
+                    });
+                    break;
+                case "object":
+
+                    break;
+            }
+        },
+        //触发事件
+        trigger: function(name, data) {
+            each(this, function(i, e) {
+                //拥有原生事件的就触发
+                if (e[name] && (("on" + name) in e)) {
+                    e[name](data);
+                }
+            });
+        },
+        clone: function() {
+            return this.map(function(i, e) {
+                return e.cloneNode(true);
+            });
         }
     });
 

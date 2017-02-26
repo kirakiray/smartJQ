@@ -13,7 +13,7 @@
     </style>
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
-    <!--    <script src="jquery-3.1.1.js"></script>-->
+    <!--<script src="jquery-3.1.1.js"></script>-->
     <!--                        <script src="zepto.js"></script>-->
 </head>
 
@@ -137,6 +137,8 @@
 
     <div class="test_group">
         <div class="tar4_fade"></div>
+        <div class="tar4_fade2"></div>
+        <div class="tar4_fade2"></div>
         <div id="tar4">
             <div class="tar4_test1"></div>
             <div class="tar4_test2"></div>
@@ -155,6 +157,11 @@
 
                 //判断节点正确性
                 assert.ok($('.tar4_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4_test1').appendTo('.tar4_fade2');
+
+                //判断个数
+                assert.ok($('.tar4_fade2 .tar4_test1').length == 2, 'count ok2!');
             });
         </script>
     </div>
@@ -450,6 +457,28 @@
                 assert.ok($('#tar15_2').data('cao') == 300, 'data ok 4');
 
                 //                console.log($('#tar15_2').data());
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar16">
+            <div class="tar16_1"></div>
+            <div class="tar16_1"></div>
+        </div>
+        <script>
+            QUnit.test("event trigger", function(assert) {
+                //绑定原生事件
+                $('#tar16')[0].addEventListener('click', function() {
+                    assert.ok(true, 'trigger ok');
+                    console.log(arguments);
+                });
+
+                //触发事件
+                $('.tar16_1').eq(0).trigger('click', {
+                    "kaka": "luote"
+                });
             });
         </script>
     </div>
