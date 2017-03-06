@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <!--    <script src="../src/smartjq.js"></script>-->
+    <!--<script src="../src/smartjq.js"></script>-->
 
-    <script src="jquery-3.1.1.js"></script>
+    <!--<script src="jquery-3.1.1.js"></script>-->
     <!--    <script src="jquery-2.2.0.min.js"></script>-->
-    <!--        <script src="zepto.js"></script>-->
+    <script src="zepto.js"></script>
     <!--    <script src="../src/recordjq.js"></script>-->
 
 </head>
@@ -20,17 +20,59 @@
             <div class="tar6_bar"></div>
             <div class="tar6_baz"></div>
         </ul>
-        <ul>
+        <ul id="tar6_ul">
             <div class="tar6_baz"></div>
-            <div class="tar6_foo" id="tar6_foo_2"></div>
+            <div class="tar6_foo" id="tar6_foo_2">啊啊</div>
             <div class="tar6_bar"></div>
         </ul>
     </div>
 </body>
 <script>
-    aaa = $('div').map(function(i, e) {
-        return i;
-        console.log(arguments);
+    // $('#tar6').on('click', '#tar6_ul', {
+    //     haha: "hahahahahaha",
+    //     kaka: "kakakakakka"
+    // }, function(e) {
+    //     console.log(e);
+    //     // e.stopPropagation();
+    // });
+
+    // $('#tar6_ul').click(function(e) {
+    //     console.log("@tar6_ul", e);
+    // });
+    // $('#tar6').click(function(e) {
+    //     console.log("@tar6", e);
+    // });
+
+
+    // $('.tar6_baz').click(function(e) {
+    //     console.log("@tar611", e);
+    // });
+
+    // $('.tar6_baz').triggerHandler('click');
+
+    // document.querySelector('#tar6_ul').addEventListener('click', function(e) {
+    //     console.log("@tar6_ul", e);
+    // });
+    // document.querySelector('#tar6').addEventListener('click', function(e) {
+    //     console.log("@tar6", e);
+    // }, true, {
+    //     once: true
+    // });
+
+    var obj = {};
+    var $obj = $(obj);
+
+    $obj.on('haha', {
+        cus: "custiondata"
+    }, function(e) {
+        console.log('haha1 => ', e, arguments);
+        e.stopImmediatePropagation();
+    });
+    $obj.on('haha', function(e) {
+        console.log('haha2 => ', e);
+    });
+    $obj.trigger('haha', {
+        tt: "tt"
     });
 </script>
 

@@ -131,10 +131,10 @@
                 merge(arg1, this);
                 break;
             default:
-                if (arg1 instanceof smartyJQ) {
-                    return arg1;
-                } else {
+                if (arg1.nodeType) {
                     this.push(arg1);
+                } else if (arg1 instanceof smartyJQ) {
+                    return arg1;
                 }
 
         }
@@ -485,22 +485,60 @@
             var smartEventObj = smartEventData[eventName];
 
             var newArr = [];
-            each(smartEventObj, function(i, handleObj) {
-                var newEventObject = new $._Event(oriEvent, handleObj);
+            each(smartEventObj, function(i, callObj) {
+                var newEventObject = {};
 
-                newEventObject.type = eventName;
+                each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'screenX', 'screenY', 'targetTouches', 'toElement', 'touches', 'type', 'which'], function(i, e) {
+                    newEventObject[e] = oriEvent[e];
+                });
 
-                handleObj.f(newEventObject);
+                // extend(newEventObject, oriEvent);
 
-                if (!handleObj.o) {
-                    newArr.push(handleObj);
+                //合并jquery的方法
+                // extend(oriEvent, {
+                //     // originalEvent: oriEvent,
+                //     data: callObj.d,
+                //     isDefaultPrevented: "",
+                //     isImmediatePropagationStopped: "",
+                //     isPropagationStopped: "",
+                //     preventDefault: "",
+                //     stopImmediatePropagation: "",
+                //     stopPropagation: ""
+                // });
+
+
+                extend(newEventObject, {
+                    currentTarget: "",
+                    data: callObj.d,
+                    delegateTarget: "",
+                    handleObj: "",
+                    isDefaultPrevented: "",
+                    jQuery123123: "",
+                    // isImmediatePropagationStopped: "",
+                    // isPropagationStopped: "",
+                    originalEvent: oriEvent,
+                    relatedTarget: "",
+                    // preventDefault: "",
+                    // stopImmediatePropagation: "",
+                    // stopPropagation: "",
+                    target: "",
+                    timeStamp: "",
+                });
+
+                callObj.f(newEventObject);
+
+                //内存回收
+                // delete oriEvent.originalEvent;
+                // oriEvent.originalEvent = null;
+
+                if (!callObj.o) {
+                    newArr.push(callObj);
                 }
             });
             smartEventData[eventName] = smartEventObj = newArr;
         },
         //注册事件
         on: function(arg1, arg2, arg3, arg4, isOne) {
-            //@use---fn._tr
             var event, selectors, data, callback, _this = this;
             var eventArr = arg1.split(" ");
 
@@ -562,22 +600,12 @@
             });
         },
         //触发事件
-        trigger: function(eventName, data) {
-            each(this, function(i, tar) {
+        trigger: function(name, data) {
+            each(this, function(i, e) {
                 //拥有原生事件的就触发
-                if (tar[eventName] && (("on" + eventName) in tar)) {
-                    tar[eventName](data);
-                    return;
+                if (e[name] && (("on" + name) in e)) {
+                    e[name](data);
                 }
-
-                //触发自定义事件
-                prototypeObj._tr(tar, eventName);
-                // var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
-                // var smartEventObj = smartEventData[eventName];
-
-                // // smartEventObj && each(smartEventObj, function(i, e) {
-                // //     prototypeObj._tr(tar, eventName, oriEvent);
-                // // });
             });
         },
         clone: function() {
@@ -600,51 +628,20 @@
         makearray: makeArray,
         merge: merge,
         type: getType,
-        _Event: function(oriEvent, handleObj) {
-            var _this = this;
-
-            //添加相关属性
-            oriEvent && each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'screenX', 'screenY', 'targetTouches', 'toElement', 'touches', 'which'], function(i, e) {
-                _this[e] = oriEvent[e];
-            });
-
-            extend(_this, {
-                currentTarget: "",
-                data: handleObj.d,
-                delegateTarget: "",
-                //jquery用的EVENT寄生对象
-                // handleObj: "",
-                isDefaultPrevented: "",
-                // jQuery123123: "",
-                // isImmediatePropagationStopped: "",
-                // isPropagationStopped: "",
-                originalEvent: oriEvent,
-                relatedTarget: "",
-                // preventDefault: "",
-                // stopImmediatePropagation: "",
-                // stopPropagation: "",
-                target: "",
-                timeStamp: "",
-            });
-        }
+        _Event: function() {}
     });
 
     //主体event对象
     $._Event.prototype = {
         preventDefault: function() {
-            var originalEvent = this.originalEvent;
-            originalEvent && originalEvent.preventDefault();
+
         },
         stopPropagation: function() {
-            var originalEvent = this.originalEvent;
-            originalEvent && originalEvent.stopPropagation();
+
         },
-        isPropagationStopped: function() {},
         stopImmediatePropagation: function() {
-            var originalEvent = this.originalEvent;
-            originalEvent && originalEvent.stopImmediatePropagation();
-        },
-        isImmediatePropagationStopped: function() {},
+
+        }
     };
 
     glo.$ = $;
