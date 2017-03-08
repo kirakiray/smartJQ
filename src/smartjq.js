@@ -35,21 +35,24 @@
     //集大成each
     var each = (function() {
         var arreach = (function() {
-            if ([].forEach) {
+            if ([].some) {
                 return function(arrobj, func) {
-                    makeArray(arrobj).forEach(function(e, i) {
-                        func(i, e);
+                    makeArray(arrobj).some(function(e, i) {
+                        return func(i, e) === false;
                     });
                 };
             } else {
                 return function(arrobj, func) {
                     for (var len = arrobj.length, i = 0; i < len; i++) {
-                        func(i, arrobj[i]);
+                        if (func(i, arrobj[i]) === false) {
+                            break;
+                        };
                     }
                 };
             }
         })();
         return function(obj, func) {
+            if (!obj) return;
             if ('length' in obj) {
                 arreach(obj, func);
             } else if (getType(obj) == "object") {
@@ -479,7 +482,7 @@
             return this;
         },
         //模拟事件触发器
-        _tr: function(tar, eventName, oriEvent) {
+        _tr: function(tar, eventName, oriEvent, triggerData) {
             //@use---$._Event
             var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
             var smartEventObj = smartEventData[eventName];
@@ -488,15 +491,23 @@
             each(smartEventObj, function(i, handleObj) {
                 var newEventObject = new $._Event(oriEvent, handleObj);
 
+                //设置事件名
                 newEventObject.type = eventName;
 
-                handleObj.f(newEventObject);
+                //运行事件函数
+                handleObj.f(newEventObject, triggerData);
+
+                //判断是否阻止事件继续运行下去
+                if (newEventObject._ips) {
+                    return false;
+                }
 
                 if (!handleObj.o) {
                     newArr.push(handleObj);
                 }
             });
-            smartEventData[eventName] = smartEventObj = newArr;
+            smartEventData[eventName] = newArr;
+            smartEventObj = null;
         },
         //注册事件
         on: function(arg1, arg2, arg3, arg4, isOne) {
@@ -544,7 +555,7 @@
                         if (("on" + eventName) in tar) {
                             //绑定事件
                             tar.addEventListener(eventName, function(oriEvent) {
-                                prototypeObj._tr(tar, eventName, oriEvent);
+                                prototypeObj._tr(tar, eventName, oriEvent, oriEvent.detail);
                             });
                         }
                     }
@@ -566,18 +577,21 @@
             each(this, function(i, tar) {
                 //拥有原生事件的就触发
                 if (tar[eventName] && (("on" + eventName) in tar)) {
-                    tar[eventName](data);
+                    // tar[eventName](data);
+                    var event = new CustomEvent(eventName, {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true,
+                        detail: data
+                    });
+
+                    // Dispatch the event.
+                    tar.dispatchEvent(event);
                     return;
                 }
 
                 //触发自定义事件
-                prototypeObj._tr(tar, eventName);
-                // var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
-                // var smartEventObj = smartEventData[eventName];
-
-                // // smartEventObj && each(smartEventObj, function(i, e) {
-                // //     prototypeObj._tr(tar, eventName, oriEvent);
-                // // });
+                prototypeObj._tr(tar, eventName, null, data);
             });
         },
         clone: function() {
@@ -605,7 +619,7 @@
 
             //添加相关属性
             oriEvent && each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'screenX', 'screenY', 'targetTouches', 'toElement', 'touches', 'which'], function(i, e) {
-                _this[e] = oriEvent[e];
+                oriEvent[e] && (_this[e] = oriEvent[e]);
             });
 
             extend(_this, {
@@ -614,7 +628,7 @@
                 delegateTarget: "",
                 //jquery用的EVENT寄生对象
                 // handleObj: "",
-                isDefaultPrevented: "",
+                // isDefaultPrevented: "",
                 // jQuery123123: "",
                 // isImmediatePropagationStopped: "",
                 // isPropagationStopped: "",
@@ -631,20 +645,28 @@
 
     //主体event对象
     $._Event.prototype = {
+        isDefaultPrevented: function() {},
         preventDefault: function() {
             var originalEvent = this.originalEvent;
             originalEvent && originalEvent.preventDefault();
+            this._dp = true;
+        },
+        isPropagationStopped: function() {
+            return this._ps;
         },
         stopPropagation: function() {
             var originalEvent = this.originalEvent;
             originalEvent && originalEvent.stopPropagation();
+            this._ps = true;
         },
-        isPropagationStopped: function() {},
+        isImmediatePropagationStopped: function() {
+            return this._ips;
+        },
         stopImmediatePropagation: function() {
             var originalEvent = this.originalEvent;
             originalEvent && originalEvent.stopImmediatePropagation();
-        },
-        isImmediatePropagationStopped: function() {},
+            this._ips = true;
+        }
     };
 
     glo.$ = $;

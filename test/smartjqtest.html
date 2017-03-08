@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <!--<script src="../src/smartjq.js"></script>-->
+    <script src="../src/smartjq.js"></script>
 
     <!--<script src="jquery-3.1.1.js"></script>-->
-    <!--    <script src="jquery-2.2.0.min.js"></script>-->
-    <script src="zepto.js"></script>
+    <!--<script src="jquery-2.1.3.js"></script>-->
+    <!--<script src="zepto.js"></script>-->
     <!--    <script src="../src/recordjq.js"></script>-->
 
 </head>
@@ -59,21 +59,35 @@
     //     once: true
     // });
 
-    var obj = {};
-    var $obj = $(obj);
+    // var obj = {};
+    // var $obj = $(obj);
 
-    $obj.on('haha', {
-        cus: "custiondata"
-    }, function(e) {
-        console.log('haha1 => ', e, arguments);
-        e.stopImmediatePropagation();
+    // $obj.on('haha', {
+    //     cus: "custiondata"
+    // }, function(e) {
+    //     console.log('haha1 => ', e, arguments);
+    //     e.stopImmediatePropagation();
+    // });
+    // $obj.on('haha', function(e) {
+    //     console.log('haha2 => ', e);
+    // });
+    // $obj.trigger('haha', {
+    //     tt: "tt"
+    // });
+
+    $('#tar6')[0].onclick = function(e) {
+        console.log('@tar6 orn', arguments);
+    };
+    $('#tar6').on('haha', function(e) {
+        console.log('#tar6', arguments);
     });
-    $obj.on('haha', function(e) {
-        console.log('haha2 => ', e);
+    $('#tar6_ul').on('haha', function(e) {
+        console.log('#tar6_ul', arguments);
     });
-    $obj.trigger('haha', {
-        tt: "tt"
+    $('#tar6_foo_2').on('haha', function(e) {
+        console.log('#tar6_foo_2', arguments);
     });
+    $('#tar6_foo_2').trigger('haha', 'custom string HAHA', 'custom string HAHA22');
 </script>
 
 </html>
