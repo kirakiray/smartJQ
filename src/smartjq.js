@@ -34,23 +34,22 @@
 
     //集大成each
     var each = (function() {
-        var arreach = (function() {
-            if ([].some) {
-                return function(arrobj, func) {
-                    makeArray(arrobj).some(function(e, i) {
-                        return func(i, e) === false;
-                    });
-                };
-            } else {
-                return function(arrobj, func) {
-                    for (var len = arrobj.length, i = 0; i < len; i++) {
-                        if (func(i, arrobj[i]) === false) {
-                            break;
-                        };
-                    }
-                };
-            }
-        })();
+        var arreach;
+        if ([].some) {
+            arreach = function(arrobj, func) {
+                makeArray(arrobj).some(function(e, i) {
+                    return func(i, e) === false;
+                });
+            };
+        } else {
+            arreach = function(arrobj, func) {
+                for (var len = arrobj.length, i = 0; i < len; i++) {
+                    if (func(i, arrobj[i]) === false) {
+                        break;
+                    };
+                }
+            };
+        }
         return function(obj, func) {
             if (!obj) return;
             if ('length' in obj) {
@@ -65,11 +64,10 @@
 
     //合并数组
     var merge = function(arr1, arr2) {
-        each(arr1, function(i, e) {
-            arr2.push(e);
+        each(arr2, function(i, e) {
+            arr1.push(e);
         });
     };
-
 
     //查找元素的方法
     var findEles = function(owner, expr) {
@@ -103,7 +101,7 @@
             case "string":
                 if (/</.test(arg1)) {
                     //带有生成对象的类型
-                    merge(transToEles(arg1), this);
+                    merge(this, transToEles(arg1));
                 } else {
                     //查找元素
                     var eles = [];
@@ -122,7 +120,7 @@
                     } else if (!arg2) {
                         eles = findEles(document, arg1);
                     }
-                    merge(eles, this);
+                    merge(this, eles);
                 }
                 break;
             case "function":
@@ -131,7 +129,7 @@
                 }, false);
                 break;
             case "array":
-                merge(arg1, this);
+                merge(this, arg1);
                 break;
             default:
                 if (arg1 instanceof smartyJQ) {
@@ -481,21 +479,27 @@
             });
             return this;
         },
-        //模拟事件触发器
-        _tr: function(tar, eventName, oriEvent, triggerData) {
+        //smartEvent事件触发器
+        _tr: function(tar, eventName, oriEvent, triggerData, filterEle) {
             //@use---$._Event
             var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
             var smartEventObj = smartEventData[eventName];
 
             var newArr = [];
             each(smartEventObj, function(i, handleObj) {
-                var newEventObject = new $._Event(oriEvent, handleObj);
+                var newEventObject = new $._Event(oriEvent);
 
                 //设置事件名
                 newEventObject.type = eventName;
 
+                //设置数据
+                newEventObject.data = handleObj.d;
+
+                //设置事件对象
+                newEventObject.currentTarget = tar;
+
                 //运行事件函数
-                handleObj.f(newEventObject, triggerData);
+                handleObj.f.bind(tar)(newEventObject, triggerData);
 
                 //判断是否阻止事件继续运行下去
                 if (newEventObject._ips) {
@@ -512,6 +516,15 @@
         //注册事件
         on: function(arg1, arg2, arg3, arg4, isOne) {
             //@use---fn._tr
+
+            if (getType(arg1) == 'object') {
+                var _this = this;
+                each(arg1, function(eventName, callback) {
+                    _this.on(eventName);
+                });
+                return;
+            }
+
             var event, selectors, data, callback, _this = this;
             var eventArr = arg1.split(" ");
 
@@ -521,6 +534,7 @@
                     callback = arg2;
                     break;
                 case 'string':
+                    selectors = arg2;
                     if (getType(arg3) == "function") {
                         callback = arg3;
                     } else {
@@ -543,17 +557,12 @@
                     var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
                     var smartEventObj = smartEventData[eventName];
 
-                    if (getType(arg2) == "string") {
-                        selectors = findEles(tar, arg2);
-                    }
-
                     if (!smartEventObj) {
                         //设定事件对象
                         smartEventObj = (smartEventData[eventName] = []);
 
-                        //判断是否支持该事件
-                        if (("on" + eventName) in tar) {
-                            //绑定事件
+                        //属于事件元素的，则绑定事件
+                        if (tar instanceof EventTarget) {
                             tar.addEventListener(eventName, function(oriEvent) {
                                 prototypeObj._tr(tar, eventName, oriEvent, oriEvent.detail);
                             });
@@ -575,18 +584,15 @@
         //触发事件
         trigger: function(eventName, data) {
             each(this, function(i, tar) {
-                //拥有原生事件的就触发
-                if (tar[eventName] && (("on" + eventName) in tar)) {
-                    // tar[eventName](data);
-                    var event = new CustomEvent(eventName, {
+                //拥有EventTarget的就触发
+                if (tar instanceof EventTarget) {
+                    // 触发自定义CustomEvent
+                    tar.dispatchEvent(new CustomEvent(eventName, {
                         'view': window,
                         'bubbles': true,
                         'cancelable': true,
                         detail: data
-                    });
-
-                    // Dispatch the event.
-                    tar.dispatchEvent(event);
+                    }));
                     return;
                 }
 
@@ -614,56 +620,51 @@
         makearray: makeArray,
         merge: merge,
         type: getType,
-        _Event: function(oriEvent, handleObj) {
+        _Event: function(oriEvent) {
             var _this = this;
 
-            //添加相关属性
-            oriEvent && each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'screenX', 'screenY', 'targetTouches', 'toElement', 'touches', 'which'], function(i, e) {
-                oriEvent[e] && (_this[e] = oriEvent[e]);
-            });
+            if (oriEvent) {
+                //添加相关属性
+                each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'toElement', 'touches', 'which'], function(i, e) {
+                    oriEvent[e] && (_this[e] = oriEvent[e]);
+                });
+
+                //判断是否自定义事件
+                _this._oe = _this.originalEvent = oriEvent;
+            }
 
             extend(_this, {
-                currentTarget: "",
-                data: handleObj.d,
+                // currentTarget: "",
+                // data: handleObj.d,
                 delegateTarget: "",
-                //jquery用的EVENT寄生对象
-                // handleObj: "",
-                // isDefaultPrevented: "",
-                // jQuery123123: "",
-                // isImmediatePropagationStopped: "",
-                // isPropagationStopped: "",
-                originalEvent: oriEvent,
-                relatedTarget: "",
-                // preventDefault: "",
-                // stopImmediatePropagation: "",
-                // stopPropagation: "",
-                target: "",
-                timeStamp: "",
+                timeStamp: new Date().getTime(),
             });
         }
     });
 
     //主体event对象
     $._Event.prototype = {
-        isDefaultPrevented: function() {},
+        isDefaultPrevented: function() {
+            return this._dp || false;
+        },
+        isPropagationStopped: function() {
+            return this._ps || false;
+        },
+        isImmediatePropagationStopped: function() {
+            return this._ips || false;
+        },
         preventDefault: function() {
-            var originalEvent = this.originalEvent;
+            var originalEvent = this._oe;
             originalEvent && originalEvent.preventDefault();
             this._dp = true;
         },
-        isPropagationStopped: function() {
-            return this._ps;
-        },
         stopPropagation: function() {
-            var originalEvent = this.originalEvent;
+            var originalEvent = this._oe;
             originalEvent && originalEvent.stopPropagation();
             this._ps = true;
         },
-        isImmediatePropagationStopped: function() {
-            return this._ips;
-        },
         stopImmediatePropagation: function() {
-            var originalEvent = this.originalEvent;
+            var originalEvent = this._oe;
             originalEvent && originalEvent.stopImmediatePropagation();
             this._ips = true;
         }

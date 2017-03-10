@@ -16,14 +16,14 @@
 <body>
     <div id="tar6">
         <ul>
-            <div class="tar6_foo aaaa bbbb"></div>
-            <div class="tar6_bar"></div>
-            <div class="tar6_baz"></div>
+            <div class="tar6_foo aaaa bbbb">tar6_foo</div>
+            <div class="tar6_bar">tar6_bar</div>
+            <div class="tar6_baz">tar6_baz</div>
         </ul>
         <ul id="tar6_ul">
-            <div class="tar6_baz"></div>
-            <div class="tar6_foo" id="tar6_foo_2">啊啊</div>
-            <div class="tar6_bar"></div>
+            <div class="tar6_baz">tar6_baz2</div>
+            <div class="tar6_foo" id="tar6_foo_2">tar6_foo2</div>
+            <div class="tar6_bar">tar6_bar2</div>
         </ul>
     </div>
 </body>
@@ -78,16 +78,17 @@
     $('#tar6')[0].onclick = function(e) {
         console.log('@tar6 orn', arguments);
     };
-    $('#tar6').on('haha', function(e) {
-        console.log('#tar6', arguments);
+    $('#tar6').on('click', function(e) {
+        console.log('#tar6', arguments, this);
     });
-    $('#tar6_ul').on('haha', function(e) {
-        console.log('#tar6_ul', arguments);
+    $('#tar6_ul').on('click', function(e) {
+        e.stopPropagation();
+        console.log('#tar6_ul', arguments, this);
     });
-    $('#tar6_foo_2').on('haha', function(e) {
-        console.log('#tar6_foo_2', arguments);
+    $('#tar6_foo_2').on('click', function(e) {
+        console.log('#tar6_foo_2 mopve', arguments, this);
     });
-    $('#tar6_foo_2').trigger('haha', 'custom string HAHA', 'custom string HAHA22');
+    $('#tar6_foo_2').trigger('click', 'custom string HAHA', 'custom string HAHA22');
 </script>
 
 </html>
