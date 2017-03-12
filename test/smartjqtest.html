@@ -25,16 +25,21 @@
             <div class="tar6_foo" id="tar6_foo_2">tar6_foo2</div>
             <div class="tar6_bar">tar6_bar2</div>
         </ul>
+        <ul id="tar6_ul2">
+            <div class="tar6_baz">tar6_baz2</div>
+            <div class="tar6_foo" id="tar6_foo_3">tar6_foo2</div>
+            <div class="tar6_bar">tar6_bar2</div>
+        </ul>
     </div>
 </body>
 <script>
-    // $('#tar6').on('click', '#tar6_ul', {
-    //     haha: "hahahahahaha",
-    //     kaka: "kakakakakka"
-    // }, function(e) {
-    //     console.log(e);
-    //     // e.stopPropagation();
-    // });
+    $('#tar6').on('click', '#tar6_ul,#tar6_ul2', {
+        haha: "hahahahahaha",
+        kaka: "kakakakakka"
+    }, function(e) {
+        console.log(e);
+        // e.stopPropagation();
+    });
 
     // $('#tar6_ul').click(function(e) {
     //     console.log("@tar6_ul", e);
@@ -75,20 +80,20 @@
     //     tt: "tt"
     // });
 
-    $('#tar6')[0].onclick = function(e) {
-        console.log('@tar6 orn', arguments);
-    };
-    $('#tar6').on('click', function(e) {
-        console.log('#tar6', arguments, this);
-    });
-    $('#tar6_ul').on('click', function(e) {
-        e.stopPropagation();
-        console.log('#tar6_ul', arguments, this);
-    });
-    $('#tar6_foo_2').on('click', function(e) {
-        console.log('#tar6_foo_2 mopve', arguments, this);
-    });
-    $('#tar6_foo_2').trigger('click', 'custom string HAHA', 'custom string HAHA22');
+    // $('#tar6')[0].onclick = function(e) {
+    //     console.log('@tar6 orn', arguments);
+    // };
+    // $('#tar6').on('click', function(e) {
+    //     console.log('#tar6', arguments, this);
+    // });
+    // $('#tar6_ul').on('click', function(e) {
+    //     // e.stopPropagation();
+    //     console.log('#tar6_ul', arguments, this);
+    // });
+    // $('#tar6_foo_2').on('click', function(e) {
+    //     console.log('#tar6_foo_2 mopve', arguments, this);
+    // });
+    // $('#tar6_foo_2').trigger('click', 'custom string HAHA', 'custom string HAHA22');
 </script>
 
 </html>
