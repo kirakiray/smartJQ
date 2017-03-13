@@ -486,7 +486,7 @@
             var smartEventData = ele[SMARTKEY + "e"] || (ele[SMARTKEY + "e"] = {});
             var smartEventObj = smartEventData[eventName];
 
-            targets = findEles(ele, targets);
+            ele instanceof Node && (targets = findEles(ele, targets));
 
             var newArr = [];
             each(smartEventObj, function(i, handleObj) {
@@ -499,7 +499,7 @@
                 var cancall = 0;
 
                 //设置targets
-                if (targets) {
+                if (targets && getType(targets) != "string") {
                     each($(newEventObject.target).parents(), function(i, e) {
                         if (ele == e) {
                             return false;
@@ -512,7 +512,7 @@
                             }
                         });
                         if (cancall) {
-                            return;
+                            return false;
                         }
                     });
                 } else {
@@ -528,7 +528,8 @@
                     newEventObject.currentTarget = ct;
 
                     //运行事件函数
-                    handleObj.f.bind(ele)(newEventObject, triggerData);
+                    var f = handleObj.f.bind(ele);
+                    triggerData ? f(newEventObject, triggerData) : f(newEventObject);
 
                     //判断是否阻止事件继续运行下去
                     if (newEventObject._ips) {
@@ -599,7 +600,8 @@
                         //属于事件元素的，则绑定事件
                         if (tar instanceof EventTarget) {
                             tar.addEventListener(eventName, function(oriEvent) {
-                                prototypeObj._tr(tar, eventName, oriEvent, oriEvent.detail, selectors);
+                                var data = oriEvent._args;
+                                prototypeObj._tr(tar, eventName, oriEvent, data, selectors);
                             });
                         }
                     }
@@ -621,18 +623,27 @@
             each(this, function(i, tar) {
                 //拥有EventTarget的就触发
                 if (tar instanceof EventTarget) {
+                    var EventClass;
+                    if (eventName == "click") {
+                        EventClass = MouseEvent;
+                    } else if (eventName == "focus" && eventName in tar) {
+                        tar[eventName]();
+                        return;
+                    } else {
+                        EventClass = Event;
+                    }
                     // 触发自定义CustomEvent
-                    tar.dispatchEvent(new CustomEvent(eventName, {
+                    var event = new EventClass(eventName, {
                         'view': window,
                         'bubbles': true,
-                        'cancelable': true,
-                        detail: data
-                    }));
-                    return;
+                        'cancelable': true
+                    });
+                    event._args = data;
+                    tar.dispatchEvent(event);
+                } else {
+                    //触发自定义事件
+                    prototypeObj._tr(tar, eventName, null, data);
                 }
-
-                //触发自定义事件
-                prototypeObj._tr(tar, eventName, null, data);
             });
         },
         clone: function() {
@@ -660,20 +671,15 @@
 
             if (oriEvent) {
                 //添加相关属性
-                each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'toElement', 'touches', 'which'], function(i, e) {
+                each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(i, e) {
                     (oriEvent[e] != undefined) && (_this[e] = oriEvent[e]);
                 });
 
                 //判断是否自定义事件
-                _this._oe = _this.originalEvent = oriEvent;
+                _this.originalEvent = oriEvent;
             }
 
-            extend(_this, {
-                // currentTarget: "",
-                // data: handleObj.d,
-                // delegateTarget: "",
-                timeStamp: new Date().getTime(),
-            });
+            _this.timeStamp || (_this.timeStamp = new Date().getTime());
         }
     });
 
@@ -689,17 +695,17 @@
             return this._ips || false;
         },
         preventDefault: function() {
-            var originalEvent = this._oe;
+            var originalEvent = this.originalEvent;
             originalEvent && originalEvent.preventDefault();
             this._dp = true;
         },
         stopPropagation: function() {
-            var originalEvent = this._oe;
+            var originalEvent = this.originalEvent;
             originalEvent && originalEvent.stopPropagation();
             this._ps = true;
         },
         stopImmediatePropagation: function() {
-            var originalEvent = this._oe;
+            var originalEvent = this.originalEvent;
             originalEvent && originalEvent.stopImmediatePropagation();
             this._ips = true;
         }

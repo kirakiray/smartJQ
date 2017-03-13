@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <script src="../src/smartjq.js"></script>
+    <!--<script src="../src/smartjq.js"></script>-->
 
     <!--<script src="jquery-3.1.1.js"></script>-->
-    <!--<script src="jquery-2.1.3.js"></script>-->
+    <script src="jquery-2.1.3.js"></script>
     <!--<script src="zepto.js"></script>-->
     <!--    <script src="../src/recordjq.js"></script>-->
 
@@ -31,15 +31,21 @@
             <div class="tar6_bar">tar6_bar2</div>
         </ul>
     </div>
+    <div class="text_con"><input type="text" id="test_input"></div>
+    <!--<a href="http://myzaker.com" id="kakalink"></a>-->
 </body>
 <script>
-    $('#tar6').on('click', '#tar6_ul,#tar6_ul2', {
-        haha: "hahahahahaha",
-        kaka: "kakakakakka"
-    }, function(e) {
-        console.log(e);
-        // e.stopPropagation();
-    });
+    // setTimeout(function() {
+    //     $('#kakalink').trigger('click');
+    // }, 1000);
+
+    // $('#tar6').on('click', '#tar6_ul,#tar6_ul2', {
+    //     haha: "hahahahahaha",
+    //     kaka: "kakakakakka"
+    // }, function(e) {
+    //     console.log(e);
+    //     // e.stopPropagation();
+    // });
 
     // $('#tar6_ul').click(function(e) {
     //     console.log("@tar6_ul", e);
@@ -64,36 +70,52 @@
     //     once: true
     // });
 
-    // var obj = {};
-    // var $obj = $(obj);
+    var obj = {};
+    var $obj = $(obj);
 
-    // $obj.on('haha', {
-    //     cus: "custiondata"
-    // }, function(e) {
-    //     console.log('haha1 => ', e, arguments);
-    //     e.stopImmediatePropagation();
-    // });
-    // $obj.on('haha', function(e) {
-    //     console.log('haha2 => ', e);
-    // });
-    // $obj.trigger('haha', {
-    //     tt: "tt"
-    // });
+    $obj.on('haha', {
+        cus: "custiondata"
+    }, function(e) {
+        console.log('haha1 => ', e, arguments);
+        e.stopImmediatePropagation();
+    });
+    $obj.on('haha', function(e) {
+        console.log('haha2 => ', e);
+    });
+    $obj.trigger('haha', {
+        tt: "tt"
+    });
 
     // $('#tar6')[0].onclick = function(e) {
     //     console.log('@tar6 orn', arguments);
     // };
-    // $('#tar6').on('click', function(e) {
+    // $('#tar6').on('haha', function(e) {
     //     console.log('#tar6', arguments, this);
     // });
-    // $('#tar6_ul').on('click', function(e) {
+    // $('#tar6_ul').on('haha', function(e) {
     //     // e.stopPropagation();
     //     console.log('#tar6_ul', arguments, this);
     // });
-    // $('#tar6_foo_2').on('click', function(e) {
+    // $('#tar6_foo_2').on('haha', function(e) {
     //     console.log('#tar6_foo_2 mopve', arguments, this);
     // });
-    // $('#tar6_foo_2').trigger('click', 'custom string HAHA', 'custom string HAHA22');
+    // $('#tar6_foo_2').trigger('haha', 'custom string HAHA', 'custom string HAHA22');
+
+    // document.querySelector('.text_con').addEventListener('click', function() {
+    //     console.log('原生1 =>', arguments);
+    // });
+    // $('.text_con').on('click', function() {
+    //     console.log('text_con => ', arguments);
+    // });
+    // document.querySelector('#test_input').addEventListener('click', function() {
+    //     console.log('原生2 =>', arguments);
+    // });
+    // $('#test_input').on('click', function(e) {
+    //     console.log('聚焦了=>', arguments);
+    // });
+    // $('#test_input').trigger('click', "111");
+    // $('#test_input')[0].click();
+    // $('#test_input').trigger('click', "222");
 </script>
 
 </html>
