@@ -403,6 +403,29 @@
 
 
     <div class="test_group">
+        <div id="tar13_1">
+            <div class="tar13_1_con haha">
+                <div class="tar13_1_ch"></div>
+            </div>
+            <div class="tar13_1_con haha">
+                <div class="tar13_1_ch"></div>
+            </div>
+            <div class="tar13_1_con">
+                <div class="tar13_1_ch"></div>
+                <div class="tar13_1_ch"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("parentsUntil", function(assert) {
+                assert.ok($('.tar13_1_ch').parentsUntil('.test_group').length == 4, 'parentUntil count ok');
+                assert.ok($('.tar13_1_ch').parentsUntil('.test_group', '.haha').length == 2, 'filter count ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
         <div id="tar14">
             <div class="tar14_ele1">
                 <div class="tar14_ele_c1"></div>
@@ -472,7 +495,7 @@
                 //绑定原生事件
                 $('#tar16')[0].addEventListener('click', function() {
                     assert.ok(true, 'trigger ok');
-                    console.log(arguments);
+                    // console.log(arguments);
                 });
 
                 //触发事件
@@ -482,6 +505,61 @@
             });
         </script>
     </div>
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar17">
+            <div class="tar17_con">
+                <div class="tar17_con_ele1"></div>
+                <div class="tar17_con_ele2"></div>
+                <div class="tar17_con_ele3"></div>
+            </div>
+            <div class="tar17_con">
+                <div class="tar17_con_ele1"></div>
+                <div class="tar17_con_ele2"></div>
+                <div class="tar17_con_ele4"></div>
+            </div>
+            <div class="tar17_con2">
+                <div class="tar17_con2_ele1"></div>
+                <div class="tar17_con2_ele2"></div>
+                <div class="tar17_con2_ele4"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("event on:count", function(assert) {
+                assert.expect(2);　　
+                $('.tar17_con').on('haha', function(e) {
+                    assert.ok(true, 'base on event ok');
+                });
+                $('.tar17_con').trigger('haha');
+            });
+            QUnit.test("event on:data", function(assert) {
+                $('.tar17_con').on('haha2', {
+                    kaka: "luote"
+                }, function(e, data) {
+                    // console.log(arguments);
+                    assert.ok(data.haha == "hahadata", 'data ok1');
+                    assert.ok(e.data.kaka == "luote", 'data ok2');
+                });
+                $('.tar17_con').trigger('haha2', {
+                    haha: "hahadata"
+                });
+            });
+            QUnit.test("event on:selector", function(assert) {
+                $('#tar17').on('haha', '.tar17_con2', function(e) {
+                    assert.ok(e.currentTarget == $('.tar17_con2')[0], 'currentTarget ok');
+                    assert.ok(e.delegateTarget == $('#tar17')[0], 'delegateTarget ok');
+                    assert.ok(e.target == $('.tar17_con2_ele2')[0], 'target ok');
+                    console.log(e);
+                });
+                $('.tar17_con2_ele2').trigger('haha');
+            });
+        </script>
+    </div>
+
 
 
 

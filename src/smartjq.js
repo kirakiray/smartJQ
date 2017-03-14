@@ -365,34 +365,30 @@
             });
         },
         parent: function(expr) {
-            //@use---fn.map
             var arr = [];
-            if (expr) {
-                each(this, function(i, e) {
-                    var parentNode = e.parentNode;
-                    if (judgeEle(parentNode, expr) && arr.indexOf(parentNode) == -1) {
-                        arr.push(parentNode);
+            each(this, function(i, e) {
+                var parentNode = e.parentNode;
+                //确定没有重复
+                if (arr.indexOf(parentNode) == -1) {
+                    //有标识但找不到
+                    if (expr && !judgeEle(parentNode, expr)) {
+                        return;
                     }
-                });
-            } else {
-                each(this, function(i, e) {
-                    var parentNode = e.parentNode;
-                    if (arr.indexOf(parentNode) == -1) {
-                        arr.push(parentNode);
-                    }
-                });
-            }
+                    arr.push(parentNode);
+                }
+            });
             return $(arr);
         },
-        parents: function(selector) {
-            //@use---fn.filter
+        parentsUntil: function(expr, selector) {
+            //@use---fn.parents
             var arr = [],
-                tars = this;
+                tars = this,
+                lastEles = $(expr);
             while (tars.length > 0) {
                 var newtars = [];
                 each(tars, function(i, e) {
                     var parentNode = e.parentNode;
-                    if (parentNode && parentNode != document && arr.indexOf(parentNode) < 0) {
+                    if (parentNode && arr.indexOf(parentNode) < 0 && lastEles.indexOf(parentNode) < 0) {
                         arr.push(parentNode);
                         if (newtars.indexOf() < 0) {
                             newtars.push(parentNode);
@@ -402,6 +398,10 @@
                 tars = newtars;
             };
             return selector ? $(arr).filter(selector) : $(arr);
+        },
+        parents: function(selector) {
+            //@use---fn.parentsUntil
+            return this.parentsUntil(document, selector);
         },
         each: function(func) {
             each(this, function(i, e) {
@@ -480,13 +480,11 @@
             return this;
         },
         //smartEvent事件触发器
-        _tr: function(ele, eventName, oriEvent, triggerData, targets) {
+        _tr: function(ele, eventName, oriEvent, triggerData, delegatetargets) {
             //@use---$._Event
-            //@use---fn.parents
+            //@use---fn.parentsUntil
             var smartEventData = ele[SMARTKEY + "e"] || (ele[SMARTKEY + "e"] = {});
             var smartEventObj = smartEventData[eventName];
-
-            ele instanceof Node && (targets = findEles(ele, targets));
 
             var newArr = [];
             each(smartEventObj, function(i, handleObj) {
@@ -498,23 +496,13 @@
                 //是否可以call
                 var cancall = 0;
 
-                //设置targets
-                if (targets && getType(targets) != "string") {
-                    each($(newEventObject.target).parents(), function(i, e) {
-                        if (ele == e) {
-                            return false;
-                        }
-                        each(targets, function(i, e2) {
-                            if (e == e2) {
-                                cancall = 1;
-                                ct = e2;
-                                return false;
-                            }
-                        });
-                        if (cancall) {
-                            return false;
-                        }
-                    });
+                var tarparent = $(newEventObject.target).parentsUntil(ele, delegatetargets);
+
+                if (delegatetargets) {
+                    if (tarparent.length) {
+                        ct = tarparent[0];
+                        cancall = 1;
+                    }
                 } else {
                     cancall = 1;
                 }
@@ -626,7 +614,7 @@
                     var EventClass;
                     if (eventName == "click") {
                         EventClass = MouseEvent;
-                    } else if (eventName == "focus" && eventName in tar) {
+                    } else if (eventName in tar && ("on" + eventName) in tar) {
                         tar[eventName]();
                         return;
                     } else {
@@ -646,11 +634,11 @@
                 }
             });
         },
-        clone: function() {
-            return this.map(function(i, e) {
-                return e.cloneNode(true);
-            });
-        }
+        // clone: function() {
+        //     return this.map(function(i, e) {
+        //         return e.cloneNode(true);
+        //     });
+        // }
     });
 
     //init
