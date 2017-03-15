@@ -483,7 +483,8 @@
         _tr: function(ele, eventName, oriEvent, triggerData, delegatetargets) {
             //@use---$._Event
             //@use---fn.parentsUntil
-            var smartEventData = ele[SMARTKEY + "e"] || (ele[SMARTKEY + "e"] = {});
+            var smartEventData = ele[SMARTKEY + "e"];
+            if (!smartEventData) { return; }
             var smartEventObj = smartEventData[eventName];
 
             var newArr = [];
@@ -496,9 +497,8 @@
                 //是否可以call
                 var cancall = 0;
 
-                var tarparent = $(newEventObject.target).parentsUntil(ele, delegatetargets);
-
                 if (delegatetargets) {
+                    var tarparent = $(newEventObject.target).parentsUntil(ele, delegatetargets);
                     if (tarparent.length) {
                         ct = tarparent[0];
                         cancall = 1;
@@ -514,6 +514,7 @@
                     //设置数据
                     newEventObject.data = handleObj.d;
                     newEventObject.currentTarget = ct;
+                    newEventObject.target || (newEventObject.target = ele);
 
                     //运行事件函数
                     var f = handleObj.f.bind(ele);
@@ -578,7 +579,13 @@
 
                 each(_this, function(i, tar) {
                     //事件寄宿对象
-                    var smartEventData = tar[SMARTKEY + "e"] || (tar[SMARTKEY + "e"] = {});
+                    tar[SMARTKEY + "e"] || Object.defineProperty(tar, SMARTKEY + "e", {
+                        // enumerable: false,
+                        configurable: true,
+                        writable: true,
+                        value: {}
+                    });
+                    var smartEventData = tar[SMARTKEY + "e"];
                     var smartEventObj = smartEventData[eventName];
 
                     if (!smartEventObj) {

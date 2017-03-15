@@ -14,6 +14,7 @@
     <script src="qunit-1.15.0.js"></script>
     <script src="../src/smartjq.js"></script>
     <!--<script src="jquery-3.1.1.js"></script>-->
+    <!--<script src="jquery-2.1.3.js"></script>-->
     <!--<script src="zepto.js"></script>-->
 </head>
 
@@ -553,9 +554,57 @@
                     assert.ok(e.currentTarget == $('.tar17_con2')[0], 'currentTarget ok');
                     assert.ok(e.delegateTarget == $('#tar17')[0], 'delegateTarget ok');
                     assert.ok(e.target == $('.tar17_con2_ele2')[0], 'target ok');
-                    console.log(e);
+                    // console.log(e);
                 });
                 $('.tar17_con2_ele2').trigger('haha');
+            });
+            QUnit.test("event:custom object", function(assert) {
+                var obj = {};
+
+                $(obj).on('haha', {
+                    ondata: true
+                }, function(e, td) {
+                    console.log('haha', obj, e, td);
+                    assert.ok(e.currentTarget == obj, 'custom object currentTarget ok');
+                    assert.ok(e.delegateTarget == obj, 'custom object delegateTarget ok');
+                    assert.ok(e.target == obj, 'custom object target ok');
+                    assert.ok(e.data.ondata, 'custom object data ok1');
+                    assert.ok(td.triggerdata, 'custom object data ok2');
+                });
+
+                $(obj).trigger('haha', {
+                    triggerdata: true
+                });
+            });
+            QUnit.test("event:stopImmediatePropagation", function(assert) {
+                var obj = {};
+                $(obj).on('haha', function(e) {
+                    assert.ok(true, 'custom ok');
+                    //禁止传递事件
+                    e.stopImmediatePropagation();
+                });
+
+                $(obj).on('haha', function(e) {
+                    throw "error";
+                });
+
+                $(obj).trigger('haha');
+            });
+            QUnit.test("event:stopPropagation", function(assert) {
+                $('#tar17').on('haha3', function(e) {
+                    throw "error";
+                });
+
+                $('.tar17_con2').on('haha3', function(e) {
+                    assert.ok(true, 'Propagation ok');
+                    e.stopPropagation();
+                });
+
+                $('.tar17_con2_ele4').on('haha3', function(e) {
+                    assert.ok(true, 'event ok');
+                });
+
+                $('.tar17_con2_ele4').trigger('haha3');
             });
         </script>
     </div>
