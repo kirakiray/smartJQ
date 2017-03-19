@@ -528,6 +528,7 @@
                 <div class="tar17_con2_ele2"></div>
                 <div class="tar17_con2_ele4"></div>
             </div>
+            <a id="tar17_link" href="http://github.com/"></a>
         </div>
         <script>
             QUnit.test("event on:count", function(assert) {
@@ -564,7 +565,7 @@
                 $(obj).on('haha', {
                     ondata: true
                 }, function(e, td) {
-                    console.log('haha', obj, e, td);
+                    // console.log('haha', obj, e, td);
                     assert.ok(e.currentTarget == obj, 'custom object currentTarget ok');
                     assert.ok(e.delegateTarget == obj, 'custom object delegateTarget ok');
                     assert.ok(e.target == obj, 'custom object target ok');
@@ -605,6 +606,180 @@
                 });
 
                 $('.tar17_con2_ele4').trigger('haha3');
+            });
+            QUnit.test("event:preventDefault", function(assert) {
+                $('#tar17_link').on('click', function(e) {
+                    assert.ok(true, 'preventDefault ok');
+                    e.preventDefault();
+                });
+
+                $('#tar17_link').trigger('click');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div class="tar18_ele1"></div>
+        <div class="tar18_ele2"></div>
+        <div id="tar18">
+            <div class="tar18_ele3">
+                <div class="tar18_child3"></div>
+            </div>
+            <div class="tar18_ele4">
+                <div class="tar18_child4"></div>
+            </div>
+        </div>
+        <div id="tar18_2">
+            <div class="tar18_ele5">
+                <div class="tar18_child5"></div>
+            </div>
+            <div class="tar18_ele6">
+                <div class="tar18_child6"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("event:off", function(assert) {
+                assert.expect(7);
+                $('.tar18_ele1').on('haha', function() {
+                    throw "haha";
+                });
+                $('.tar18_ele1').on('haha', function() {
+                    throw "haha2";
+                });
+                assert.ok(true, 'event ready');
+                //测试是否注销haha事件
+                $('.tar18_ele1').off('haha');
+                $('.tar18_ele1').trigger('haha');
+
+
+                var callfun = function() {
+                    throw "haha3";
+                };
+                $('.tar18_ele2').on('haha', callfun);
+                $('.tar18_ele2').on('haha', function() {
+                    assert.ok(true, 'event ok1');
+                });
+                //测试是否注销特定函数
+                $('.tar18_ele2').off('haha', callfun);
+                $('.tar18_ele2').trigger('haha');
+
+
+                $('#tar18').on('haha', '.tar18_ele3', callfun);
+                $('#tar18').on('haha', '.tar18_ele3', function() {
+                    assert.ok(true, 'event ok2');
+                });
+                $('#tar18').on('haha', '.tar18_ele4', callfun);
+                $('#tar18').on('haha', '.tar18_ele4', function() {
+                    assert.ok(true, 'event ok3');
+                });
+                //测试是否去除公用的函数
+                $('#tar18').off('haha', callfun);
+                $('.tar18_child3').trigger('haha');
+                $('.tar18_child4').trigger('haha');
+
+                var callfun2 = function() {
+                    if (this.classList.contains('tar18_ele5')) {
+                        throw "haha4";
+                    } else {
+                        assert.ok(true, 'event ok5');
+                    }
+                };
+                $('#tar18_2').on('haha', '.tar18_ele5', callfun2);
+                $('#tar18_2').on('haha', '.tar18_ele5', function() {
+                    assert.ok(true, 'event ok4');
+                });
+                $('#tar18_2').on('haha', '.tar18_ele6', callfun2);
+                $('#tar18_2').on('haha', '.tar18_ele6', function() {
+                    assert.ok(true, 'event ok6');
+                });
+                $('#tar18_2').off('haha', '.tar18_ele5', callfun2);
+                $('.tar18_child5').trigger('haha');
+                $('.tar18_child6').trigger('haha');
+
+                // //测试清空所有
+                $('#tar18').off();
+                $('#tar18').trigger('haha');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <script>
+            QUnit.test("event:one", function(assert) {
+                assert.expect(3);
+                var obj = {};
+                $(obj).one('haha', {
+                    onedata: true
+                }, function(e, data) {
+                    assert.ok(true, 'base');
+                    assert.ok(data.triggerdata == 1, 'data ok');
+                    assert.ok(e.data.onedata, 'data ok2');
+                });
+
+                $(obj).trigger('haha', {
+                    triggerdata: 1
+                });
+                $(obj).trigger('haha', {
+                    triggerdata: 2
+                });
+                $(obj).trigger('haha', {
+                    triggerdata: 3
+                });
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <script>
+            QUnit.test("bind and unbind", function(assert) {
+                assert.expect(3);
+                var obj = {};
+                $(obj).bind('haha', {
+                    b: true
+                }, function(e, data) {
+                    assert.ok(true, 'base');
+                    assert.ok(data.t, 'data ok');
+                    assert.ok(e.data.b, 'data ok2');
+                });
+                $(obj).trigger('haha', {
+                    t: true
+                });
+
+                $(obj).unbind('haha');
+                $(obj).trigger('haha', {
+                    t: true
+                });
+            });
+        </script>
+    </div>
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar19">
+            <a class="tar19_ele1" href="#error"></a>
+        </div>
+        <script>
+            QUnit.test("triggerHandler", function(assert) {
+                $('#tar19').click(function(e) {
+                    throw "haha error";
+                });
+                $('.tar19_ele1').click(function(e) {
+                    assert.ok(true, 'ok');
+                });
+                $('.tar19_ele1').triggerHandler('click');
             });
         </script>
     </div>

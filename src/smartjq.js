@@ -438,6 +438,15 @@
             });
             return this;
         },
+        //获取制定对象数据的方法
+        _ge: function(obj, keyname) {
+            obj[keyname] || Object.defineProperty(obj, keyname, {
+                configurable: true,
+                writable: true,
+                value: {}
+            });
+            return obj[keyname];
+        },
         data: function(name, value) {
             var smartData;
             switch (getType(name)) {
@@ -447,19 +456,19 @@
                         if (!tar) {
                             return;
                         }
-                        smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
+                        smartData = prototypeObj._ge(tar, SMARTKEY);
 
                         return smartData[name] || tar.dataset[name];
                     } else {
                         each(this, function(i, tar) {
-                            smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
+                            smartData = prototypeObj._ge(tar, SMARTKEY);
                             smartData[name] = value;
                         });
                     }
                     break;
                 case "object":
                     each(this, function(i, tar) {
-                        smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
+                        smartData = prototypeObj._ge(tar, SMARTKEY);
                         each(name, function(name, value) {
                             smartData[name] = value;
                         });
@@ -467,28 +476,30 @@
                     break;
                 case "undefined":
                     var tar = this[0];
-                    smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
+                    smartData = tar[SMARTKEY] || {};
                     return extend({}, tar.dataset, smartData);
             }
             return this;
         },
         removeData: function(name) {
             each(this, function(i, tar) {
-                var smartData = tar[SMARTKEY] || (tar[SMARTKEY] = {});
+                var smartData = prototypeObj._ge(tar, SMARTKEY);
                 delete smartData[name];
             });
             return this;
         },
         //smartEvent事件触发器
-        _tr: function(ele, eventName, oriEvent, triggerData, delegatetargets) {
+        // _tr: function(ele, eventName, oriEvent, triggerData, delegatetargets) {
+        _tr: function(ele, eventName, oriEvent, triggerData) {
             //@use---$._Event
             //@use---fn.parentsUntil
             var smartEventData = ele[SMARTKEY + "e"];
-            if (!smartEventData) { return; }
-            var smartEventObj = smartEventData[eventName];
+            if (!smartEventData) return
+
+            var smartEventObjs = smartEventData[eventName];
 
             var newArr = [];
-            each(smartEventObj, function(i, handleObj) {
+            each(smartEventObjs, function(i, handleObj) {
                 var newEventObject = new $._Event(oriEvent);
 
                 //设置事件对象
@@ -497,6 +508,7 @@
                 //是否可以call
                 var cancall = 0;
 
+                var delegatetargets = handleObj.s;
                 if (delegatetargets) {
                     var tarparent = $(newEventObject.target).parentsUntil(ele, delegatetargets);
                     if (tarparent.length) {
@@ -517,7 +529,7 @@
                     newEventObject.target || (newEventObject.target = ele);
 
                     //运行事件函数
-                    var f = handleObj.f.bind(ele);
+                    var f = handleObj.f.bind(ct);
                     triggerData ? f(newEventObject, triggerData) : f(newEventObject);
 
                     //判断是否阻止事件继续运行下去
@@ -531,11 +543,12 @@
                 }
             });
             smartEventData[eventName] = newArr;
-            smartEventObj = null;
+            smartEventObjs = null;
         },
         //注册事件
         on: function(arg1, arg2, arg3, arg4, isOne) {
             //@use---fn._tr
+            //@use---fn._ge
             var selectors, data, _this = this;
 
             if (getType(arg1) == 'object') {
@@ -579,13 +592,7 @@
 
                 each(_this, function(i, tar) {
                     //事件寄宿对象
-                    tar[SMARTKEY + "e"] || Object.defineProperty(tar, SMARTKEY + "e", {
-                        // enumerable: false,
-                        configurable: true,
-                        writable: true,
-                        value: {}
-                    });
-                    var smartEventData = tar[SMARTKEY + "e"];
+                    var smartEventData = prototypeObj._ge(tar, SMARTKEY + "e");
                     var smartEventObj = smartEventData[eventName];
 
                     if (!smartEventObj) {
@@ -596,7 +603,8 @@
                         if (tar instanceof EventTarget) {
                             tar.addEventListener(eventName, function(oriEvent) {
                                 var data = oriEvent._args;
-                                prototypeObj._tr(tar, eventName, oriEvent, data, selectors);
+                                // prototypeObj._tr(tar, eventName, oriEvent, data, selectors);
+                                prototypeObj._tr(tar, eventName, oriEvent, data);
                             });
                         }
                     }
@@ -608,10 +616,16 @@
                         //数据data
                         d: data,
                         // 是否执行一次
-                        o: isOne
+                        o: isOne,
+                        // 选择目标
+                        s: selectors
                     });
                 });
             });
+            return this;
+        },
+        one: function(event, selector, data, callback) {
+            return this.on(event, selector, data, callback, 1);
         },
         //触发事件
         trigger: function(eventName, data) {
@@ -640,6 +654,62 @@
                     prototypeObj._tr(tar, eventName, null, data);
                 }
             });
+            return this;
+        },
+        off: function(types, selector, fn) {
+            each(this, function(i, ele) {
+                var smartEventData = ele[SMARTKEY + "e"];
+                if (!smartEventData) return
+
+                var arg2Type = getType(selector);
+
+                switch (getType(types)) {
+                    case "string":
+                        var smartEventData_types = smartEventData[types];
+                        if (!selector) {
+                            delete smartEventData[types];
+                        } else if (arg2Type == "function") {
+                            smartEventData[types] = smartEventData_types.filter(function(e) {
+                                return e.f == selector ? 0 : 1;
+                            });
+                        } else if (arg2Type == "string") {
+                            if (!fn) {
+                                smartEventData[types] = smartEventData_types.filter(function(e) {
+                                    return e.s == selector ? 0 : 1;
+                                });
+                            } else {
+                                smartEventData[types] = smartEventData_types.filter(function(e) {
+                                    return (e.s == selector && e.f == fn) ? 0 : 1;
+                                });
+                            }
+                        }
+                        break;
+                    case "undefined":
+                        for (var i in smartEventData) {
+                            delete smartEventData[i];
+                        }
+                        break;
+                    case "object":
+                        var _this;
+                        each(types, function(k, v) {
+                            _this.off(k, v);
+                        });
+                        return;
+                }
+            });
+            return this;
+        },
+        bind: function(event, data, callback) {
+            return this.on(event, data, callback);
+        },
+        unbind: function(event, callback) {
+            return this.off(event, callback)
+        },
+        triggerHandler: function(eventName, data) {
+            //@use---fn._tr
+            var tar = this[0];
+            tar && prototypeObj._tr(tar, eventName, null, data);
+            return this;
         },
         // clone: function() {
         //     return this.map(function(i, e) {
@@ -647,6 +717,13 @@
         //     });
         // }
     });
+
+    //设置event
+    each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
+        prototypeObj[e] = function(callback) {
+            callback ? this.on(e, callback) : this.trigger(e);
+        }
+    })
 
     //init
     var $ = function(selector, context) {
