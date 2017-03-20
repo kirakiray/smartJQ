@@ -711,11 +711,20 @@
             tar && prototypeObj._tr(tar, eventName, null, data);
             return this;
         },
-        // clone: function() {
-        //     return this.map(function(i, e) {
-        //         return e.cloneNode(true);
-        //     });
-        // }
+        delegate: function(selector, types, data, fn) {
+            return this.on(types, selector, data, fn);
+        },
+        undelegate: function(selector, types, fn) {
+            return this.off(types, selector, fn);
+        },
+        hover: function(fnOver, fnOut) {
+            return this.on('mouseenter', fnOver).on('mouseleave', fnOut || fnOver);
+        },
+        clone: function() {
+            return this.map(function(i, e) {
+                return e.cloneNode(true);
+            });
+        }
     });
 
     //设置event

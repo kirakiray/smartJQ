@@ -786,6 +786,40 @@
 
 
 
+    <!--<div class="test_group">
+        <div id="tar20">asdasd</div>
+        <script>
+            QUnit.test("hover", function(assert) {
+                assert.ok(true, 'base');
+                $('#tar20').hover(function() {
+                    $(this).css('background-color', 'red');
+                }, function() {
+                    $(this).css('background-color', 'blue');
+                });
+            });
+        </script>
+    </div>-->
+
+
+
+    <div class="test_group">
+        <div id="tar21">
+            <div class="tar21_ele"></div>
+            <div class="tar21_ele2">
+                <div class="tar21_ele2_child"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("clone", function(assert) {
+                $('.tar21_ele2').clone().appendTo('.tar21_ele');
+                assert.ok($('.tar21_ele2').length == 2, 'element count ok');
+                assert.ok($('.tar21_ele2_child').length == 2, 'element child count ok');
+            });
+        </script>
+    </div>
+
+
+
 
     <!--
 
