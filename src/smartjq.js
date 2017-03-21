@@ -90,11 +90,6 @@
 
     //main
     function smartyJQ(arg1, arg2) {
-        //根据参数不同，做不同处理
-        if (arg2 && arg1 instanceof smartyJQ) {
-            return arg1;
-        }
-
         //只有一个参数的情况
         var a1type = getType(arg1);
         switch (a1type) {
@@ -192,6 +187,10 @@
             });
             return this;
         },
+        prop: function(name, value) {
+            var tar = this[0];
+            return tar[name];
+        },
         addClass: function(name) {
             each(this, function(i, e) {
                 e.classList.add(name);
@@ -216,11 +215,13 @@
         },
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
+            targets = $(targets);
+            ele = $(ele);
             //最后的id
             var lastid = targets.length - 1;
 
-            each($(ele), function(i, e) {
-                each($(targets), function(i, tar) {
+            each(ele, function(i, e) {
+                each(targets, function(i, tar) {
                     if (i == lastid) {
                         func(e, tar);
                     } else {
@@ -448,6 +449,7 @@
             return obj[keyname];
         },
         data: function(name, value) {
+            //@use---fn._ge
             var smartData;
             switch (getType(name)) {
                 case "string":
@@ -603,7 +605,6 @@
                         if (tar instanceof EventTarget) {
                             tar.addEventListener(eventName, function(oriEvent) {
                                 var data = oriEvent._args;
-                                // prototypeObj._tr(tar, eventName, oriEvent, data, selectors);
                                 prototypeObj._tr(tar, eventName, oriEvent, data);
                             });
                         }
@@ -720,10 +721,49 @@
         hover: function(fnOver, fnOut) {
             return this.on('mouseenter', fnOver).on('mouseleave', fnOut || fnOver);
         },
-        clone: function() {
-            return this.map(function(i, e) {
-                return e.cloneNode(true);
+        clone: function(isDeep) {
+            //@use---fn._tr
+            var arr = [];
+
+            //克隆自定义方法和自定义数据
+            var mapCloneEvent = function(ele, tarele) {
+                var customData = ele[SMARTKEY],
+                    eventData = ele[SMARTKEY + "e"];
+
+                if (eventData) {
+                    //事件处理
+                    each(eventData, function(eventName) {
+                        tarele.addEventListener(eventName, function(oriEvent) {
+                            var data = oriEvent._args;
+                            prototypeObj._tr(tarele, eventName, oriEvent, data);
+                        });
+                    });
+                    tarele[SMARTKEY + "e"] = eventData;
+                }
+
+                //设定数据
+                customData && (tarele[SMARTKEY] = customData);
+
+                //判断是否有children
+                var childs = ele.children;
+                var tarchild = tarele.children;
+                if (childs.length) {
+                    each(childs, function(i, e) {
+                        mapCloneEvent(e, tarchild[i]);
+                    });
+                }
+            };
+
+            each(this, function(i, e) {
+                var cloneEle = e.cloneNode(true);
+                isDeep && mapCloneEvent(e, cloneEle);
+                arr.push(cloneEle);
             });
+
+            //回收
+            mapCloneEvent = null;
+
+            return $(arr);
         }
     });
 

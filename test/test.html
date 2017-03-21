@@ -812,8 +812,21 @@
         <script>
             QUnit.test("clone", function(assert) {
                 $('.tar21_ele2').clone().appendTo('.tar21_ele');
-                assert.ok($('.tar21_ele2').length == 2, 'element count ok');
-                assert.ok($('.tar21_ele2_child').length == 2, 'element child count ok');
+
+                $('.tar21_ele2').data('haha', true);
+                $('.tar21_ele2').on('click', function() {
+                    assert.ok(true, 'clone event ok');
+                });
+
+                //深度克隆
+                var deepCloneEle = $('.tar21_ele2').eq(0).clone(true);
+                $('#tar21').append(deepCloneEle);
+                deepCloneEle.find('.tar21_ele2_child').click();
+                assert.ok(deepCloneEle.data('haha'), 'clone event ok');
+
+
+                assert.ok($('.tar21_ele2').length == 3, 'element data ok');
+                assert.ok($('.tar21_ele2_child').length == 3, 'element child count ok');
             });
         </script>
     </div>
