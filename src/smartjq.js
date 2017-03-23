@@ -188,8 +188,85 @@
             return this;
         },
         prop: function(name, value) {
-            var tar = this[0];
-            return tar[name];
+            switch (getType(name)) {
+                case "string":
+                    if (value == undefined) {
+                        var tar = this[0];
+                        return tar[name];
+                    } else if (getType(value) == "function") {
+                        each(this, function(i, e) {
+                            var revalue = value.call(e, i, e[name]);
+                            (revalue != undefined) && (e[name] = revalue);
+                        });
+                    } else {
+                        each(this, function(i, e) {
+                            e[name] = value;
+                        });
+                    }
+                    return this;
+                case "object":
+                    each(this, function(i, e) {
+                        each(name, function(k, v) {
+                            e[k] = v;
+                        });
+                    });
+                    return this;
+            }
+        },
+        removeProp: function(name) {
+            each(this, function(i, e) {
+                if (e instanceof EventTarget && name in e.cloneNode()) {
+                    e[name] = "";
+                } else {
+                    delete e[name];
+                }
+            });
+            return this;
+        },
+        html: function(val) {
+            //@use---fn.prop
+            return this.prop('innerHTML', val);
+        },
+        text: function(val) {
+            //@use---fn.prop
+            return this.prop('innerText', val);
+        },
+        val: function(vals) {
+            //@use---fn.prop
+            if (getType(vals) == "array") {
+                var mapvals = function(option) {
+                    each(vals, function(i, val) {
+                        var bool = false;
+                        if (option.value == val) {
+                            bool = true;
+                        }
+                        if ("selected" in option) {
+                            option.selected = bool;
+                        } else if ("checked" in option) {
+                            option.checked = bool;
+                        }
+                        if (bool) {
+                            return false;
+                        }
+                    });
+                };
+                each(this, function(i, ele) {
+                    if (0 in ele) {
+                        each(ele, function(i, option) {
+                            mapvals(option);
+                        });
+                    } else {
+                        mapvals(ele);
+                    }
+                });
+                mapvals = null;
+                return this;
+            } else if (vals == "string") {
+
+            } else {
+
+            }
+            // return this.prop('value', vals);
         },
         addClass: function(name) {
             each(this, function(i, e) {

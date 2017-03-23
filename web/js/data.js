@@ -29,6 +29,9 @@ var jqdatas = [{
     }, {
         val: "text",
         fn: 1
+    }, {
+        val: "val",
+        fn: 1
     }]
 }, {
     title: "CSS相关和定位",

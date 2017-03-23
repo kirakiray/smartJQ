@@ -12,8 +12,8 @@
         }
     </style>
     <script src="qunit-1.15.0.js"></script>
-    <script src="../src/smartjq.js"></script>
-    <!--<script src="jquery-3.1.1.js"></script>-->
+    <!--<script src="../src/smartjq.js"></script>-->
+    <script src="jquery-3.1.1.js"></script>
     <!--<script src="jquery-2.1.3.js"></script>-->
     <!--<script src="zepto.js"></script>-->
 </head>
@@ -129,6 +129,122 @@
                 //去除属性
                 tar3_test.removeAttr('a1');
                 assert.ok(tar3_test[0].getAttribute('a1') == undefined && tar3_test[1].getAttribute('a1') == undefined, "removeOK");
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group" style="display:none;">
+        <input class="tar3a" type="checkbox" checked="checked">
+        <input class="tar3a" type="checkbox" checked>
+        <input class="tar3a_2" type="checkbox">
+        <input class="tar3a_2" type="checkbox" checked>
+        <input class="tar3a_3" type="checkbox">
+        <script>
+            QUnit.test("prop removeProp", function(assert) {
+                assert.ok($('.tar3a').prop('checked') == true, 'prop ok');
+
+                //设置不选中
+                $('.tar3a').prop('checked', false);
+                assert.ok($('.tar3a').prop('checked') == false, 'prop ok2');
+
+                $('.tar3a_2').prop('checked', function(i, val) {
+                    return !val;
+                });
+
+                assert.ok($('.tar3a_2').eq(0).prop('checked') == true, "prop ok 3");
+                assert.ok($('.tar3a_2').eq(1).prop('checked') == false, 'prop ok 4');
+
+                $('.tar3a_3').prop({
+                    checked: true
+                });
+                assert.ok($('.tar3a_3').prop('checked') == true, "prop ok 5");
+
+                // $('.tar3a_3').removeProp('checked');
+                // assert.ok($('.tar3a_3').prop('checked') == false, "removeProp ok 5");
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group" style="display:none;">
+        <div id="tar3b">
+            <div class="tar3b_ele1"><span>haha</span></div>
+            <div class="tar3b_ele2"></div>
+            <div class="tar3b_ele3">asd</div>
+            <div class="tar3b_ele3">asd</div>
+        </div>
+        <script>
+            QUnit.test("html", function(assert) {
+                assert.ok($('.tar3b_ele1').html() == "<span>haha</span>", 'get html ok');
+                $('.tar3b_ele2').html('<span style="color:red;">haha2</span>');
+                assert.ok($('.tar3b_ele2').html() == '<span style="color:red;">haha2</span>', 'set html ok');
+                $('.tar3b_ele3').html(function(i, html) {
+                    return html + "__" + i;
+                });
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar3c">
+            <div class="tar3c_ele1">asd</div>
+        </div>
+        <script>
+            QUnit.test("text", function(assert) {
+                assert.ok($('.tar3c_ele1').text() == "asd", 'get text ok');
+                $('.tar3c_ele1').text('haha');
+                assert.ok($('.tar3c_ele1').text() == "haha", 'set text ok');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar3d">
+            <select id="tar3d_single">
+                <option>Single</option>
+                <option>Single2</option>
+            </select>
+            <select id="tar3d_multiple" multiple="multiple">
+                <option selected="selected">Multiple</option>
+                <option>Multiple2</option>
+                <option selected="selected">Multiple3</option>
+            </select>
+            <select id="tar3d_multiple_b" multiple="multiple">
+                <option selected="selected">Multiple_b</option>
+                <option>Multiple2_b</option>
+                <option selected="selected">Multiple3_b</option>
+            </select>
+
+            <input type="checkbox" value="check1" /> check1 <br>
+            <input type="checkbox" value="check2" /> check2<br>
+            <input type="radio" value="radio1" /> radio1<br>
+            <input type="radio" value="radio2" /> radio2<br>
+        </div>
+        <script>
+            QUnit.test("val", function(assert) {
+                assert.ok(true, 'base');
+                $("#tar3d_single").val("Single2");
+                $("#tar3d_multiple").val(["Multiple2", "Multiple3"]);
+                $("#tar3d input").val(["check2", "radio1"]);
+
+                assert.ok($("#tar3d_single").val() == "Single2", 'select ok');
+                assert.ok($("#tar3d_multiple").val().toString() == ["Multiple2", "Multiple3"].toString(), 'Multiple2 select val ok');
+                assert.ok($('#tar3d [type=checkbox]').eq(1).prop('checked'), 'checkbox ok');
+                assert.ok($('#tar3d [type=radio]').eq(0).prop('checked'), 'radio ok');
             });
         </script>
     </div>
@@ -830,6 +946,10 @@
             });
         </script>
     </div>
+
+
+
+
 
 
 
