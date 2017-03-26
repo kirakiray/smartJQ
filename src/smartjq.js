@@ -13,14 +13,6 @@
         return Object.prototype.toString.call(value).toLowerCase().replace(/(\[object )|(])/g, '');
     };
 
-    //判断是否空对象
-    //    var isEmptyObject = function(obj) {
-    //        for (var i in obj) {
-    //            return false;
-    //        }
-    //        return true;
-    //    };
-
     //合并对象
     var extend = function(def) {
         var args = makeArray(arguments).slice(1);
@@ -59,6 +51,7 @@
                     func(i, obj[i]);
                 }
             }
+            return obj;
         };
     })();
 
@@ -159,6 +152,90 @@
             }
             return this;
         },
+        offset: function() {
+            // if (!options) {
+            var tar = this[0];
+            var boundingClientRect = tar.getBoundingClientRect();
+
+            return {
+                top: boundingClientRect.top + window.pageYOffset,
+                left: boundingClientRect.left + window.pageXOffset
+            };
+            // }
+        },
+        position: function() {
+            //@use---fn.css
+            //@use---fn.offset
+            //获取父元素
+            var offsetParent = $(this[0].offsetParent);
+            // var parentOffset = offsetParent.offset();
+            var tarOffset = this.offset();
+
+            var martop = parseFloat(this.css('marginTop'));
+            var marleft = parseFloat(this.css('marginLeft'));
+
+            var parentBordertop = parseFloat(offsetParent.css('borderTopWidth'));
+            var parentBorderleft = parseFloat(offsetParent.css('borderLeftWidth'));
+
+            return {
+                // top: tarOffset.top - parentOffset.top - martop - parentBordertop,
+                // left: tarOffset.left - parentOffset.left - marleft - parentBorderleft,
+                top: tarOffset.top - martop - parentBordertop,
+                left: tarOffset.left - marleft - parentBorderleft,
+            };
+        },
+        _sc: function(key, val) {
+            return val == undefined ? this[0][key] : each(this, function(i, tar) {
+                tar[key] = val;
+            });
+        },
+        scrollTop: function(val) {
+            //@use---fn._sc
+            return this._sc('scrollTop', val);
+        },
+        scrollLeft: function(val) {
+            //@use---fn._sc
+            return this._sc('scrollLeft', val);
+        },
+        _wh: function(key, val) {
+            //@use---fn.css
+            switch (getType(val)) {
+                case "function":
+                    return each(this, function(i, tar) {
+                        var $tar = $(tar);
+                        var reval = val.call(tar, i, parseFloat($tar.css(key)));
+                        reval && $tar[key](reval);
+                    });
+                case "undefined":
+                    return parseFloat(this.css(key));
+                case "number":
+                    val += "px";
+                case "string":
+                    return each(this, function(i, tar) {
+                        $(tar).css(key, val);
+                    });
+            }
+        },
+        height: function(val) {
+            //@use---fn._wh
+            return this._wh("height", val);
+        },
+        width: function(val) {
+            //@use---fn._wh
+            return this._wh("width", val);
+        },
+        innerHeight: function() {
+            return this[0].clientHeight;
+        },
+        innerWidth: function() {
+            return this[0].clientWidth;
+        },
+        outerHeight: function() {
+            return this[0].offsetHeight;
+        },
+        outerWidth: function() {
+            return this[0].offsetWidth;
+        },
         attr: function(name, value) {
             var _this = this;
             switch (getType(name)) {
@@ -182,10 +259,9 @@
             return _this;
         },
         removeAttr: function(name) {
-            each(this, function(i, tar) {
+            return each(this, function(i, tar) {
                 tar.removeAttribute(name);
             });
-            return this;
         },
         prop: function(name, value) {
             switch (getType(name)) {
@@ -203,25 +279,24 @@
                             e[name] = value;
                         });
                     }
-                    return this;
+                    break;
                 case "object":
                     each(this, function(i, e) {
                         each(name, function(k, v) {
                             e[k] = v;
                         });
                     });
-                    return this;
             }
+            return this;
         },
         removeProp: function(name) {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 if (e instanceof EventTarget && name in e.cloneNode()) {
                     e[name] = "";
                 } else {
                     delete e[name];
                 }
             });
-            return this;
         },
         html: function(val) {
             //@use---fn.prop
@@ -233,58 +308,66 @@
         },
         val: function(vals) {
             //@use---fn.prop
-            if (getType(vals) == "array") {
-                var mapvals = function(option) {
-                    each(vals, function(i, val) {
-                        var bool = false;
-                        if (option.value == val) {
-                            bool = true;
-                        }
-                        if ("selected" in option) {
-                            option.selected = bool;
-                        } else if ("checked" in option) {
-                            option.checked = bool;
-                        }
-                        if (bool) {
-                            return false;
+            switch (getType(vals)) {
+                case "array":
+                    var mapvals = function(option) {
+                        each(vals, function(i, val) {
+                            var bool = false;
+                            if (option.value == val) {
+                                bool = true;
+                            }
+                            if ("selected" in option) {
+                                option.selected = bool;
+                            } else if ("checked" in option) {
+                                option.checked = bool;
+                            }
+                            if (bool) {
+                                return false;
+                            }
+                        });
+                    };
+                    each(this, function(i, ele) {
+                        if (0 in ele) {
+                            each(ele, function(i, option) {
+                                mapvals(option);
+                            });
+                        } else {
+                            mapvals(ele);
                         }
                     });
-                };
-                each(this, function(i, ele) {
-                    if (0 in ele) {
-                        each(ele, function(i, option) {
-                            mapvals(option);
+                    mapvals = null;
+                    return this;
+                case "undefined":
+                    var tar = this[0];
+                    if (tar.multiple) {
+                        var rearr = [];
+                        each(tar, function(i, e) {
+                            (e.selected || e.checked) && rearr.push(e.value);
                         });
-                    } else {
-                        mapvals(ele);
+                        return rearr;
                     }
-                });
-                mapvals = null;
-                return this;
-            } else if (vals == "string") {
-
-            } else {
+                default:
+                    return this.prop('value', vals);
 
             }
-            // return this.prop('value', vals);
         },
         addClass: function(name) {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 e.classList.add(name);
             });
-            return this;
+            // return this;
         },
         removeClass: function(name) {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 e.classList.remove(name);
             });
-            return this;
+            // return this;
         },
         toggleClass: function(name) {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 e.classList.toggle(name);
             });
-            return this;
+            // return this;
         },
         hasClass: function(name) {
             var tar = this[0];
@@ -385,6 +468,13 @@
             });
             return $(eles);
         },
+        offsetParent: function() {
+            var arr = [];
+            each(this, function(i, e) {
+                arr.push(e.offsetParent || document.body);
+            });
+            return $(arr);
+        },
         children: function(expr) {
             var eles = [];
             each(this, function(i, e) {
@@ -482,10 +572,10 @@
             return this.parentsUntil(document, selector);
         },
         each: function(func) {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 func.call(e, i, e);
             });
-            return this;
+            // return this;
         },
         index: function(ele) {
             var owner, tar;
@@ -505,16 +595,16 @@
             return owner.indexOf(tar);
         },
         hide: function() {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 e.style['display'] = "none";
             });
-            return this;
+            // return this;
         },
         show: function() {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 e.style['display'] = "";
             });
-            return this;
+            // return this;
         },
         //获取制定对象数据的方法
         _ge: function(obj, keyname) {
@@ -561,11 +651,11 @@
             return this;
         },
         removeData: function(name) {
-            each(this, function(i, tar) {
+            return each(this, function(i, tar) {
                 var smartData = prototypeObj._ge(tar, SMARTKEY);
                 delete smartData[name];
             });
-            return this;
+            // return this;
         },
         //smartEvent事件触发器
         // _tr: function(ele, eventName, oriEvent, triggerData, delegatetargets) {
@@ -707,7 +797,7 @@
         },
         //触发事件
         trigger: function(eventName, data) {
-            each(this, function(i, tar) {
+            return each(this, function(i, tar) {
                 //拥有EventTarget的就触发
                 if (tar instanceof EventTarget) {
                     var EventClass;
@@ -732,10 +822,10 @@
                     prototypeObj._tr(tar, eventName, null, data);
                 }
             });
-            return this;
+            // return this;
         },
         off: function(types, selector, fn) {
-            each(this, function(i, ele) {
+            return each(this, function(i, ele) {
                 var smartEventData = ele[SMARTKEY + "e"];
                 if (!smartEventData) return
 
@@ -775,7 +865,7 @@
                         return;
                 }
             });
-            return this;
+            // return this;
         },
         bind: function(event, data, callback) {
             return this.on(event, data, callback);

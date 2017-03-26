@@ -42,7 +42,7 @@ var jqdatas = [{
         val: "offset",
         fn: 1
     }, {
-        val: "postion",
+        val: "position",
         fn: 1
     }, {
         val: "scrollTop",
@@ -96,16 +96,16 @@ var jqdatas = [{
         val: "insertBefore",
         fn: 1
     }, {
-        val: "warp",
+        val: "wrap",
         fn: 1
     }, {
-        val: "unwarp",
+        val: "unwrap",
         fn: 1
     }, {
-        val: "warpall",
+        val: "wrapAll",
         fn: 1
     }, {
-        val: "warpInner",
+        val: "wrapInner",
         fn: 1
     }, {
         val: "replaceWith",
@@ -174,7 +174,7 @@ var jqdatas = [{
         val: "next",
         fn: 1
     }, {
-        val: "nextall",
+        val: "nextAll",
         fn: 1
     }, {
         val: "nextUntil",
@@ -195,7 +195,7 @@ var jqdatas = [{
         val: "prev",
         fn: 1
     }, {
-        val: "prevall",
+        val: "prevAll",
         fn: 1
     }, {
         val: "prevUntil",

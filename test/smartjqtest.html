@@ -14,25 +14,24 @@
 </head>
 
 <body>
-    <div class="tar">
-        <div class="tar_ele">tar_ele</div>
+    <div style="margin:100px;border:blue solid 5px;">
+        <div style="padding:20px;margin:30px;border:green solid 5px;">
+            <div style="padding:20px;margin:10px;border:red solid 5px;">
+                <div class="tar_ele" style="display:inline-block;margin:50px;background-color:#eee;">tar_ele</div>
+            </div>
+        </div>
     </div>
 </body>
 <script>
-    $('.tar').data('haha', "hahahahahaha");
-    $('.tar').click(function() {
-        console.log('click tar');
-    });
-    $('.tar').click(function() {
-        console.log('click tar2');
-    });
-    $('.tar .tar_ele').click(function() {
-        console.log('click tar_ele');
-    });
-
-    var newtar = $('.tar').clone(true);
-    newtar.appendTo('body');
-    console.log(newtar.data('haha'));
+    console.log('position => ', $('.tar_ele').position());
+    console.log('offset => ', $('.tar_ele').offset());
+    console.log('scrollTop => ', $('body').scrollTop());
+    console.log('parent.height => ', $('.tar_ele').parent().height());
+    console.log('parent.width => ', $('.tar_ele').parent().width());
+    console.log('parent.innerHeight => ', $('.tar_ele').parent().innerHeight());
+    console.log('parent.innerWidth => ', $('.tar_ele').parent().innerWidth());
+    console.log('parent.outerHeight => ', $('.tar_ele').parent().outerHeight());
+    console.log('parent.outerWidth => ', $('.tar_ele').parent().outerWidth());
 </script>
 
 </html>
