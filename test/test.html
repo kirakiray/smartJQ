@@ -307,14 +307,14 @@
         <div class="tar4_fade"></div>
         <div class="tar4_fade2"></div>
         <div class="tar4_fade2"></div>
-        <div id="tar4">
+        <div>
             <div class="tar4_test1"></div>
             <div class="tar4_test2"></div>
             <div class="tar4_test3"></div>
             <div class="tar4_test3"></div>
         </div>
         <script>
-            QUnit.test("element control", function(assert) {
+            QUnit.test("append appendto", function(assert) {
                 var tar4_fade = $('.tar4_fade');
                 tar4_fade[0].kaka = "fa";
 
@@ -330,6 +330,161 @@
 
                 //判断个数
                 assert.ok($('.tar4_fade2 .tar4_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div class="tar4b_fade"></div>
+        <div class="tar4b_fade2"></div>
+        <div class="tar4b_fade2"></div>
+        <div>
+            <div class="tar4b_test1"></div>
+            <div class="tar4b_test2"></div>
+            <div class="tar4b_test3"></div>
+            <div class="tar4b_test3"></div>
+        </div>
+        <script>
+            QUnit.test("prepend prependTo", function(assert) {
+                var tar4b_fade = $('.tar4b_fade');
+                tar4b_fade[0].kaka = "fa";
+
+                $('.tar4_test3').prepend(tar4b_fade);
+
+                //判断个数
+                assert.ok($('.tar4b_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4b_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4b_test1').prependTo('.tar4b_fade2');
+
+                //判断个数
+                assert.ok($('.tar4b_fade2 .tar4b_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div class="tar4c_fade"></div>
+        <div class="tar4c_fade2"></div>
+        <div class="tar4c_fade2"></div>
+        <div>
+            <div class="tar4c_test1"></div>
+            <div class="tar4c_test2"></div>
+            <div class="tar4c_test3"></div>
+            <div class="tar4c_test3"></div>
+        </div>
+        <script>
+            QUnit.test("after insertAfter", function(assert) {
+                var tar4c_fade = $('.tar4c_fade');
+                tar4c_fade[0].kaka = "fa";
+
+                $('.tar4c_test3').after(tar4c_fade);
+
+                //判断个数
+                assert.ok($('.tar4c_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4c_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4c_test1').insertAfter('.tar4c_fade2');
+
+                //判断个数
+                assert.ok($('.tar4c_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div class="tar4d_fade"></div>
+        <div class="tar4d_fade2"></div>
+        <div class="tar4d_fade2"></div>
+        <div>
+            <div class="tar4d_test1"></div>
+            <div class="tar4d_test2"></div>
+            <div class="tar4d_test3"></div>
+            <div class="tar4d_test3"></div>
+        </div>
+        <script>
+            QUnit.test("before insertBefore", function(assert) {
+                var tar4d_fade = $('.tar4d_fade');
+                tar4d_fade[0].kaka = "fa";
+
+                $('.tar4d_test3').before(tar4d_fade);
+
+                //判断个数
+                assert.ok($('.tar4d_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4d_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4d_test1').insertBefore('.tar4d_fade2');
+
+                //判断个数
+                assert.ok($('.tar4d_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4e">1</div>
+        <div class="tar4e">2</div>
+        <div class="tar4e_test1"></div>
+        <script>
+            QUnit.test("warp", function(assert) {
+                $('.tar4e').wrap('<div class="tar4e_outer"></div>');
+
+                assert.ok($('.tar4e_outer').length == 2, 'count ok!');
+
+                $('.tar4e').wrap(function() {
+                    // console.log(arguments, this);
+                    return '<div class="tar4e_outer2">' + this.innerHTML + '</div>';
+                });
+
+                assert.ok($('.tar4e_outer2').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4f_3">4</div>
+        <div class="tar4f">1</div>
+        <div class="tar4f">1</div>
+        <div class="tar4f_test1">3</div>
+        <script>
+            QUnit.test("replaceWith", function(assert) {
+                $('.tar4f').replaceWith('<div class="tar4f_2">2</div>');
+                assert.ok($('.tar4f_2').length == 2, 'count ok!');
+
+                $('.tar4f_test1').replaceWith('.tar4f_3');
+            });
+        </script>
+    </div>
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4g_con">
+            <div class="tar4g"></div>
+            <div class="tar4g"></div>
+            <div class="tar4g"></div>
+        </div>
+        <div class="tar4g_con">
+            <div class="tar4g"></div>
+        </div>
+        <script>
+            QUnit.test("unwrap", function(assert) {
+                assert.ok($('.tar4g_con').length == 2, 'count ok!');
+                $('.tar4g').unwrap();
+                assert.ok($('.tar4g_con').length == 0, 'count ok2!');
             });
         </script>
     </div>

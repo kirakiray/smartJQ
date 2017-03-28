@@ -445,11 +445,36 @@
             this.before.call(tars, this);
             return this;
         },
+        replaceWith: function(newContent) {
+            //@use---fn.before
+            return this.before(newContent).remove();
+        },
+        wrap: function(val) {
+            var valtype = getType(val);
+            each(this, function(i, tar) {
+                var reval = val;
+                if (valtype == "function") {
+                    reval = val.call(tar, i);
+                }
+                if (reval) {
+                    reval = $(reval)[0];
+                    tar.parentNode.insertBefore(reval, tar);
+                    reval.appendChild(tar);
+                }
+            });
+        },
+        unwrap: function() {
+            //@use---fn.parent
+            //@use---fn.replaceWith
+            this.parent().each(function(i, tar) {
+                $(tar).replaceWith(makeArray(this.children))
+            })
+            return this
+        },
         empty: function() {
-            each(this, function(i, e) {
+            return each(this, function(i, e) {
                 e.innerHTML = "";
             });
-            return this;
         },
         remove: function() {
             each(this, function(i, e) {
