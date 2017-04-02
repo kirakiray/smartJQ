@@ -449,6 +449,12 @@
             //@use---fn.before
             return this.before(newContent).remove();
         },
+        replaceAll: function(tar) {
+            //@use---fn.replaceWith
+            tar = $(tar);
+            tar.replaceWith(this);
+            return this;
+        },
         wrap: function(val) {
             var valtype = getType(val);
             each(this, function(i, tar) {
@@ -469,6 +475,16 @@
             this.parent().each(function(i, tar) {
                 $(tar).replaceWith(makeArray(this.children))
             })
+            return this
+        },
+        wrapAll: function(structure) {
+            //@use---fn.children
+            if (this[0]) {
+                $(this[0]).before(structure = $(structure))
+                var children
+                while ((children = structure.children()).length) structure = $(children[0])
+                $(structure).append(this)
+            }
             return this
         },
         empty: function() {
