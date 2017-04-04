@@ -484,12 +484,25 @@
         },
         wrapInner: function(content) {
             //@use---fn.append
+            // var func = getType(structure) == "function";
+            // return this.each(function(index) {
+            //     var self = $(this),
+            //         contents = self.contents(),
+            //         dom = func ? structure.call(this, index) : structure
+            //     contents.length ? contents.wrapAll(dom) : self.append(dom)
+            // });
+
             return each(this, function(i, tar) {
+                var c = content;
                 if (getType(content) == "function") {
-                    content = content.call(tar);
+                    c = content.call(tar, i);
                 }
-                var a = $(content).append(makeArray(tar.childNodes));
-                $(tar).append(a);
+                c = $(c)[0];
+                each(tar.childNodes, function(i, tar) {
+                    c.appendChild(tar);
+                });
+                // c = $(c).append(makeArray(tar.childNodes));
+                tar.appendChild(c);
             });
         },
         empty: function() {
@@ -595,7 +608,7 @@
             var tars = this.filter(expr);
             return !!tars.length;
         },
-        _np: function(expr, key, untilExpr, untilFilter) {
+        _np: function(expr, key) {
             var arr = [];
             each(this, function(i, tar) {
                 tar = tar[key];
@@ -618,7 +631,7 @@
             //@use---fn._np
             return this._np(expr, "parentNode");
         },
-        _nu: function(lastExpr, filter, key) {
+        _nu: function(key, filter, lastExpr) {
             var arr = [];
             var getEle = function(tar) {
                 var nextEle = tar[key];
@@ -642,52 +655,27 @@
         },
         nextUntil: function(lastExpr, filter) {
             //@use---fn._nu
-            return this._nu(lastExpr, filter, 'nextElementSibling');
-            // var arr = [];
-            // var getEle = function(tar) {
-            //     var nextEle = tar['nextElementSibling'];
-            //     if (nextEle) {
-            //         if (lastExpr) {
-            //             if ((getType(lastExpr) == "string" && judgeEle(nextEle, lastExpr)) || lastExpr == nextEle) {
-            //                 return;
-            //             }
-            //         }
-            //         if ((!filter || judgeEle(nextEle, filter)) && arr.indexOf(nextEle) == -1) {
-            //             arr.push(nextEle);
-            //         }
-            //         getEle(nextEle);
-            //     }
-            // };
-            // each(this, function(i, tar) {
-            //     getEle(tar);
-            // });
-            // getEle = null;
-            // return $(arr);
+            return this._nu('nextElementSibling', filter, lastExpr);
+        },
+        prevUntil: function(lastExpr, filter) {
+            //@use---fn._nu
+            return this._nu('previousElementSibling', filter, lastExpr);
         },
         parentsUntil: function(lastExpr, filter) {
             //@use---fn._nu
-            return this._nu(lastExpr, filter, 'parentNode');
-            // var arr = [],
-            //     tars = this,
-            //     lastEles = $(lastExpr);
-            // while (tars.length > 0) {
-            //     var newtars = [];
-            //     each(tars, function(i, e) {
-            //         var parentNode = e.parentNode;
-            //         if (parentNode && arr.indexOf(parentNode) < 0 && lastEles.indexOf(parentNode) < 0) {
-            //             arr.push(parentNode);
-            //             if (newtars.indexOf() < 0) {
-            //                 newtars.push(parentNode);
-            //             }
-            //         }
-            //     });
-            //     tars = newtars;
-            // };
-            // return selector ? $(arr).filter(selector) : $(arr);
+            return this._nu('parentNode', filter, lastExpr);
         },
-        parents: function(selector) {
-            //@use---fn.parentsUntil
-            return this.parentsUntil(document, selector);
+        nextAll: function(filter) {
+            //@use---fn._nu
+            return this._nu('nextElementSibling', filter);
+        },
+        prevAll: function(filter) {
+            //@use---fn._nu
+            return this._nu('previousElementSibling', filter);
+        },
+        parents: function(filter) {
+            //@use---fn._nu
+            return this._nu('parentNode', filter, document);
         },
         closest: function(selector, context) {
             //@use---fn.parentsUntil
@@ -1102,6 +1090,9 @@
 
     //init
     var $ = function(selector, context) {
+        if (selector instanceof smartyJQ) {
+            return selector;
+        }
         return new smartyJQ(selector, context);
     };
     $.fn = $.prototype = smartyJQ.fn;

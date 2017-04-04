@@ -1249,17 +1249,34 @@
 
     <div class="test_group">
         <div id="tar22">
-            <p>1</p>
-            <p>2</p>
-            <p class="haha">3</p>
-            <p>4</p>
+            <p class="haha1">1</p>
+            <p class="haha2">2</p>
+            <p class="haha3">3</p>
+            <p class="haha4">4</p>
         </div>
         <script>
-            QUnit.test("next prev", function(assert) {
+            QUnit.test("next prev nextAll prevAll nextUntil prevUntil", function(assert) {
                 assert.ok($('#tar22 p').next().length == 3, 'next ok');
-                assert.ok($('#tar22 p').next('.haha').length == 1, 'next ok2');
-                assert.ok($('#tar22 p').prev().length == 3, 'next ok');
-                assert.ok($('#tar22 p').prev('.haha').length == 1, 'next ok2');
+                assert.ok($('#tar22 p').next('.haha3').length == 1, 'next ok2');
+
+                assert.ok($('#tar22 p').eq(0).nextAll().length == 3, 'nextAll ok');
+                assert.ok($('#tar22 p').eq(0).nextAll('.haha3').length == 1, 'nextAll ok2');
+
+                assert.ok($('#tar22 p').eq(0).nextUntil().length == 3, 'nextUntil ok');
+                assert.ok($('#tar22 p').eq(0).nextUntil('.haha4').length == 2, 'nextUntil ok2');
+                assert.ok($('#tar22 p').eq(0).nextUntil($('#tar22 .haha4')[0]).length == 2, 'nextUntil ok3');
+                assert.ok($('#tar22 p').eq(0).nextUntil('.haha4', '.haha3').length == 1, 'nextUntil ok4');
+
+                assert.ok($('#tar22 p').prev().length == 3, 'prev ok');
+                assert.ok($('#tar22 p').prev('.haha3').length == 1, 'prev ok2');
+
+                assert.ok($('#tar22 p').eq(3).prevAll().length == 3, 'prevAll ok');
+                assert.ok($('#tar22 p').eq(3).prevAll('.haha3').length == 1, 'prevAll ok2');
+
+                assert.ok($('#tar22 p').eq(3).prevUntil().length == 3, 'prevUntil ok');
+                assert.ok($('#tar22 p').eq(3).prevUntil('.haha1').length == 2, 'prevUntil ok2');
+                assert.ok($('#tar22 p').eq(3).prevUntil($('#tar22 .haha1')[0]).length == 2, 'prevUntil ok3');
+                assert.ok($('#tar22 p').eq(3).prevUntil('.haha4', '.haha3').length == 1, 'prevUntil ok4');
             });
         </script>
     </div>
