@@ -71,7 +71,7 @@
     var judgeEle = function(ele, expr) {
         var fadeParent = document.createElement('div');
         fadeParent.appendChild(ele.cloneNode(false));
-        return findEles(fadeParent, expr).length ? true : false;
+        return 0 in findEles(fadeParent, expr) ? true : false;
     };
 
     //转换字符串到html对象
@@ -116,16 +116,14 @@
                     arg1($)
                 }, false);
                 break;
-            case "array":
-                merge(this, arg1);
-                break;
             default:
                 if (arg1 instanceof smartyJQ) {
                     return arg1;
+                } else if (arg1 instanceof Array) {
+                    merge(this, arg1);
                 } else {
                     this.push(arg1);
                 }
-
         }
     };
 
@@ -355,19 +353,16 @@
             return each(this, function(i, e) {
                 e.classList.add(name);
             });
-            // return this;
         },
         removeClass: function(name) {
             return each(this, function(i, e) {
                 e.classList.remove(name);
             });
-            // return this;
         },
         toggleClass: function(name) {
             return each(this, function(i, e) {
                 e.classList.toggle(name);
             });
-            // return this;
         },
         hasClass: function(name) {
             var tar = this[0];
@@ -473,7 +468,7 @@
             //@use---fn.parent
             //@use---fn.replaceWith
             this.parent().each(function(i, tar) {
-                $(tar).replaceWith(makeArray(this.children))
+                $(tar).replaceWith(makeArray(this.childNodes))
             })
             return this
         },
@@ -487,27 +482,28 @@
             }
             return this
         },
+        wrapInner: function(content) {
+            //@use---fn.append
+            return each(this, function(i, tar) {
+                if (getType(content) == "function") {
+                    content = content.call(tar);
+                }
+                var a = $(content).append(makeArray(tar.childNodes));
+                $(tar).append(a);
+            });
+        },
         empty: function() {
             return each(this, function(i, e) {
                 e.innerHTML = "";
             });
         },
-        remove: function() {
+        remove: function(expr) {
             each(this, function(i, e) {
+                if (expr) {
+                    if (!judgeEle(e, expr)) return;
+                }
                 e.parentNode.removeChild(e);
             });
-        },
-        find: function(str) {
-            var eles = [];
-            each(this, function(i, e) {
-                var arr = findEles(e, str);
-                each(arr, function(i, e) {
-                    if (eles.indexOf(e) == -1) {
-                        eles.push(e);
-                    }
-                });
-            });
-            return $(eles);
         },
         offsetParent: function() {
             var arr = [];
@@ -547,6 +543,14 @@
             //@use---fn.slice
             return this.slice(i, i + 1 || undefined);
         },
+        first: function() {
+            //@use---fn.eq
+            return this.eq(0);
+        },
+        last: function() {
+            //@use---fn.eq
+            return this.eq(-1);
+        },
         filter: function(expr) {
             var arr = [];
             switch (getType(expr)) {
@@ -564,6 +568,19 @@
                             arr.push(e);
                         }
                     });
+                    break;
+                default:
+                    if (expr instanceof smartyJQ) {
+                        each(this, function(i, e) {
+                            each(expr, function(i, tar) {
+                                (e == tar) && arr.push(e);
+                            });
+                        });
+                    } else if (expr.nodeType) {
+                        each(this, function(i, e) {
+                            (e == expr) && arr.push(e);
+                        });
+                    }
             }
             return $(arr);
         },
@@ -573,26 +590,72 @@
                 return !judgeEle(e, expr);
             });
         },
-        parent: function(expr) {
+        is: function(expr) {
+            //@use---fn.filter
+            var tars = this.filter(expr);
+            return !!tars.length;
+        },
+        _np: function(expr, key, until) {
             var arr = [];
-            each(this, function(i, e) {
-                var parentNode = e.parentNode;
-                //确定没有重复
-                if (arr.indexOf(parentNode) == -1) {
-                    //有标识但找不到
-                    if (expr && !judgeEle(parentNode, expr)) {
-                        return;
-                    }
-                    arr.push(parentNode);
+            each(this, function(i, tar) {
+                tar = tar[key];
+                if (!tar || arr.indexOf(tar) != -1 || (expr && !judgeEle(tar, expr))) {
+                    return;
                 }
+                arr.push(tar);
             });
             return $(arr);
         },
-        parentsUntil: function(expr, selector) {
-            //@use---fn.parents
+        next: function(expr) {
+            //@use---fn._np
+            return this._np(expr, "nextElementSibling");
+        },
+        prev: function(expr) {
+            //@use---fn._np
+            return this._np(expr, "previousElementSibling");
+        },
+        parent: function(expr) {
+            //@use---fn._np
+            return this._np(expr, "parentNode");
+            // var arr = [];
+            // each(this, function(i, e) {
+            //     var parentNode = e.parentNode;
+            //     //确定没有重复
+            //     if (arr.indexOf(parentNode) == -1) {
+            //         //有标识但找不到
+            //         if (expr && !judgeEle(parentNode, expr)) {
+            //             return;
+            //         }
+            //         arr.push(parentNode);
+            //     }
+            // });
+            // return $(arr);
+        },
+        nextUntil: function(expr, filter) {
+            var arr = [];
+            var getEle = function(tar) {
+                var nextEle = tar['nextElementSibling'];
+                if (nextEle) {
+                    arr.push(nextEle);
+                    getEle(nextEle);
+                    if (expr) {
+                        if (getType(expr) == "string") {
+
+                        }
+                    }
+                }
+            };
+            each(this, function(i, tar) {
+                getEle(tar);
+            });
+            getEle = null;
+            return $(arr);
+        },
+        parentsUntil: function(lastExpr, selector) {
+            //@use---fn.filter
             var arr = [],
                 tars = this,
-                lastEles = $(expr);
+                lastEles = $(lastExpr);
             while (tars.length > 0) {
                 var newtars = [];
                 each(tars, function(i, e) {
@@ -611,6 +674,47 @@
         parents: function(selector) {
             //@use---fn.parentsUntil
             return this.parentsUntil(document, selector);
+        },
+        closest: function(selector, context) {
+            //@use---fn.parentsUntil
+            //@use---fn.parent
+            var parentEles = $(selector).parent();
+            context && parentEles.push(context);
+            return this.parentsUntil(parentEles, selector);
+        },
+        find: function(arg) {
+            //@use---fn.parentsUntil
+            var eles = [];
+            if (getType(arg) == "string") {
+                each(this, function(i, e) {
+                    var arr = findEles(e, arg);
+                    each(arr, function(i, e) {
+                        if (eles.indexOf(e) == -1) {
+                            eles.push(e);
+                        }
+                    });
+                });
+            } else if (arg instanceof smartyJQ || arg.nodeType) {
+                arg.nodeType && (arg = [arg]);
+                var $this = this;
+                each(arg, function(i, tar) {
+                    var lastele = [].pop.call($(tar).parentsUntil($this));
+                    if (lastele != document) {
+                        eles.push(lastele);
+                    }
+                });
+            }
+            return $(eles);
+        },
+        has: function(expr) {
+            //@use---fn.find
+            var arr = [];
+            each(this, function(i, tar) {
+                if (0 in $(tar).find(expr)) {
+                    arr.push(tar);
+                }
+            });
+            return $(arr);
         },
         each: function(func) {
             return each(this, function(i, e) {

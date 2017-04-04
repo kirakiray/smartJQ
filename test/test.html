@@ -505,17 +505,39 @@
         </script>
     </div>
 
+    <div class="test_group" style="display: none;">
+        <div class="tar4i_con1">
+            <div class="tar4i">tar4i</div>
+            <div class="tar4i">tar4i</div>
+            <div class="tar4i">tar4i</div>
+        </div>
+        <div class="tar4i">tar4i</div>
+        <script>
+            QUnit.test("wrapInner", function(assert) {
+                assert.expect(5);
+                $('.tar4i').wrapInner('<div class="tar4i_con2"></div>');
+                assert.ok($('.tar4i .tar4i_con2').length == 4, 'count ok!');
+                $('.tar4i .tar4i_con2').each(function() {
+                    assert.ok($(this).text() == "tar4i", 'value ok!');
+                });
+                $('.tar4i_con2').wrapInner(function() {
+                    return '<div class="tar4i_con3" style="color:red;">' + $(this).text() + '</div>';
+                });
+            });
+        </script>
+    </div>
 
 
 
-    <div class="test_group">
+
+    <div class="test_group" style="display:none;">
         <div id="tar5">
             <div class="tar5_a1"></div>
-            <div class="tar5_a1">
-                <div class="tar5_a1_c"></div>
+            <div class="tar5_a1">111
+                <div class="tar5_a1_c">1</div>
             </div>
-            <div class="tar5_a1">
-                <div class="tar5_a1_c"></div>
+            <div class="tar5_a1">222
+                <div class="tar5_a1_c">2</div>
             </div>
             <div class="tar5_a2"></div>
         </div>
@@ -523,6 +545,25 @@
             QUnit.test("find", function(assert) {
                 assert.ok($('#tar5').find('.tar5_a1').length == 3, 'count ok');
                 assert.ok($('#tar5').find('.tar5_a1').find('.tar5_a1_c').length == 2, 'count ok2');
+                assert.ok($('#tar5').find($('.tar5_a1_c,.tar4i_con1')).length == 2, 'find ok');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group" style="display:none;">
+        <div class="tar5_b1"></div>
+        <div class="tar5_b1">111
+            <div class="tar5_b1_c">1</div>
+        </div>
+        <div class="tar5_b1">222
+            <div class="tar5_b1_c">2</div>
+        </div>
+        <div class="tar5_b2"></div>
+        <script>
+            QUnit.test("has", function(assert) {
+                assert.ok($('.tar5_b1').has('.tar5_b1_c').length == 2, 'count ok');
+                assert.ok($('.tar5_b1').has('.tar5_b1_c').hasClass('tar5_b1'), 'class ok');
             });
         </script>
     </div>
@@ -652,6 +693,9 @@
                     return e.getAttribute('kk');
                 }).length == 2, "filter function ok");
 
+                assert.ok($('.tar9_ele').filter($('.tar9_ele').eq(0)).length == 1, "filter count ok2");
+                assert.ok($('.tar9_ele').filter($('.tar9_ele').eq(0)[0]).length == 1, "filter count ok3");
+
             });
         </script>
     </div>
@@ -667,6 +711,19 @@
         <script>
             QUnit.test("not", function(assert) {
                 assert.ok($('.tar10_ele').not('.haha').length == 1, 'not ok');
+            });
+        </script>
+    </div>
+
+    <div class="test_group">
+        <div id="tar10a">
+            <div class="tar10a_ele haha"></div>
+            <div class="tar10a_ele kaka"></div>
+            <div class="tar10a_ele haha"></div>
+        </div>
+        <script>
+            QUnit.test("is", function(assert) {
+                assert.ok($('.tar10a_ele').is('.haha'), 'is ok');
             });
         </script>
     </div>
@@ -742,7 +799,7 @@
 
 
 
-    <div class="test_group">
+    <div class="test_group haha">
         <div id="tar13_1">
             <div class="tar13_1_con haha">
                 <div class="tar13_1_ch"></div>
@@ -782,6 +839,24 @@
             QUnit.test("parents", function(assert) {
                 assert.ok($('.tar14_ele_c1').parents().length == 7, 'parents ok');
                 assert.ok($('.tar14_ele_c1').parents('.tar14_ele1').length == 2, 'parents ok');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group haha2">
+        <div id="tar14b">
+            <div class="tar14b_1 haha">
+                <div class="tar14b_1_1 haha">
+                    <div class="tar14b_1_1_1"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("closest and parents", function(assert) {
+                assert.ok($('.tar14b_1_1_1').parents('.haha').length == 2, 'parents ok');
+                assert.ok($('.tar14b_1_1_1').closest('.haha').length == 1, 'closest ok');
+                assert.ok($('.tar14b_1_1_1').closest('.haha2', $('#tar14b')[0]).length == 0, 'closest ok2');
             });
         </script>
     </div>
@@ -1172,6 +1247,26 @@
 
 
 
+    <div class="test_group">
+        <div id="tar22">
+            <p>1</p>
+            <p>2</p>
+            <p class="haha">3</p>
+            <p>4</p>
+        </div>
+        <script>
+            QUnit.test("next prev", function(assert) {
+                assert.ok($('#tar22 p').next().length == 3, 'next ok');
+                assert.ok($('#tar22 p').next('.haha').length == 1, 'next ok2');
+                assert.ok($('#tar22 p').prev().length == 3, 'next ok');
+                assert.ok($('#tar22 p').prev('.haha').length == 1, 'next ok2');
+            });
+        </script>
+    </div>
+
+
+
+
 
 
 
@@ -1190,38 +1285,6 @@
     </div>
 
 -->
-
-    <!--
-    <div class="test_group">
-        <div id="tarx9">
-            <div class="tarx9_ele1"></div>
-            <div class="tarx9_ele1"></div>
-            <div class="tarx9_ele2">
-                <div>haha</div>
-            </div>
-        </div>
-        <script>
-            QUnit.test("clone", function(assert) {
-                var tarx9_ele1 = $('.tarx9_ele1').clone();
-                $('#tarx9').append(tarx9_ele1);
-                assert.ok($('.tarx9_ele1').length == 4, 'clone count ok');
-
-                //设置事件
-                //                $('.tarx9_ele2 div').bind('click', function() {
-                //                    console.log('haha');
-                //                });
-                //
-                //                var tarx9_ele2 = $('.tarx9_ele2').clone(true);
-                //                $('#tarx9').append(tarx9_ele2);
-            });
-        </script>
-    </div>
-
--->
-
-
-
-
 
 </body>
 
