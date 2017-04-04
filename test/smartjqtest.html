@@ -6,7 +6,7 @@
     <title>Document</title>
     <script src="../src/smartjq.js"></script>
 
-    <script src="jquery-3.1.1.js"></script>
+    <!--<script src="jquery-3.1.1.js"></script>-->
     <!--<script src="jquery-2.1.3.js"></script>-->
     <!--<script src="zepto.js"></script>-->
     <!--<script src="../src/recordjq.js"></script>-->
@@ -83,7 +83,7 @@
         $('#term-2').nextUntil('dt').css('background-color', 'red');
 
         var term3 = document.getElementById("term-3");
-        $("#term-1").nextUntil(term3, "dd").css("color", "green");
+        $("#term-1").nextUntil($(term3), "dd").css("color", "green");
     </script>
 </body>
 

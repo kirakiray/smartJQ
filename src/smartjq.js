@@ -595,7 +595,7 @@
             var tars = this.filter(expr);
             return !!tars.length;
         },
-        _np: function(expr, key, until) {
+        _np: function(expr, key, untilExpr, untilFilter) {
             var arr = [];
             each(this, function(i, tar) {
                 tar = tar[key];
@@ -617,32 +617,21 @@
         parent: function(expr) {
             //@use---fn._np
             return this._np(expr, "parentNode");
-            // var arr = [];
-            // each(this, function(i, e) {
-            //     var parentNode = e.parentNode;
-            //     //确定没有重复
-            //     if (arr.indexOf(parentNode) == -1) {
-            //         //有标识但找不到
-            //         if (expr && !judgeEle(parentNode, expr)) {
-            //             return;
-            //         }
-            //         arr.push(parentNode);
-            //     }
-            // });
-            // return $(arr);
         },
-        nextUntil: function(expr, filter) {
+        _nu: function(lastExpr, filter, key) {
             var arr = [];
             var getEle = function(tar) {
-                var nextEle = tar['nextElementSibling'];
+                var nextEle = tar[key];
                 if (nextEle) {
-                    arr.push(nextEle);
-                    getEle(nextEle);
-                    if (expr) {
-                        if (getType(expr) == "string") {
-
+                    if (lastExpr) {
+                        if ((getType(lastExpr) == "string" && judgeEle(nextEle, lastExpr)) || lastExpr == nextEle || (lastExpr instanceof Array && lastExpr.indexOf(nextEle) > -1)) {
+                            return;
                         }
                     }
+                    if ((!filter || judgeEle(nextEle, filter)) && arr.indexOf(nextEle) == -1) {
+                        arr.push(nextEle);
+                    }
+                    getEle(nextEle);
                 }
             };
             each(this, function(i, tar) {
@@ -651,25 +640,50 @@
             getEle = null;
             return $(arr);
         },
-        parentsUntil: function(lastExpr, selector) {
-            //@use---fn.filter
-            var arr = [],
-                tars = this,
-                lastEles = $(lastExpr);
-            while (tars.length > 0) {
-                var newtars = [];
-                each(tars, function(i, e) {
-                    var parentNode = e.parentNode;
-                    if (parentNode && arr.indexOf(parentNode) < 0 && lastEles.indexOf(parentNode) < 0) {
-                        arr.push(parentNode);
-                        if (newtars.indexOf() < 0) {
-                            newtars.push(parentNode);
-                        }
-                    }
-                });
-                tars = newtars;
-            };
-            return selector ? $(arr).filter(selector) : $(arr);
+        nextUntil: function(lastExpr, filter) {
+            //@use---fn._nu
+            return this._nu(lastExpr, filter, 'nextElementSibling');
+            // var arr = [];
+            // var getEle = function(tar) {
+            //     var nextEle = tar['nextElementSibling'];
+            //     if (nextEle) {
+            //         if (lastExpr) {
+            //             if ((getType(lastExpr) == "string" && judgeEle(nextEle, lastExpr)) || lastExpr == nextEle) {
+            //                 return;
+            //             }
+            //         }
+            //         if ((!filter || judgeEle(nextEle, filter)) && arr.indexOf(nextEle) == -1) {
+            //             arr.push(nextEle);
+            //         }
+            //         getEle(nextEle);
+            //     }
+            // };
+            // each(this, function(i, tar) {
+            //     getEle(tar);
+            // });
+            // getEle = null;
+            // return $(arr);
+        },
+        parentsUntil: function(lastExpr, filter) {
+            //@use---fn._nu
+            return this._nu(lastExpr, filter, 'parentNode');
+            // var arr = [],
+            //     tars = this,
+            //     lastEles = $(lastExpr);
+            // while (tars.length > 0) {
+            //     var newtars = [];
+            //     each(tars, function(i, e) {
+            //         var parentNode = e.parentNode;
+            //         if (parentNode && arr.indexOf(parentNode) < 0 && lastEles.indexOf(parentNode) < 0) {
+            //             arr.push(parentNode);
+            //             if (newtars.indexOf() < 0) {
+            //                 newtars.push(parentNode);
+            //             }
+            //         }
+            //     });
+            //     tars = newtars;
+            // };
+            // return selector ? $(arr).filter(selector) : $(arr);
         },
         parents: function(selector) {
             //@use---fn.parentsUntil
