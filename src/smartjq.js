@@ -684,6 +684,15 @@
             context && parentEles.push(context);
             return this.parentsUntil(parentEles, selector);
         },
+        siblings: function(expr) {
+            //@use---fn.parent
+            //@use---fn.children
+            //@use---fn.map
+            var _this = this;
+            return this.parent().children(expr).map(function() {
+                if (_this.indexOf(this) == -1) return this
+            });
+        },
         find: function(arg) {
             //@use---fn.parentsUntil
             var eles = [];

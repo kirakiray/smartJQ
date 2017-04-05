@@ -1283,6 +1283,26 @@
 
 
 
+    <div class="test_group">
+        <div id="tar23_1">
+            <p>1</p>
+            <div class="tar23_tar">2</div>
+            <span>3</span>
+            <div>4</div>
+        </div>
+        <div id="tar23_1">
+            <p>5</p>
+            <div class="tar23_tar">6</div>
+            <span>7</span>
+            <div>8</div>
+        </div>
+        <script>
+            QUnit.test("siblings", function(assert) {
+                assert.ok($('.tar23_tar').siblings().length == 6, 'siblings ok');
+                assert.ok($('.tar23_tar').siblings('div').length == 2, 'siblings ok2');
+            });
+        </script>
+    </div>
 
 
 
