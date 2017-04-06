@@ -60,6 +60,7 @@
         each(arr2, function(i, e) {
             arr1.push(e);
         });
+        return arr1;
     };
 
     //查找元素的方法
@@ -1087,7 +1088,23 @@
             mapCloneEvent = null;
 
             return $(arr);
-        }
+        },
+        add: function(expr, content) {
+            var $this = this;
+            each($(expr, content), function(i, e) {
+                if ($this.indexOf(e) == -1) {
+                    $this.push(e);
+                }
+            });
+            return $this;
+        },
+        contents: function() {
+            var arr = [];
+            each(this, function(i, tar) {
+                merge(arr, tar.childNodes);
+            });
+            return $(arr);
+        },
     });
 
     //设置event

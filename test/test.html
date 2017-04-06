@@ -97,16 +97,6 @@
         </script>
     </div>
 
-    <div class="test_group">
-        <div id="tar">
-        </div>
-        <script>
-            QUnit.test("offset", function(assert) {
-                assert.ok(true, 'base');
-            });
-        </script>
-    </div>
-
 
     <div class="test_group">
         <div id="tar2">
@@ -1306,6 +1296,32 @@
 
 
 
+    <div class="test_group">
+        <div id="tar24">
+            <div class="tar24_1"></div>
+            <div class="tar24_2"></div>
+            <div class="tar24_3"></div>
+        </div>
+        <script>
+            QUnit.test("add", function(assert) {
+                var tar2 = $('.tar24_1,.tar24_2').add($('.tar24_2,.tar24_3'));
+                assert.ok(tar2.length == 3, 'add ok');
+            });
+        </script>
+    </div>
+
+    <div class="test_group">
+        <div id="tar25">
+            <div class="tar25_1"></div>
+            <div class="tar25_2"></div>
+            <div class="tar25_3"></div>
+        </div>
+        <script>
+            QUnit.test("contents", function(assert) {
+                assert.ok($('#tar25').contents().length == 7, 'contents ok');
+            });
+        </script>
+    </div>
 
 
 
