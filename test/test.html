@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>smartJQ test</title>
+    <link rel="stylesheet" href="qunit-1.15.0.css" />
+    <style>
+        .test_group {
+            margin-top: 50px;
+        }
+    </style>
+    <script src="qunit-1.15.0.js"></script>
+    <script src="../src/smartjq.js"></script>
+    <!--<script src="jquery-3.1.1.js"></script>-->
+    <!--<script src="jquery-2.1.3.js"></script>-->
+    <!--<script src="zepto.js"></script>-->
+</head>
+
+<body>
+    <h1 id="qunit-header">smartJQ test</h1>
+    <h2 id="qunit-banner"></h2>
+    <ol id="qunit-tests"></ol>
+
+    <div class="test_group">
+        <div id="tar0">
+            <div class="tar0_ele"></div>
+            <div class="tar0_ele"></div>
+            <div class="tar0_ele"></div>
+        </div>
+        <script>
+            QUnit.test("core", function(assert) {
+                assert.ok($('.tar0_ele').length, 'length ok');
+
+                //获取成数组类型
+                var arr = $('.tar0_ele').get();
+                //确认arr不是$对象
+                assert.ok(!arr.addClass, 'is array');
+
+                //转换对象测试
+                assert.ok(!!$(arr).addClass, 'is $');
+            });
+        </script>
+    </div>
+
+
+
+    <!--
+
+    <div class="test_group">
+        <div id="tar">
+        </div>
+        <script>
+            QUnit.test("attr", function(assert) {
+                assert.ok(true, 'base');
+            });
+        </script>
+    </div>
+
+-->
+
+
+
+
+    <div class="test_group">
+        <div id="tar1">
+            <div class="tar1_test1" style="font-size:13px;"></div>
+            <div class="tar1_test2"></div>
+            <div class="tar1_test3"></div>
+            <div class="tar1_test3"></div>
+        </div>
+        <script>
+            QUnit.test("css", function(assert) {
+                //测试获取样式
+                var t1f = $('.tar1_test1').css('font-size');
+                assert.ok(t1f == "13px", 'css get fontSize');
+
+                //设置样式
+                $('.tar1_test2').css('font-size', "14px");
+                var t2f = $('.tar1_test2').css('font-size');
+                assert.ok((t2f == "14px"), 'css set fontSize');
+
+                //object设置样式
+                $('.tar1_test3').css({
+                    "font-size": "15px",
+                    "line-height": "20px"
+                });
+                var t3f = $('.tar1_test3').css('font-size');
+                var t3l = $('.tar1_test3').css('line-height');
+                assert.ok((t3f == "15px") && (t3l == "20px"), 'css obj set color');
+
+                //获取第二个元素样式
+                assert.ok($('.tar1_test3')[1].style['font-size'] == "15px", 'the second element is no problem');
+                assert.ok($($('.tar1_test3')[1]).css('font-size') == "15px", 'the second element is no problem');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar2">
+            <div class="tar2_test1" kaka="luote"></div>
+            <div class="tar2_test2"></div>
+            <div class="tar2_test3"></div>
+            <div class="tar2_test3"></div>
+        </div>
+        <script>
+            QUnit.test("attr", function(assert) {
+                //获取属性测试
+                var t1a = $('.tar2_test1').attr('kaka');
+                assert.ok(t1a == "luote", 'attr get');
+
+                //设置属性
+                $('.tar2_test2').attr('fake', "u2");
+                var t2a = $('.tar2_test2').attr('fake');
+                assert.ok(t2a == "u2", 'attr set');
+
+                //object设置属性
+                $('.tar2_test3').attr({
+                    "beau": "tiful",
+                    "cong": "ratulate"
+                });
+                assert.ok($('.tar2_test3').attr('beau') == "tiful" && $('.tar2_test3').attr('cong') == "ratulate", "attr obj set");
+
+                //第二个元素属性
+                assert.ok($($('.tar2_test3')[1]).attr('beau') == "tiful", "the second element is no problem");
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar3">
+            <div class="tar3_test" a1="true"></div>
+            <div class="tar3_test" a1="true"></div>
+        </div>
+        <script>
+            QUnit.test("removeAttr", function(assert) {
+                var tar3_test = $('.tar3_test');
+
+                //确认个数
+                assert.ok(tar3_test.length == 2, 'count ok!');
+
+                //去除属性
+                tar3_test.removeAttr('a1');
+                assert.ok(tar3_test[0].getAttribute('a1') == undefined && tar3_test[1].getAttribute('a1') == undefined, "removeOK");
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group" style="display:none;">
+        <input class="tar3a" type="checkbox" checked="checked">
+        <input class="tar3a" type="checkbox" checked>
+        <input class="tar3a_2" type="checkbox">
+        <input class="tar3a_2" type="checkbox" checked>
+        <input class="tar3a_3" type="checkbox">
+        <script>
+            QUnit.test("prop removeProp", function(assert) {
+                assert.ok($('.tar3a').prop('checked') == true, 'prop ok');
+
+                //设置不选中
+                $('.tar3a').prop('checked', false);
+                assert.ok($('.tar3a').prop('checked') == false, 'prop ok2');
+
+                $('.tar3a_2').prop('checked', function(i, val) {
+                    return !val;
+                });
+
+                assert.ok($('.tar3a_2').eq(0).prop('checked') == true, "prop ok 3");
+                assert.ok($('.tar3a_2').eq(1).prop('checked') == false, 'prop ok 4');
+
+                $('.tar3a_3').prop({
+                    checked: true
+                });
+                assert.ok($('.tar3a_3').prop('checked') == true, "prop ok 5");
+
+                // $('.tar3a_3').removeProp('checked');
+                // assert.ok($('.tar3a_3').prop('checked') == false, "removeProp ok 5");
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group" style="display:none;">
+        <div id="tar3b">
+            <div class="tar3b_ele1"><span>haha</span></div>
+            <div class="tar3b_ele2"></div>
+            <div class="tar3b_ele3">asd</div>
+            <div class="tar3b_ele3">asd</div>
+        </div>
+        <script>
+            QUnit.test("html", function(assert) {
+                assert.ok($('.tar3b_ele1').html() == "<span>haha</span>", 'get html ok');
+                $('.tar3b_ele2').html('<span style="color:red;">haha2</span>');
+                assert.ok($('.tar3b_ele2').html() == '<span style="color:red;">haha2</span>', 'set html ok');
+                $('.tar3b_ele3').html(function(i, html) {
+                    return html + "__" + i;
+                });
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group" style="display: none;">
+        <div id="tar3c">
+            <div class="tar3c_ele1">asd</div>
+        </div>
+        <script>
+            QUnit.test("text", function(assert) {
+                assert.ok($('.tar3c_ele1').text() == "asd", 'get text ok');
+                $('.tar3c_ele1').text('haha');
+                assert.ok($('.tar3c_ele1').text() == "haha", 'set text ok');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group" style="display:none;">
+        <div id="tar3d">
+            <select id="tar3d_single">
+                <option>Single</option>
+                <option>Single2</option>
+            </select>
+            <select id="tar3d_multiple" multiple="multiple">
+                <option selected="selected">Multiple</option>
+                <option>Multiple2</option>
+                <option selected="selected">Multiple3</option>
+            </select>
+            <select id="tar3d_multiple_b" multiple="multiple">
+                <option selected="selected">Multiple_b</option>
+                <option>Multiple2_b</option>
+                <option selected="selected">Multiple3_b</option>
+            </select>
+
+            <input type="checkbox" value="check1" /> check1 <br>
+            <input type="checkbox" value="check2" /> check2<br>
+            <input type="radio" value="radio1" /> radio1<br>
+            <input type="radio" value="radio2" /> radio2<br>
+        </div>
+        <script>
+            QUnit.test("val", function(assert) {
+                assert.ok(true, 'base');
+                $("#tar3d_single").val("Single2");
+                $("#tar3d_multiple").val(["Multiple2", "Multiple3"]);
+                $("#tar3d input").val(["check2", "radio1"]);
+
+                assert.ok($("#tar3d_single").val() == "Single2", 'select ok');
+                assert.ok($("#tar3d_multiple").val().toString() == ["Multiple2", "Multiple3"].toString(), 'Multiple2 select val ok');
+                assert.ok($('#tar3d [type=checkbox]').eq(1).prop('checked'), 'checkbox ok');
+                assert.ok($('#tar3d [type=radio]').eq(0).prop('checked'), 'radio ok');
+            });
+        </script>
+    </div>
+
+
+
+
+    <!--<div class="test_group">
+        <div style="margin:100px;border:blue solid 5px;">
+            <div style="padding:20px;margin:30px;border:green solid 5px;">
+                <div style="padding:20px;margin:10px;border:red solid 5px;">
+                    <div class="tar_ele" style="display:inline-block;margin:50px;background-color:#eee;">tar_ele</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('position => ', $('.tar_ele').position());
+            console.log('offset => ', $('.tar_ele').offset());
+            console.log('scrollTop => ', $('body').scrollTop());
+            console.log('parent.height => ', $('.tar_ele').parent().height());
+            console.log('parent.width => ', $('.tar_ele').parent().width());
+            console.log('parent.innerHeight => ', $('.tar_ele').parent().innerHeight());
+            console.log('parent.innerWidth => ', $('.tar_ele').parent().innerWidth());
+            console.log('parent.outerHeight => ', $('.tar_ele').parent().outerHeight());
+            console.log('parent.outerWidth => ', $('.tar_ele').parent().outerWidth());
+        </script>
+    </div>-->
+
+
+
+
+    <div class="test_group">
+        <div class="tar4_fade"></div>
+        <div class="tar4_fade2"></div>
+        <div class="tar4_fade2"></div>
+        <div>
+            <div class="tar4_test1"></div>
+            <div class="tar4_test2"></div>
+            <div class="tar4_test3"></div>
+            <div class="tar4_test3"></div>
+        </div>
+        <script>
+            QUnit.test("append appendto", function(assert) {
+                var tar4_fade = $('.tar4_fade');
+                tar4_fade[0].kaka = "fa";
+
+                $('.tar4_test3').append(tar4_fade);
+
+                //判断个数
+                assert.ok($('.tar4_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4_test1').appendTo('.tar4_fade2');
+
+                //判断个数
+                assert.ok($('.tar4_fade2 .tar4_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div class="tar4b_fade"></div>
+        <div class="tar4b_fade2"></div>
+        <div class="tar4b_fade2"></div>
+        <div>
+            <div class="tar4b_test1"></div>
+            <div class="tar4b_test2"></div>
+            <div class="tar4b_test3"></div>
+            <div class="tar4b_test3"></div>
+        </div>
+        <script>
+            QUnit.test("prepend prependTo", function(assert) {
+                var tar4b_fade = $('.tar4b_fade');
+                tar4b_fade[0].kaka = "fa";
+
+                $('.tar4_test3').prepend(tar4b_fade);
+
+                //判断个数
+                assert.ok($('.tar4b_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4b_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4b_test1').prependTo('.tar4b_fade2');
+
+                //判断个数
+                assert.ok($('.tar4b_fade2 .tar4b_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div class="tar4c_fade"></div>
+        <div class="tar4c_fade2"></div>
+        <div class="tar4c_fade2"></div>
+        <div>
+            <div class="tar4c_test1"></div>
+            <div class="tar4c_test2"></div>
+            <div class="tar4c_test3"></div>
+            <div class="tar4c_test3"></div>
+        </div>
+        <script>
+            QUnit.test("after insertAfter", function(assert) {
+                var tar4c_fade = $('.tar4c_fade');
+                tar4c_fade[0].kaka = "fa";
+
+                $('.tar4c_test3').after(tar4c_fade);
+
+                //判断个数
+                assert.ok($('.tar4c_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4c_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4c_test1').insertAfter('.tar4c_fade2');
+
+                //判断个数
+                assert.ok($('.tar4c_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div class="tar4d_fade"></div>
+        <div class="tar4d_fade2"></div>
+        <div class="tar4d_fade2"></div>
+        <div>
+            <div class="tar4d_test1"></div>
+            <div class="tar4d_test2"></div>
+            <div class="tar4d_test3"></div>
+            <div class="tar4d_test3"></div>
+        </div>
+        <script>
+            QUnit.test("before insertBefore", function(assert) {
+                var tar4d_fade = $('.tar4d_fade');
+                tar4d_fade[0].kaka = "fa";
+
+                $('.tar4d_test3').before(tar4d_fade);
+
+                //判断个数
+                assert.ok($('.tar4d_fade').length == 2, 'count ok!');
+
+                //判断节点正确性
+                assert.ok($('.tar4d_fade')[1].kaka == "fa", 'element data ok!');
+
+                $('.tar4d_test1').insertBefore('.tar4d_fade2');
+
+                //判断个数
+                assert.ok($('.tar4d_test1').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4e">1</div>
+        <div class="tar4e">2</div>
+        <div class="tar4e_test1"></div>
+        <script>
+            QUnit.test("warp", function(assert) {
+                $('.tar4e').wrap('<div class="tar4e_outer"></div>');
+
+                assert.ok($('.tar4e_outer').length == 2, 'count ok!');
+
+                $('.tar4e').wrap(function() {
+                    // console.log(arguments, this);
+                    return '<div class="tar4e_outer2">' + this.innerHTML + '</div>';
+                });
+
+                assert.ok($('.tar4e_outer2').length == 2, 'count ok2!');
+            });
+        </script>
+    </div>
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4f_3">4</div>
+        <div class="tar4f">1</div>
+        <div class="tar4f">1</div>
+        <div class="tar4f_test1">3</div>
+        <script>
+            QUnit.test("replaceWith", function(assert) {
+                $('.tar4f').replaceWith('<div class="tar4f_2">2</div>');
+                assert.ok($('.tar4f_2').length == 2, 'count ok!');
+
+                $('.tar4f_test1').replaceWith('.tar4f_3');
+            });
+        </script>
+    </div>
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4g_con">
+            <div class="tar4g"></div>
+            <div class="tar4g"></div>
+            <div class="tar4g"></div>
+        </div>
+        <div class="tar4g_con">
+            <div class="tar4g"></div>
+        </div>
+        <script>
+            QUnit.test("unwrap", function(assert) {
+                assert.ok($('.tar4g_con').length == 2, 'count ok!');
+                $('.tar4g').unwrap();
+                assert.ok($('.tar4g_con').length == 0, 'count ok2!');
+            });
+        </script>
+    </div>
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4h_con1">
+            <div class="tar4h"></div>
+            <div class="tar4h"></div>
+            <div class="tar4h"></div>
+        </div>
+        <div class="tar4h"></div>
+        <script>
+            QUnit.test("wrapAll", function(assert) {
+                $('.tar4h').wrapAll('<div class="tar4h_con2"></div>');
+                assert.ok($('.tar4h_con2').length == 1, 'count ok!');
+                assert.ok($('.tar4h_con1 .tar4h').length == 4, 'count ok2!');
+            });
+        </script>
+    </div>
+
+    <div class="test_group" style="display: none;">
+        <div class="tar4i_con1">
+            <div class="tar4i">tar4i</div>
+            <div class="tar4i">tar4i</div>
+            <div class="tar4i">tar4i</div>
+        </div>
+        <div class="tar4i">tar4i</div>
+        <script>
+            QUnit.test("wrapInner", function(assert) {
+                assert.expect(5);
+                $('.tar4i').wrapInner('<div class="tar4i_con2"></div>');
+                assert.ok($('.tar4i .tar4i_con2').length == 4, 'count ok!');
+                $('.tar4i .tar4i_con2').each(function() {
+                    assert.ok($(this).text() == "tar4i", 'value ok!');
+                });
+                $('.tar4i_con2').wrapInner(function() {
+                    return '<div class="tar4i_con3" style="color:red;">' + $(this).text() + '</div>';
+                });
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group" style="display:none;">
+        <div id="tar5">
+            <div class="tar5_a1"></div>
+            <div class="tar5_a1">111
+                <div class="tar5_a1_c">1</div>
+            </div>
+            <div class="tar5_a1">222
+                <div class="tar5_a1_c">2</div>
+            </div>
+            <div class="tar5_a2"></div>
+        </div>
+        <script>
+            QUnit.test("find", function(assert) {
+                assert.ok($('#tar5').find('.tar5_a1').length == 3, 'count ok');
+                assert.ok($('#tar5').find('.tar5_a1').find('.tar5_a1_c').length == 2, 'count ok2');
+                assert.ok($('#tar5').find($('.tar5_a1_c,.tar4i_con1')).length == 2, 'find ok');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group" style="display:none;">
+        <div class="tar5_b1"></div>
+        <div class="tar5_b1">111
+            <div class="tar5_b1_c">1</div>
+        </div>
+        <div class="tar5_b1">222
+            <div class="tar5_b1_c">2</div>
+        </div>
+        <div class="tar5_b2"></div>
+        <script>
+            QUnit.test("has", function(assert) {
+                assert.ok($('.tar5_b1').has('.tar5_b1_c').length == 2, 'count ok');
+                assert.ok($('.tar5_b1').has('.tar5_b1_c').hasClass('tar5_b1'), 'class ok');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar5x_1">
+            <div class="tar5x_1_ele">
+                <div class="tar5x_1_ele_c1"></div>
+                <div class="tar5x_1_ele_c2"></div>
+                <div class="tar5x_1_ele_c3"></div>
+            </div>
+            <div class="tar5x_1_ele">
+                <div class="tar5x_1_ele_c3"></div>
+                <div class="tar5x_1_ele_c2"></div>
+                <div class="tar5x_1_ele_c3"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("children", function(assert) {
+
+                assert.ok($('.tar5x_1_ele').children().length == 6, 'count 6 ok');
+                assert.ok($('.tar5x_1_ele').children('.tar5x_1_ele_c3').length == 3, 'count 3 ok');
+                assert.ok($('.tar5x_1_ele').children('.tar5x_1_ele_c2').length == 2, 'count 2 ok');
+                assert.ok($('.tar5x_1_ele').children('.tar5x_1_ele_c1').length == 1, 'count 1 ok');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar6">
+            <ul>
+                <div class="tar6_foo"></div>
+                <div class="tar6_bar"></div>
+                <div class="tar6_baz"></div>
+            </ul>
+            <ul>
+                <div class="tar6_baz"></div>
+                <div class="tar6_foo" id="tar6_foo_2"></div>
+                <div class="tar6_bar"></div>
+            </ul>
+        </div>
+        <script>
+            QUnit.test("index", function(assert) {
+                assert.ok($('.tar6_baz').index() == 2, 'get index ok');
+
+                assert.ok($('#tar6 div').index($('.tar6_foo')[1]) == 4, 'element index ok');
+
+                assert.ok($('#tar6 div').index($('#tar6_foo_2')) == 4, "$element index ok");
+
+                assert.ok($('#tar6 div').index($('.tar6_bar')) == 1, "$element index ok 2");
+
+                assert.ok($('#tar6_foo_2').index('#tar6 div') == 4, "index string ok");
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar7" class="haha2"></div>
+        <!--        <div id="tar7"></div>-->
+        <script>
+            QUnit.test("class Function", function(assert) {
+                //hasclass是否生效
+                assert.ok($('#tar7').hasClass('haha') == false, 'hasClass');
+
+                //添加class
+                $('#tar7').addClass('haha');
+                assert.ok($('#tar7').hasClass('haha'), 'addClass');
+
+                $('#tar7').removeClass('haha');
+                assert.ok($('#tar7').hasClass('haha') == false, 'removeClass');
+
+                $('#tar7').toggleClass('haha');
+                assert.ok($('#tar7').hasClass('haha'), 'toggleClass 1 ok');
+
+                $('#tar7').toggleClass('haha');
+                assert.ok($('#tar7').hasClass('haha') == false, 'toggleClass 2 ok');
+
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar8">
+            <div class="tar8_ele" haha="1"></div>
+            <div class="tar8_ele" haha="2"></div>
+        </div>
+        <script>
+            QUnit.test("map", function(assert) {
+                var tar8data = $('.tar8_ele').map(function(i, e) {
+                    assert.ok(this.nodeType, "isNode");
+                    return i;
+                });
+                assert.ok(tar8data.length, 'map count ok');
+                assert.ok(!!tar8data.addClass, 'function ok');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div id="tar9">
+            <div class="tar9_ele haha"></div>
+            <div class="tar9_ele" kk="1"></div>
+            <div class="tar9_ele haha"></div>
+            <div class="tar9_ele"></div>
+            <div class="tar9_ele haha" kk="2"></div>
+        </div>
+        <script>
+            QUnit.test("filter", function(assert) {
+                assert.ok($('.tar9_ele').filter('.haha').length == 3, 'count ok');
+
+                assert.ok($('.tar9_ele').filter(function(i, e) {
+                    return e.getAttribute('kk');
+                }).length == 2, "filter function ok");
+
+                assert.ok($('.tar9_ele').filter($('.tar9_ele').eq(0)).length == 1, "filter count ok2");
+                assert.ok($('.tar9_ele').filter($('.tar9_ele').eq(0)[0]).length == 1, "filter count ok3");
+
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar10">
+            <div class="tar10_ele haha"></div>
+            <div class="tar10_ele kaka"></div>
+            <div class="tar10_ele haha"></div>
+        </div>
+        <script>
+            QUnit.test("not", function(assert) {
+                assert.ok($('.tar10_ele').not('.haha').length == 1, 'not ok');
+            });
+        </script>
+    </div>
+
+    <div class="test_group">
+        <div id="tar10a">
+            <div class="tar10a_ele haha"></div>
+            <div class="tar10a_ele kaka"></div>
+            <div class="tar10a_ele haha"></div>
+        </div>
+        <script>
+            QUnit.test("is", function(assert) {
+                assert.ok($('.tar10a_ele').is('.haha'), 'is ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar11">
+            <div class="tar11_ele" a="10"></div>
+            <div class="tar11_ele" a="20"></div>
+            <div class="tar11_ele" a="30"></div>
+            <div class="tar11_ele" a="40"></div>
+            <div class="tar11_ele" a="50"></div>
+        </div>
+        <script>
+            QUnit.test("slice", function(assert) {
+                assert.ok($('.tar11_ele').slice(1, 2).attr('a') == 20, 'slice ok');
+                assert.ok($('.tar11_ele').slice(1).length == 4, 'slice length ok');
+                assert.ok($('.tar11_ele').slice(-2).length == 2, 'slice length2 ok');
+                assert.ok($('.tar11_ele').slice(5).length == 0, 'slice length3 ok');
+                assert.ok($('.tar11_ele').slice(-2, 5).length == 2, 'slice length4 ok');
+                assert.ok($('.tar11_ele').slice(-2, 100).length == 2, 'slice length5 ok');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <div id="tar12">
+            <div class="tar12_ele" a="10"></div>
+            <div class="tar12_ele" a="20"></div>
+            <div class="tar12_ele" a="30"></div>
+            <div class="tar12_ele" a="40"></div>
+            <div class="tar12_ele" a="50"></div>
+        </div>
+        <script>
+            QUnit.test("eq", function(assert) {
+                assert.ok($('.tar12_ele').eq(1).attr('a') == 20, 'index ok');
+                assert.ok($('.tar12_ele').eq(-1).attr('a') == 50, 'index2 ok');
+                assert.ok($('.tar12_ele').eq(-2).attr('a') == 40, 'index3 ok');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar13">
+            <div class="tar13_con haha">
+                <div class="tar13_ch"></div>
+            </div>
+            <div class="tar13_con haha">
+                <div class="tar13_ch"></div>
+            </div>
+            <div class="tar13_con">
+                <div class="tar13_ch"></div>
+                <div class="tar13_ch"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("parent", function(assert) {
+                assert.ok($('.tar13_ch').parent().length == 3, 'parent count ok');
+
+                assert.ok($('.tar13_ch').parent('.haha').length == 2, 'parent filter ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group haha">
+        <div id="tar13_1">
+            <div class="tar13_1_con haha">
+                <div class="tar13_1_ch"></div>
+            </div>
+            <div class="tar13_1_con haha">
+                <div class="tar13_1_ch"></div>
+            </div>
+            <div class="tar13_1_con">
+                <div class="tar13_1_ch"></div>
+                <div class="tar13_1_ch"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("parentsUntil", function(assert) {
+                assert.ok($('.tar13_1_ch').parentsUntil('.test_group').length == 4, 'parentUntil count ok');
+                assert.ok($('.tar13_1_ch').parentsUntil('.test_group', '.haha').length == 2, 'filter count ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar14">
+            <div class="tar14_ele1">
+                <div class="tar14_ele_c1"></div>
+                <div class="tar14_ele_c1"></div>
+            </div>
+            <div class="tar14_ele2">
+                <div class="tar14_ele_c1"></div>
+            </div>
+            <div class="tar14_ele1">
+                <div class="tar14_ele_c1"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("parents", function(assert) {
+                assert.ok($('.tar14_ele_c1').parents().length == 7, 'parents ok');
+                assert.ok($('.tar14_ele_c1').parents('.tar14_ele1').length == 2, 'parents ok');
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group haha2">
+        <div id="tar14b">
+            <div class="tar14b_1 haha">
+                <div class="tar14b_1_1 haha">
+                    <div class="tar14b_1_1_1"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("closest and parents", function(assert) {
+                assert.ok($('.tar14b_1_1_1').parents('.haha').length == 2, 'parents ok');
+                assert.ok($('.tar14b_1_1_1').closest('.haha').length == 1, 'closest ok');
+                assert.ok($('.tar14b_1_1_1').closest('.haha2', $('#tar14b')[0]).length == 0, 'closest ok2');
+            });
+        </script>
+    </div>
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar15"></div>
+        <div id="tar15_2" data-cao="300"></div>
+        <script>
+            QUnit.test("data , removeData", function(assert) {
+
+                assert.ok($('#tar15').data('haha') == undefined, 'data get data  ok');
+
+                $('#tar15').data('haha', 100)
+                assert.ok($('#tar15').data('haha') == 100, 'data set ok');
+                assert.ok($('#tar15').attr('data-haha') == undefined, 'data no attr');
+
+                $('#tar15,#tar15_2').data({
+                    haha: 200,
+                    kaka: "luote"
+                });
+                assert.ok($('#tar15').data('haha') == 200, 'data change ok');
+                assert.ok($('#tar15').data('kaka') == 'luote', 'object data ok');
+
+                assert.ok($('#tar15_2').data('cao') == 300, 'attr data ok');
+                assert.ok($('#tar15_2').data('haha') == 200, 'data ok 2');
+
+                $('#tar15_2').data('cao', "400")
+                assert.ok($('#tar15_2').data('cao') == 400, 'data ok 3');
+                assert.ok($('#tar15_2').attr('data-cao') == 300, 'attr data ok 2');
+
+                $('#tar15_2').removeData('cao')
+                assert.ok($('#tar15_2').data('cao') == 300, 'data ok 4');
+
+                //                console.log($('#tar15_2').data());
+            });
+        </script>
+    </div>
+
+
+    <div class="test_group">
+        <div id="tar16">
+            <div class="tar16_1"></div>
+            <div class="tar16_1"></div>
+        </div>
+        <script>
+            QUnit.test("event trigger", function(assert) {
+                //绑定原生事件
+                $('#tar16')[0].addEventListener('click', function() {
+                    assert.ok(true, 'trigger ok');
+                    // console.log(arguments);
+                });
+
+                //触发事件
+                $('.tar16_1').eq(0).trigger('click', {
+                    "kaka": "luote"
+                });
+            });
+        </script>
+    </div>
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar17">
+            <div class="tar17_con">
+                <div class="tar17_con_ele1"></div>
+                <div class="tar17_con_ele2"></div>
+                <div class="tar17_con_ele3"></div>
+            </div>
+            <div class="tar17_con">
+                <div class="tar17_con_ele1"></div>
+                <div class="tar17_con_ele2"></div>
+                <div class="tar17_con_ele4"></div>
+            </div>
+            <div class="tar17_con2">
+                <div class="tar17_con2_ele1"></div>
+                <div class="tar17_con2_ele2"></div>
+                <div class="tar17_con2_ele4"></div>
+            </div>
+            <a id="tar17_link" href="http://github.com/"></a>
+        </div>
+        <script>
+            QUnit.test("event on:count", function(assert) {
+                assert.expect(2);　　
+                $('.tar17_con').on('haha', function(e) {
+                    assert.ok(true, 'base on event ok');
+                });
+                $('.tar17_con').trigger('haha');
+            });
+            QUnit.test("event on:data", function(assert) {
+                $('.tar17_con').on('haha2', {
+                    kaka: "luote"
+                }, function(e, data) {
+                    // console.log(arguments);
+                    assert.ok(data.haha == "hahadata", 'data ok1');
+                    assert.ok(e.data.kaka == "luote", 'data ok2');
+                });
+                $('.tar17_con').trigger('haha2', {
+                    haha: "hahadata"
+                });
+            });
+            QUnit.test("event on:selector", function(assert) {
+                $('#tar17').on('haha', '.tar17_con2', function(e) {
+                    assert.ok(e.currentTarget == $('.tar17_con2')[0], 'currentTarget ok');
+                    assert.ok(e.delegateTarget == $('#tar17')[0], 'delegateTarget ok');
+                    assert.ok(e.target == $('.tar17_con2_ele2')[0], 'target ok');
+                    // console.log(e);
+                });
+                $('.tar17_con2_ele2').trigger('haha');
+            });
+            QUnit.test("event:custom object", function(assert) {
+                var obj = {};
+
+                $(obj).on('haha', {
+                    ondata: true
+                }, function(e, td) {
+                    // console.log('haha', obj, e, td);
+                    assert.ok(e.currentTarget == obj, 'custom object currentTarget ok');
+                    assert.ok(e.delegateTarget == obj, 'custom object delegateTarget ok');
+                    assert.ok(e.target == obj, 'custom object target ok');
+                    assert.ok(e.data.ondata, 'custom object data ok1');
+                    assert.ok(td.triggerdata, 'custom object data ok2');
+                });
+
+                $(obj).trigger('haha', {
+                    triggerdata: true
+                });
+            });
+            QUnit.test("event:stopImmediatePropagation", function(assert) {
+                var obj = {};
+                $(obj).on('haha', function(e) {
+                    assert.ok(true, 'custom ok');
+                    //禁止传递事件
+                    e.stopImmediatePropagation();
+                });
+
+                $(obj).on('haha', function(e) {
+                    throw "error";
+                });
+
+                $(obj).trigger('haha');
+            });
+            QUnit.test("event:stopPropagation", function(assert) {
+                $('#tar17').on('haha3', function(e) {
+                    throw "error";
+                });
+
+                $('.tar17_con2').on('haha3', function(e) {
+                    assert.ok(true, 'Propagation ok');
+                    e.stopPropagation();
+                });
+
+                $('.tar17_con2_ele4').on('haha3', function(e) {
+                    assert.ok(true, 'event ok');
+                });
+
+                $('.tar17_con2_ele4').trigger('haha3');
+            });
+            QUnit.test("event:preventDefault", function(assert) {
+                $('#tar17_link').on('click', function(e) {
+                    assert.ok(true, 'preventDefault ok');
+                    e.preventDefault();
+                });
+
+                $('#tar17_link').trigger('click');
+            });
+        </script>
+    </div>
+
+
+
+
+
+
+    <div class="test_group">
+        <div class="tar18_ele1"></div>
+        <div class="tar18_ele2"></div>
+        <div id="tar18">
+            <div class="tar18_ele3">
+                <div class="tar18_child3"></div>
+            </div>
+            <div class="tar18_ele4">
+                <div class="tar18_child4"></div>
+            </div>
+        </div>
+        <div id="tar18_2">
+            <div class="tar18_ele5">
+                <div class="tar18_child5"></div>
+            </div>
+            <div class="tar18_ele6">
+                <div class="tar18_child6"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("event:off", function(assert) {
+                assert.expect(7);
+                $('.tar18_ele1').on('haha', function() {
+                    throw "haha";
+                });
+                $('.tar18_ele1').on('haha', function() {
+                    throw "haha2";
+                });
+                assert.ok(true, 'event ready');
+                //测试是否注销haha事件
+                $('.tar18_ele1').off('haha');
+                $('.tar18_ele1').trigger('haha');
+
+
+                var callfun = function() {
+                    throw "haha3";
+                };
+                $('.tar18_ele2').on('haha', callfun);
+                $('.tar18_ele2').on('haha', function() {
+                    assert.ok(true, 'event ok1');
+                });
+                //测试是否注销特定函数
+                $('.tar18_ele2').off('haha', callfun);
+                $('.tar18_ele2').trigger('haha');
+
+
+                $('#tar18').on('haha', '.tar18_ele3', callfun);
+                $('#tar18').on('haha', '.tar18_ele3', function() {
+                    assert.ok(true, 'event ok2');
+                });
+                $('#tar18').on('haha', '.tar18_ele4', callfun);
+                $('#tar18').on('haha', '.tar18_ele4', function() {
+                    assert.ok(true, 'event ok3');
+                });
+                //测试是否去除公用的函数
+                $('#tar18').off('haha', callfun);
+                $('.tar18_child3').trigger('haha');
+                $('.tar18_child4').trigger('haha');
+
+                var callfun2 = function() {
+                    if (this.classList.contains('tar18_ele5')) {
+                        throw "haha4";
+                    } else {
+                        assert.ok(true, 'event ok5');
+                    }
+                };
+                $('#tar18_2').on('haha', '.tar18_ele5', callfun2);
+                $('#tar18_2').on('haha', '.tar18_ele5', function() {
+                    assert.ok(true, 'event ok4');
+                });
+                $('#tar18_2').on('haha', '.tar18_ele6', callfun2);
+                $('#tar18_2').on('haha', '.tar18_ele6', function() {
+                    assert.ok(true, 'event ok6');
+                });
+                $('#tar18_2').off('haha', '.tar18_ele5', callfun2);
+                $('.tar18_child5').trigger('haha');
+                $('.tar18_child6').trigger('haha');
+
+                // //测试清空所有
+                $('#tar18').off();
+                $('#tar18').trigger('haha');
+            });
+        </script>
+    </div>
+
+
+
+
+    <div class="test_group">
+        <script>
+            QUnit.test("event:one", function(assert) {
+                assert.expect(3);
+                var obj = {};
+                $(obj).one('haha', {
+                    onedata: true
+                }, function(e, data) {
+                    assert.ok(true, 'base');
+                    assert.ok(data.triggerdata == 1, 'data ok');
+                    assert.ok(e.data.onedata, 'data ok2');
+                });
+
+                $(obj).trigger('haha', {
+                    triggerdata: 1
+                });
+                $(obj).trigger('haha', {
+                    triggerdata: 2
+                });
+                $(obj).trigger('haha', {
+                    triggerdata: 3
+                });
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <script>
+            QUnit.test("bind and unbind", function(assert) {
+                assert.expect(3);
+                var obj = {};
+                $(obj).bind('haha', {
+                    b: true
+                }, function(e, data) {
+                    assert.ok(true, 'base');
+                    assert.ok(data.t, 'data ok');
+                    assert.ok(e.data.b, 'data ok2');
+                });
+                $(obj).trigger('haha', {
+                    t: true
+                });
+
+                $(obj).unbind('haha');
+                $(obj).trigger('haha', {
+                    t: true
+                });
+            });
+        </script>
+    </div>
+
+
+
+
+
+    <div class="test_group">
+        <div id="tar19">
+            <a class="tar19_ele1" href="#error"></a>
+        </div>
+        <script>
+            QUnit.test("triggerHandler", function(assert) {
+                $('#tar19').click(function(e) {
+                    throw "haha error";
+                });
+                $('.tar19_ele1').click(function(e) {
+                    assert.ok(true, 'ok');
+                });
+                $('.tar19_ele1').triggerHandler('click');
+            });
+        </script>
+    </div>
+
+
+
+    <!--<div class="test_group">
+        <div id="tar20">asdasd</div>
+        <script>
+            QUnit.test("hover", function(assert) {
+                assert.ok(true, 'base');
+                $('#tar20').hover(function() {
+                    $(this).css('background-color', 'red');
+                }, function() {
+                    $(this).css('background-color', 'blue');
+                });
+            });
+        </script>
+    </div>-->
+
+
+
+    <div class="test_group">
+        <div id="tar21">
+            <div class="tar21_ele"></div>
+            <div class="tar21_ele2">
+                <div class="tar21_ele2_child"></div>
+            </div>
+        </div>
+        <script>
+            QUnit.test("clone", function(assert) {
+                $('.tar21_ele2').clone().appendTo('.tar21_ele');
+
+                $('.tar21_ele2').data('haha', true);
+                $('.tar21_ele2').on('click', function() {
+                    assert.ok(true, 'clone event ok');
+                });
+
+                //深度克隆
+                var deepCloneEle = $('.tar21_ele2').eq(0).clone(true);
+                $('#tar21').append(deepCloneEle);
+                deepCloneEle.find('.tar21_ele2_child').click();
+                assert.ok(deepCloneEle.data('haha'), 'clone event ok');
+
+
+                assert.ok($('.tar21_ele2').length == 3, 'element data ok');
+                assert.ok($('.tar21_ele2_child').length == 3, 'element child count ok');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar22">
+            <p class="haha1">1</p>
+            <p class="haha2">2</p>
+            <p class="haha3">3</p>
+            <p class="haha4">4</p>
+        </div>
+        <script>
+            QUnit.test("next prev nextAll prevAll nextUntil prevUntil", function(assert) {
+                assert.ok($('#tar22 p').next().length == 3, 'next ok');
+                assert.ok($('#tar22 p').next('.haha3').length == 1, 'next ok2');
+
+                assert.ok($('#tar22 p').eq(0).nextAll().length == 3, 'nextAll ok');
+                assert.ok($('#tar22 p').eq(0).nextAll('.haha3').length == 1, 'nextAll ok2');
+
+                assert.ok($('#tar22 p').eq(0).nextUntil().length == 3, 'nextUntil ok');
+                assert.ok($('#tar22 p').eq(0).nextUntil('.haha4').length == 2, 'nextUntil ok2');
+                assert.ok($('#tar22 p').eq(0).nextUntil($('#tar22 .haha4')[0]).length == 2, 'nextUntil ok3');
+                assert.ok($('#tar22 p').eq(0).nextUntil('.haha4', '.haha3').length == 1, 'nextUntil ok4');
+
+                assert.ok($('#tar22 p').prev().length == 3, 'prev ok');
+                assert.ok($('#tar22 p').prev('.haha3').length == 1, 'prev ok2');
+
+                assert.ok($('#tar22 p').eq(3).prevAll().length == 3, 'prevAll ok');
+                assert.ok($('#tar22 p').eq(3).prevAll('.haha3').length == 1, 'prevAll ok2');
+
+                assert.ok($('#tar22 p').eq(3).prevUntil().length == 3, 'prevUntil ok');
+                assert.ok($('#tar22 p').eq(3).prevUntil('.haha1').length == 2, 'prevUntil ok2');
+                assert.ok($('#tar22 p').eq(3).prevUntil($('#tar22 .haha1')[0]).length == 2, 'prevUntil ok3');
+                assert.ok($('#tar22 p').eq(3).prevUntil('.haha4', '.haha3').length == 1, 'prevUntil ok4');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar23_1">
+            <p>1</p>
+            <div class="tar23_tar">2</div>
+            <span>3</span>
+            <div>4</div>
+        </div>
+        <div id="tar23_1">
+            <p>5</p>
+            <div class="tar23_tar">6</div>
+            <span>7</span>
+            <div>8</div>
+        </div>
+        <script>
+            QUnit.test("siblings", function(assert) {
+                assert.ok($('.tar23_tar').siblings().length == 6, 'siblings ok');
+                assert.ok($('.tar23_tar').siblings('div').length == 2, 'siblings ok2');
+            });
+        </script>
+    </div>
+
+
+
+    <div class="test_group">
+        <div id="tar24">
+            <div class="tar24_1"></div>
+            <div class="tar24_2"></div>
+            <div class="tar24_3"></div>
+        </div>
+        <script>
+            QUnit.test("add", function(assert) {
+                var tar2 = $('.tar24_1,.tar24_2').add($('.tar24_2,.tar24_3'));
+                assert.ok(tar2.length == 3, 'add ok');
+            });
+        </script>
+    </div>
+
+    <div class="test_group">
+        <div id="tar25">
+            <div class="tar25_1"></div>
+            <div class="tar25_2"></div>
+            <div class="tar25_3"></div>
+        </div>
+        <script>
+            QUnit.test("contents", function(assert) {
+                assert.ok($('#tar25').contents().length == 7, 'contents ok');
+            });
+        </script>
+    </div>
+
+
+
+    <!--
+
+    <div class="test_group">
+        <div id="tar">
+        </div>
+        <script>
+            QUnit.test("attr", function(assert) {
+                assert.ok(true, 'base');
+            });
+        </script>
+    </div>
+
+-->
+
+</body>
+
+</html>
