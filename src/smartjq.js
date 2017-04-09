@@ -1105,6 +1105,109 @@
             });
             return $(arr);
         },
+        animate: function(prop, arg2, arg3, arg4) {
+            var speed = 300,
+                easing, callback;
+
+            //对齐参数
+            switch (getType(arg2)) {
+                case "string":
+                    if (/\D/.test(arg2)) {
+                        easing = arg2;
+                        callback = arg3;
+                        break;
+                    }
+                    arg2 = parseFloat(arg2);
+                case "number":
+                    speed = arg2
+                    if (getType(arg3) == "string") {
+                        easing = arg3
+                        callback = arg4;
+                    } else {
+                        callback = arg3;
+                    }
+                    break;
+                case "function":
+                    callback = arg2;
+                    break;
+            }
+
+            //获取动画帧的方法
+            var getFrame = function(n) {
+                //默认就是得到返回的
+                return n;
+            };
+            //判断是否有动画曲线
+            if (easing) {
+                if (!/cubic-bezier/.test(easing)) {
+
+                }
+                //替换相应字符串
+                easing = easing.replace('cubic-bezier(', "").replace(")", "");
+
+                var easingArr = easing.split(',');
+                console.log(easingArr);
+
+                //得到坐标点
+                var x1 = parseFloat(easingArr[0]),
+                    y1 = parseFloat(easingArr[1]),
+                    x2 = parseFloat(easingArr[2]),
+                    y2 = parseFloat(easingArr[3]);
+
+                getFrame = function(bx) {
+                    // var a = (Math.pow(1 - t, 3) * x0) + (3 * x1 * t * Math.pow(1 - t, 2)) + (3 * x2 * Math.pow(t, 2) * (1 - t)) + x3 * Math.pow(t, 3);
+                    // x0=y1 = 0   x3=y3 = 1 
+                    var a = (3 * x1 * t * Math.pow(1 - t, 2)) + (3 * x2 * Math.pow(t, 2) * (1 - t)) + Math.pow(t, 3);
+                    return;
+                };
+            }
+
+            // console.log(easing);
+
+            each(this, function(i, tar) {
+                var computeStyleObj = getComputedStyle(tar);
+                each(prop, function(name, value) {
+
+                    //获取当前值
+                    var nowValue = parseFloat(computeStyleObj[name]);
+                    console.log(nowValue);
+
+                    if (nowValue) {
+                        //修正值
+                        value = parseFloat(value);
+
+                        //获取差值
+                        var diffVal = value - nowValue;
+
+                        var animeFun = function(timestamp) {
+                            timestamp -= 1000;
+
+                            //当前进度
+                            var nowPercentage = (timestamp > speed ? speed : timestamp) / speed;
+
+                            // console.log('animeFun =>', timestamp, nowPercentage);
+
+                            //设置当前值
+                            tar.style[name] = nowValue + diffVal * nowPercentage + "px";
+
+                            if (timestamp <= speed) {
+                                requestAnimationFrame(animeFun);
+                            } else {
+                                animeFun = null;
+                                callback && callback();
+                            }
+
+                            console.log(getFrame());
+                        };
+
+                        //点火
+                        animeFun(0);
+                    }
+                });
+            });
+            getFrame = null;
+            return this;
+        }
     });
 
     //设置event
