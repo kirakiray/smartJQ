@@ -815,9 +815,8 @@
             // return this;
         },
         //smartEvent事件触发器
-        // _tr: function(ele, eventName, oriEvent, triggerData, delegatetargets) {
         _tr: function(ele, eventName, oriEvent, triggerData) {
-            //@use---$._Event
+            //@use---$.Event
             //@use---fn.parentsUntil
             var smartEventData = ele[SMARTKEY + "e"];
             if (!smartEventData) return
@@ -826,7 +825,8 @@
 
             var newArr = [];
             each(smartEventObjs, function(i, handleObj) {
-                var newEventObject = new $._Event(oriEvent);
+                var newEventObject = new $.Event(oriEvent);
+                // var newEventObject = oriEvent;
 
                 //设置事件对象
                 var ct = newEventObject.delegateTarget = ele;
@@ -972,6 +972,7 @@
                         'bubbles': true,
                         'cancelable': true
                     });
+
                     event._args = data;
                     tar.dispatchEvent(event);
                 } else {
@@ -979,7 +980,6 @@
                     prototypeObj._tr(tar, eventName, null, data);
                 }
             });
-            // return this;
         },
         off: function(types, selector, fn) {
             return each(this, function(i, ele) {
@@ -1154,11 +1154,15 @@
                     x2 = parseFloat(easingArr[2]),
                     y2 = parseFloat(easingArr[3]);
 
-                getFrame = function(bx) {
+                getFrame = function(t) {
                     // var a = (Math.pow(1 - t, 3) * x0) + (3 * x1 * t * Math.pow(1 - t, 2)) + (3 * x2 * Math.pow(t, 2) * (1 - t)) + x3 * Math.pow(t, 3);
                     // x0=y1 = 0   x3=y3 = 1 
-                    var a = (3 * x1 * t * Math.pow(1 - t, 2)) + (3 * x2 * Math.pow(t, 2) * (1 - t)) + Math.pow(t, 3);
-                    return;
+
+                    //0 <= bx <= 1
+                    // bx = Math.pow(t, 3) + (3 * x1 * t * Math.pow(1 - t, 2)) + (3 * x2 * Math.pow(t, 2) * (1 - t));
+                    // by = Math.pow(t, 3) + (3 * y1 * t * Math.pow(1 - t, 2)) + (3 * y2 * Math.pow(t, 2) * (1 - t));
+                    // bx - by = 
+                    return Math.pow(t, 3) + (3 * y1 * t * Math.pow(1 - t, 2)) + (3 * y2 * Math.pow(t, 2) * (1 - t));
                 };
             }
 
@@ -1188,7 +1192,7 @@
                             // console.log('animeFun =>', timestamp, nowPercentage);
 
                             //设置当前值
-                            tar.style[name] = nowValue + diffVal * nowPercentage + "px";
+                            tar.style[name] = nowValue + diffVal * getFrame(nowPercentage) + "px";
 
                             if (timestamp <= speed) {
                                 requestAnimationFrame(animeFun);
@@ -1197,7 +1201,7 @@
                                 callback && callback();
                             }
 
-                            console.log(getFrame());
+                            // console.log(getFrame());
                         };
 
                         //点火
@@ -1205,7 +1209,7 @@
                     }
                 });
             });
-            getFrame = null;
+            // getFrame = null;
             return this;
         }
     });
@@ -1222,6 +1226,9 @@
         if (selector instanceof smartyJQ) {
             return selector;
         }
+        if (!selector) {
+            return $([]);
+        }
         return new smartyJQ(selector, context);
     };
     $.fn = $.prototype = smartyJQ.fn;
@@ -1233,25 +1240,68 @@
         makearray: makeArray,
         merge: merge,
         type: getType,
-        _Event: function(oriEvent) {
-            var _this = this;
+        // Event: function(eventName, props) {
+        //     var EventClass;
+        //     if (eventName == "click") {
+        //         EventClass = MouseEvent;
+        //     } else {
+        //         EventClass = Event;
+        //     }
+        //     // 触发自定义CustomEvent
+        //     var event = new EventClass(eventName, {
+        //         'view': window,
+        //         'bubbles': true,
+        //         'cancelable': true
+        //     });
 
-            if (oriEvent) {
-                //添加相关属性
-                each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(i, e) {
-                    (oriEvent[e] != undefined) && (_this[e] = oriEvent[e]);
-                });
+        //     return event;
+        // },
+        isPlainObject: function(val) {
+            for (var i in val) {
+                return true;
+            }
+            return false;
+        },
+        proxy: function(arg1, arg2) {
+            var args = makeArray(arguments).slice(2);
+            var tarfun, context;
 
-                //判断是否自定义事件
-                _this.originalEvent = oriEvent;
+            //修正必要参数
+            var arg1type = getType(arg1);
+            if (arg1type == "object") {
+                tarfun = arg1[arg2];
+                context = arg1;
+            } else if (arg1type == "function") {
+                tarfun = arg1;
+                context = arg2;
             }
 
-            _this.timeStamp || (_this.timeStamp = new Date().getTime());
+            return function() {
+                tarfun.apply(context, args);
+            };
+        },
+        isFunction: function(tar) {
+            return getType(tar) == "function";
         }
     });
 
+    $.Event = function(oriEvent, props) {
+        var _this = this;
+
+        if (oriEvent && oriEvent.type) {
+            //添加相关属性
+            each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(i, e) {
+                (oriEvent[e] != undefined) && (_this[e] = oriEvent[e]);
+            });
+
+            //判断是否自定义事件
+            _this.originalEvent = oriEvent;
+        }
+
+        _this.timeStamp || (_this.timeStamp = new Date().getTime());
+    };
     //主体event对象
-    $._Event.prototype = {
+    $.Event.prototype = {
         isDefaultPrevented: function() {
             return this._dp || false;
         },
