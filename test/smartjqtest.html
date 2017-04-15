@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div style="float:left;width:30%;">
+    <!--<div style="float:left;width:30%;">
         <div class="a" style="background:#f00;width:10em;height:100px;">a</div>
     </div>
     <div style="float:left;width:30%;">
@@ -31,9 +31,40 @@
                 width: "200px",
                 height: "200px"
             });
-
         }, 1000);
         // alert($('.a').css('width'));
+    </script>-->
+
+
+    <div id="tar">asd
+        <div id="tar2">asd</div>
+    </div>
+    <script>
+        $('#tar').bind("click", function(e) {
+            console.log(e.currentTarget);
+            console.log(arguments);
+        });
+        $('#tar2').bind("click", function(e) {
+            console.log('之前的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('后来的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
+            // e.cancelBubble = true;
+            console.log(e.currentTarget);
+            console.log(arguments);
+        });
+        $('#tar').bind("haha", function(e) {
+            console.log(e.currentTarget);
+            console.log(arguments);
+        });
+
+        var eve = $.Event('click', {
+            ssss: "ssssss",
+            target: document.body
+        });
+
+        // $('#tar2').trigger('click');
+        $('#tar2').trigger(eve, 'asdasdasdasd');
     </script>
 </body>
 

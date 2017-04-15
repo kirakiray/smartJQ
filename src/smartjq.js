@@ -826,7 +826,8 @@
             var newArr = [];
             each(smartEventObjs, function(i, handleObj) {
                 var newEventObject = new $.Event(oriEvent);
-                // var newEventObject = oriEvent;
+                //合并自定义数据
+                oriEvent && oriEvent._props && extend(newEventObject, oriEvent._props);
 
                 //设置事件对象
                 var ct = newEventObject.delegateTarget = ele;
@@ -957,21 +958,26 @@
             return each(this, function(i, tar) {
                 //拥有EventTarget的就触发
                 if (tar instanceof EventTarget) {
-                    var EventClass;
-                    if (eventName == "click") {
-                        EventClass = MouseEvent;
-                    } else if (eventName in tar && ("on" + eventName) in tar) {
-                        tar[eventName]();
-                        return;
+                    var event;
+                    if (eventName instanceof Event) {
+                        event = eventName;
                     } else {
-                        EventClass = Event;
+                        var EventClass;
+                        if (eventName == "click") {
+                            EventClass = MouseEvent;
+                        } else if (eventName in tar && ("on" + eventName) in tar) {
+                            tar[eventName]();
+                            return;
+                        } else {
+                            EventClass = Event;
+                        }
+                        // 触发自定义CustomEvent
+                        event = new EventClass(eventName, {
+                            'view': window,
+                            'bubbles': true,
+                            'cancelable': true
+                        });
                     }
-                    // 触发自定义CustomEvent
-                    var event = new EventClass(eventName, {
-                        'view': window,
-                        'bubbles': true,
-                        'cancelable': true
-                    });
 
                     event._args = data;
                     tar.dispatchEvent(event);
@@ -1240,22 +1246,6 @@
         makearray: makeArray,
         merge: merge,
         type: getType,
-        // Event: function(eventName, props) {
-        //     var EventClass;
-        //     if (eventName == "click") {
-        //         EventClass = MouseEvent;
-        //     } else {
-        //         EventClass = Event;
-        //     }
-        //     // 触发自定义CustomEvent
-        //     var event = new EventClass(eventName, {
-        //         'view': window,
-        //         'bubbles': true,
-        //         'cancelable': true
-        //     });
-
-        //     return event;
-        // },
         isPlainObject: function(val) {
             for (var i in val) {
                 return true;
@@ -1288,6 +1278,48 @@
     $.Event = function(oriEvent, props) {
         var _this = this;
 
+        if (!(this instanceof $.Event)) {
+            var eventInit = {
+                'view': window,
+                'bubbles': true,
+                'cancelable': true
+            };
+
+            // 触发自定义CustomEvent
+            var event = new Event(oriEvent, eventInit);
+
+            //设置参数
+            props && (event._props = props);
+
+            //设定$的自定义方法
+            var stopPropagation = event.stopPropagation;
+            event.stopPropagation = function() {
+                stopPropagation.call(this);
+                this.cancelBubble = true;
+            }
+            event.isPropagationStopped = function() {
+                return this.cancelBubble;
+            };
+            var preventDefault = event.preventDefault;
+            event.preventDefault = function() {
+                preventDefault.call(this);
+                this.returnValue = false;
+            };
+            event.isDefaultPrevented = function() {
+                return this.returnValue == false;
+            };
+            var stopImmediatePropagation = event.stopImmediatePropagation;
+            event.stopImmediatePropagation = function() {
+                stopImmediatePropagation.call(this);
+                this._ips = true;
+            };
+            event.isImmediatePropagationStopped = function() {
+                return this._ips || false;
+            };
+
+            return event;
+        }
+
         if (oriEvent && oriEvent.type) {
             //添加相关属性
             each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(i, e) {
@@ -1298,15 +1330,18 @@
             _this.originalEvent = oriEvent;
         }
 
+        this.returnValue = true;
+        this.cancelBubble = false;
+
         _this.timeStamp || (_this.timeStamp = new Date().getTime());
     };
     //主体event对象
     $.Event.prototype = {
         isDefaultPrevented: function() {
-            return this._dp || false;
+            return this.returnValue == false;
         },
         isPropagationStopped: function() {
-            return this._ps || false;
+            return this.cancelBubble;
         },
         isImmediatePropagationStopped: function() {
             return this._ips || false;
@@ -1314,12 +1349,12 @@
         preventDefault: function() {
             var originalEvent = this.originalEvent;
             originalEvent && originalEvent.preventDefault();
-            this._dp = true;
+            this.returnValue = false;
         },
         stopPropagation: function() {
             var originalEvent = this.originalEvent;
             originalEvent && originalEvent.stopPropagation();
-            this._ps = true;
+            this.cancelBubble = true;
         },
         stopImmediatePropagation: function() {
             var originalEvent = this.originalEvent;
