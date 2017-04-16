@@ -14,59 +14,16 @@
 </head>
 
 <body>
-    <!--<div style="float:left;width:30%;">
-        <div class="a" style="background:#f00;width:10em;height:100px;">a</div>
+    <div class="tar">tar
+        <div class="tar3">tar3</div>
     </div>
-    <div style="float:left;width:30%;">
-        <div class="b" style="transition:all cubic-bezier(0.5, 0, 0.5, 1) 1s;background:#f00;width:10em;height:100px;">a</div>
-    </div>
-    <script>
-        setTimeout(function() {
-            $('.a').animate({
-                width: 200,
-                height: 200,
-                background: "#0f0"
-            }, 1000, "cubic-bezier(0.5, 0, 0.5, 1)");
-
-            $('.b').css({
-                width: "200px",
-                height: "200px"
-            });
-        }, 1000);
-        // alert($('.a').css('width'));
-    </script>-->
-
-
-    <div id="tar">asd
-        <div id="tar2">asd2</div>
-    </div>
-    <script>
-        $('#tar').bind("click", function(e) {
-            console.log(e.currentTarget);
-            console.log(arguments);
-        });
-        $('#tar2').bind("click", function(e) {
-            // console.log('之前的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
-            // e.stopPropagation();
-            // e.preventDefault();
-            // console.log('后来的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
-            // e.cancelBubble = true;
-            console.log(e.currentTarget);
-            console.log(arguments);
-        });
-
-        var eve = $.Event('click', {
-            ssss: "ssssss",
-            target: document.body
-        });
-
-        // $('#tar2').trigger('click');
-        $('#tar2').trigger(eve, 'asdasdasdasd');
-    </script>
+    <div class="tar" id="tar2">tar2</div>
+    <div>div4</div>
+    <input type="text">
 </body>
-
-
-
-
+<script>
+    $('div:odd:eq(0)').css("color", 'red');
+    // $('div:eq(1)').css('border', 'red solid 1px');
+</script>
 
 </html>

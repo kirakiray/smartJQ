@@ -2,6 +2,7 @@
     "use strict";
     //common
     var SMARTKEY = "_s_" + new Date().getTime();
+    var SMARTEVENTKEY = SMARTKEY + "_e";
 
     //function
     var makeArray = function(arrobj) {
@@ -65,6 +66,38 @@
 
     //查找元素的方法
     var findEles = function(owner, expr) {
+        //针对字符串查找（判断是否有jquery专用写法）
+        // if (expr.search(/:first(?!-)/) > -1) {
+        //     debugger;
+        // }
+
+        //带有多个情况的优先级更高
+        var expr1 = /(:even|:odd|:gt|:lt)/;
+        var matchExp1 = expr.match(expr1);
+        if (matchExp1) {
+
+        }
+
+        //只会得到单个的筛选表达式
+        var expr2 = /(:eq|:first(?!-)|:last(?!-))/;
+        var matchExp2 = expr.match(expr2);
+
+        if (matchExp2) {
+            //根据相应字符串获取所有元素
+            var exprArr = expr.match(/(.+):eq\((\d)\)/);
+
+            //获取关键值
+            var selector = exprArr[1];
+            var expVal = exprArr[2];
+
+            //查找相应值
+            var final = findEles(owner, selector);
+            return [final[expVal]];
+        }
+
+        // if (expr.search(/:has\(/) > -1) {
+        //     debugger;
+        // }
         return owner.querySelectorAll(expr);
     };
 
@@ -180,7 +213,7 @@
                 // top: tarOffset.top - parentOffset.top - martop - parentBordertop,
                 // left: tarOffset.left - parentOffset.left - marleft - parentBorderleft,
                 top: tarOffset.top - martop - parentBordertop,
-                left: tarOffset.left - marleft - parentBorderleft,
+                left: tarOffset.left - marleft - parentBorderleft
             };
         },
         _sc: function(key, val) {
@@ -290,7 +323,8 @@
         },
         removeProp: function(name) {
             return each(this, function(i, e) {
-                if (e instanceof EventTarget && name in e.cloneNode()) {
+                // if (e instanceof EventTarget && name in e.cloneNode()) {
+                if (e.nodeType && name in e.cloneNode()) {
                     e[name] = "";
                 } else {
                     delete e[name];
@@ -817,7 +851,7 @@
         //smartEvent事件触发器
         _tr: function(ele, eventName, newEventObject, triggerData) {
             //@use---fn.parentsUntil
-            var smartEventData = ele[SMARTKEY + "e"];
+            var smartEventData = ele[SMARTEVENTKEY];
             if (!smartEventData) return
 
             var smartEventObjs = smartEventData[eventName];
@@ -918,7 +952,7 @@
 
                 each(_this, function(i, tar) {
                     //事件寄宿对象
-                    var smartEventData = prototypeObj._ge(tar, SMARTKEY + "e");
+                    var smartEventData = prototypeObj._ge(tar, SMARTEVENTKEY);
                     var smartEventObj = smartEventData[eventName];
 
                     if (!smartEventObj) {
@@ -926,7 +960,8 @@
                         smartEventObj = (smartEventData[eventName] = []);
 
                         //属于事件元素的，则绑定事件
-                        if (tar instanceof EventTarget) {
+                        // if (tar instanceof EventTarget) {
+                        if (tar.nodeType) {
                             tar.addEventListener(eventName, function(oriEvent) {
                                 prototypeObj._tr(tar, eventName, $.Event(oriEvent));
                             });
@@ -956,7 +991,8 @@
             return each(this, function(i, tar) {
                 var event = $.Event(eventName);
                 //拥有EventTarget的就触发
-                if (tar instanceof EventTarget) {
+                // if (tar instanceof EventTarget) {
+                if (tar.nodeType) {
                     var eName = event.type;
 
                     //判断自身是否有该事件触发
@@ -991,7 +1027,7 @@
         },
         off: function(types, selector, fn) {
             return each(this, function(i, ele) {
-                var smartEventData = ele[SMARTKEY + "e"];
+                var smartEventData = ele[SMARTEVENTKEY];
                 if (!smartEventData) return
 
                 var arg2Type = getType(selector);
@@ -1060,7 +1096,7 @@
             //克隆自定义方法和自定义数据
             var mapCloneEvent = function(ele, tarele) {
                 var customData = ele[SMARTKEY],
-                    eventData = ele[SMARTKEY + "e"];
+                    eventData = ele[SMARTEVENTKEY];
 
                 if (eventData) {
                     //事件处理
@@ -1069,7 +1105,7 @@
                             prototypeObj._tr(tarele, eventName, $.Event(oriEvent));
                         });
                     });
-                    tarele[SMARTKEY + "e"] = eventData;
+                    tarele[SMARTEVENTKEY] = eventData;
                 }
 
                 //设定数据

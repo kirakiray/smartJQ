@@ -311,6 +311,9 @@ var jqdatas = [{
         }, {
             val: "toggle",
             fn: 1
+        }, {
+            val: "$.Event",
+            $: 1
         }]
     }, {
         title: "事件",
