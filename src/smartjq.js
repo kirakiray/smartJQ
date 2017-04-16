@@ -815,8 +815,7 @@
             // return this;
         },
         //smartEvent事件触发器
-        _tr: function(ele, eventName, oriEvent, triggerData) {
-            //@use---$.Event
+        _tr: function(ele, eventName, newEventObject, triggerData) {
             //@use---fn.parentsUntil
             var smartEventData = ele[SMARTKEY + "e"];
             if (!smartEventData) return
@@ -825,9 +824,9 @@
 
             var newArr = [];
             each(smartEventObjs, function(i, handleObj) {
-                var newEventObject = new $.Event(oriEvent);
+                // var newEventObject = new $.Event(oriEvent);
                 //合并自定义数据
-                oriEvent && oriEvent._props && extend(newEventObject, oriEvent._props);
+                // oriEvent && oriEvent._props && extend(newEventObject, oriEvent._props);
 
                 //设置事件对象
                 var ct = newEventObject.delegateTarget = ele;
@@ -929,8 +928,7 @@
                         //属于事件元素的，则绑定事件
                         if (tar instanceof EventTarget) {
                             tar.addEventListener(eventName, function(oriEvent) {
-                                var data = oriEvent._args;
-                                prototypeObj._tr(tar, eventName, oriEvent, data);
+                                prototypeObj._tr(tar, eventName, $.Event(oriEvent));
                             });
                         }
                     }
@@ -956,34 +954,38 @@
         //触发事件
         trigger: function(eventName, data) {
             return each(this, function(i, tar) {
+                var event = $.Event(eventName);
                 //拥有EventTarget的就触发
                 if (tar instanceof EventTarget) {
-                    var event;
-                    if (eventName instanceof Event) {
-                        event = eventName;
-                    } else {
-                        var EventClass;
-                        if (eventName == "click") {
-                            EventClass = MouseEvent;
-                        } else if (eventName in tar && ("on" + eventName) in tar) {
-                            tar[eventName]();
-                            return;
-                        } else {
-                            EventClass = Event;
-                        }
-                        // 触发自定义CustomEvent
-                        event = new EventClass(eventName, {
-                            'view': window,
-                            'bubbles': true,
-                            'cancelable': true
-                        });
-                    }
+                    var eName = event.type;
 
-                    event._args = data;
-                    tar.dispatchEvent(event);
+                    //判断自身是否有该事件触发
+                    if (eName in tar && ("on" + eName) in tar) {
+                        tar[eName]();
+                        return;
+                    }
+                    //设置target
+                    event.target = tar;
+
+                    //手动模拟事件触发
+                    var popTriggerEle = function(ele) {
+                        prototypeObj._tr(ele, eName, event, data);
+
+                        //没有阻止冒泡就继续往上触发
+                        if (!event.cancelBubble) {
+                            var parentNode = ele.parentNode;
+                            if (parentNode != document) { popTriggerEle(parentNode); }
+                        }
+                    };
+
+                    //点火
+                    popTriggerEle(tar);
+
+                    //内存回收
+                    popTriggerEle = null;
                 } else {
                     //触发自定义事件
-                    prototypeObj._tr(tar, eventName, null, data);
+                    prototypeObj._tr(tar, eventName, event, data);
                 }
             });
         },
@@ -1039,7 +1041,7 @@
         triggerHandler: function(eventName, data) {
             //@use---fn._tr
             var tar = this[0];
-            tar && prototypeObj._tr(tar, eventName, null, data);
+            tar && prototypeObj._tr(tar, eventName, $.Event(eventName), data);
             return this;
         },
         delegate: function(selector, types, data, fn) {
@@ -1064,8 +1066,7 @@
                     //事件处理
                     each(eventData, function(eventName) {
                         tarele.addEventListener(eventName, function(oriEvent) {
-                            var data = oriEvent._args;
-                            prototypeObj._tr(tarele, eventName, oriEvent, data);
+                            prototypeObj._tr(tarele, eventName, $.Event(oriEvent));
                         });
                     });
                     tarele[SMARTKEY + "e"] = eventData;
@@ -1279,45 +1280,9 @@
         var _this = this;
 
         if (!(this instanceof $.Event)) {
-            var eventInit = {
-                'view': window,
-                'bubbles': true,
-                'cancelable': true
-            };
-
-            // 触发自定义CustomEvent
-            var event = new Event(oriEvent, eventInit);
-
-            //设置参数
-            props && (event._props = props);
-
-            //设定$的自定义方法
-            var stopPropagation = event.stopPropagation;
-            event.stopPropagation = function() {
-                stopPropagation.call(this);
-                this.cancelBubble = true;
-            }
-            event.isPropagationStopped = function() {
-                return this.cancelBubble;
-            };
-            var preventDefault = event.preventDefault;
-            event.preventDefault = function() {
-                preventDefault.call(this);
-                this.returnValue = false;
-            };
-            event.isDefaultPrevented = function() {
-                return this.returnValue == false;
-            };
-            var stopImmediatePropagation = event.stopImmediatePropagation;
-            event.stopImmediatePropagation = function() {
-                stopImmediatePropagation.call(this);
-                this._ips = true;
-            };
-            event.isImmediatePropagationStopped = function() {
-                return this._ips || false;
-            };
-
-            return event;
+            return new $.Event(oriEvent, props);
+        } else if (oriEvent instanceof $.Event) {
+            return oriEvent;
         }
 
         if (oriEvent && oriEvent.type) {
@@ -1328,7 +1293,11 @@
 
             //判断是否自定义事件
             _this.originalEvent = oriEvent;
+        } else {
+            this.type = oriEvent;
+            props && extend(this, props);
         }
+
 
         this.returnValue = true;
         this.cancelBubble = false;
@@ -1344,7 +1313,7 @@
             return this.cancelBubble;
         },
         isImmediatePropagationStopped: function() {
-            return this._ips || false;
+            return !!this._ips;
         },
         preventDefault: function() {
             var originalEvent = this.originalEvent;

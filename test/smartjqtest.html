@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <!--<script src="../src/smart-backup.js"></script>-->
     <script src="../src/smartjq.js"></script>
 
     <!--<script src="jquery-3.1.1.js"></script>-->
@@ -37,7 +38,7 @@
 
 
     <div id="tar">asd
-        <div id="tar2">asd</div>
+        <div id="tar2">asd2</div>
     </div>
     <script>
         $('#tar').bind("click", function(e) {
@@ -45,15 +46,11 @@
             console.log(arguments);
         });
         $('#tar2').bind("click", function(e) {
-            console.log('之前的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
-            e.stopPropagation();
-            e.preventDefault();
-            console.log('后来的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
+            // console.log('之前的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
+            // e.stopPropagation();
+            // e.preventDefault();
+            // console.log('后来的cancelBubble', e.isPropagationStopped(), e.isDefaultPrevented());
             // e.cancelBubble = true;
-            console.log(e.currentTarget);
-            console.log(arguments);
-        });
-        $('#tar').bind("haha", function(e) {
             console.log(e.currentTarget);
             console.log(arguments);
         });
@@ -67,6 +64,8 @@
         $('#tar2').trigger(eve, 'asdasdasdasd');
     </script>
 </body>
+
+
 
 
 
