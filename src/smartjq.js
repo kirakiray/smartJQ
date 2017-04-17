@@ -72,33 +72,47 @@
         // }
 
         //带有多个情况的优先级更高
-        var expr1 = /(:even|:odd|:gt|:lt)/;
-        var matchExp1 = expr.match(expr1);
-        if (matchExp1) {
+        // var expr1 = /(:even|:odd|:gt|:lt)/;
+        // var matchExp1 = expr.match(expr1);
+        // if (matchExp1) {
 
-        }
-
-        //只会得到单个的筛选表达式
-        var expr2 = /(:eq|:first(?!-)|:last(?!-))/;
-        var matchExp2 = expr.match(expr2);
-
-        if (matchExp2) {
-            //根据相应字符串获取所有元素
-            var exprArr = expr.match(/(.+):eq\((\d)\)/);
-
-            //获取关键值
-            var selector = exprArr[1];
-            var expVal = exprArr[2];
-
-            //查找相应值
-            var final = findEles(owner, selector);
-            return [final[expVal]];
-        }
-
-        // if (expr.search(/:has\(/) > -1) {
-        //     debugger;
         // }
-        return owner.querySelectorAll(expr);
+
+        var redata;
+        if (0 in owner) {
+            redata = [];
+            each(owner, function(i, e) {
+                merge(redata, findEles(e, expr));
+            });
+        } else {
+            //只会得到单个的筛选表达式
+            var expr2 = /(.+)(:even|:odd|:gt|:lt|:eq|:first(?!-)|:last(?!-))/;
+            var matchExp2 = expr.match(expr2);
+
+            if (matchExp2) {
+                //判断是否有匹配，先获取前级匹配的内容
+                if (1 in matchExp2) {
+                    redata = findEles(owner, matchExp2[1]);
+
+                    //根据匹配式筛选资源
+                }
+                debugger;
+
+                //根据相应字符串获取所有元素
+                // var exprArr = expr.match(/(.+):eq\((\d)\)/);
+
+                //获取关键值
+                // var selector = exprArr[1];
+                // var expVal = exprArr[2];
+
+                //查找相应值
+                // var final = findEles(owner, selector);
+                // return [final[expVal]];
+            } else {
+                redata = owner.querySelectorAll(expr);
+            }
+        }
+        return redata;
     };
 
     //判断元素是否符合条件
