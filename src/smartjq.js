@@ -66,18 +66,6 @@
 
     //查找元素的方法
     var findEles = function(owner, expr) {
-        //针对字符串查找（判断是否有jquery专用写法）
-        // if (expr.search(/:first(?!-)/) > -1) {
-        //     debugger;
-        // }
-
-        //带有多个情况的优先级更高
-        // var expr1 = /(:even|:odd|:gt|:lt)/;
-        // var matchExp1 = expr.match(expr1);
-        // if (matchExp1) {
-
-        // }
-
         var redata;
         if (0 in owner) {
             redata = [];
@@ -86,33 +74,55 @@
             });
         } else {
             //只会得到单个的筛选表达式
-            var expr2 = /(.+)(:even|:odd|:gt|:lt|:eq|:first(?!-)|:last(?!-))/;
-            var matchExp2 = expr.match(expr2);
+            var spe_expr = /(.+)(:even|:odd|:gt\(.+?\)|:lt\(.+?\)|:eq\(.+?\)|:first(?!-)|:last(?!-))/;
+            var speMatch = expr.match(spe_expr);
 
-            if (matchExp2) {
+            if (speMatch) {
                 //判断是否有匹配，先获取前级匹配的内容
-                if (1 in matchExp2) {
-                    redata = findEles(owner, matchExp2[1]);
+                if (1 in speMatch) {
+                    redata = findEles(owner, speMatch[1]);
 
                     //根据匹配式筛选资源
+                    var expr_third = speMatch[2];
+                    switch (expr_third) {
+                        case ":odd":
+                            redata = redata.filter(function(e, i) {
+                                return !((i + 1) % 2);
+                            });
+                            break;
+                        case ":even":
+                            redata = redata.filter(function(e, i) {
+                                return (i + 1) % 2;
+                            });
+                            break;
+                        case ":first":
+                            redata = [redata[0]];
+                            break;
+                        case ":last":
+                            redata = redata.slice(-1);
+                            break;
+                        default:
+                            var expr_five;
+                            if (expr_five = expr_third.match(/:eq\((.+?)\)/)) {
+                                var e1 = parseInt(expr_five[1]);
+                                redata = redata.slice(e1, e1 > 0 ? e1 + 1 : undefined);
+                                break;
+                            }
+                            if (expr_five = expr_third.match(/:lt\((.+?)\)/)) {
+                                redata = redata.slice(0, expr_five[1]);
+                                break;
+                            }
+                            if (expr_five = expr_third.match(/:gt\((.+?)\)/)) {
+                                redata = redata.slice(expr_five[1] + 1);
+                                break;
+                            }
+                    }
                 }
-                debugger;
-
-                //根据相应字符串获取所有元素
-                // var exprArr = expr.match(/(.+):eq\((\d)\)/);
-
-                //获取关键值
-                // var selector = exprArr[1];
-                // var expVal = exprArr[2];
-
-                //查找相应值
-                // var final = findEles(owner, selector);
-                // return [final[expVal]];
             } else {
                 redata = owner.querySelectorAll(expr);
             }
         }
-        return redata;
+        return makeArray(redata);
     };
 
     //判断元素是否符合条件
