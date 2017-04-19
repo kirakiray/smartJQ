@@ -5,8 +5,9 @@
     var SMARTEVENTKEY = SMARTKEY + "_e";
 
     //function
+    var arrlyslice = Array.prototype.slice;
     var makeArray = function(arrobj) {
-        return Array.prototype.slice.call(arrobj);
+        return arrlyslice.call(arrobj);
     };
 
     //获取类型
@@ -58,17 +59,17 @@
 
     //合并数组
     var merge = function(arr1, arr2) {
-        each(arr2, function(i, e) {
-            arr1.push(e);
-        });
+        var fakeArr2 = makeArray(arr2);
+        fakeArr2.unshift(arr1.length, 0);
+        arr1.splice.apply(arr1, fakeArr2);
         return arr1;
     };
 
+    //SmartFinder
     //查找元素的方法
     var findEles = function(owner, expr) {
-        var redata;
+        var redata = [];
         if (0 in owner) {
-            redata = [];
             each(owner, function(i, e) {
                 merge(redata, findEles(e, expr));
             });
@@ -78,45 +79,65 @@
             var speMatch = expr.match(spe_expr);
 
             if (speMatch) {
-                //判断是否有匹配，先获取前级匹配的内容
-                if (1 in speMatch) {
-                    redata = findEles(owner, speMatch[1]);
+                //原生not()不支持指定选择器
+                //确认是否有not查找器
+                var notMatch = expr.match(/(.+?):not\((.+?)\)/)
+                if (notMatch) {
+                    var notMatch_1 = notMatch[1],
+                        notMatch_2 = notMatch[2];
 
-                    //根据匹配式筛选资源
-                    var expr_third = speMatch[2];
-                    switch (expr_third) {
-                        case ":odd":
-                            redata = redata.filter(function(e, i) {
-                                return !((i + 1) % 2);
-                            });
-                            break;
-                        case ":even":
-                            redata = redata.filter(function(e, i) {
-                                return (i + 1) % 2;
-                            });
-                            break;
-                        case ":first":
-                            redata = [redata[0]];
-                            break;
-                        case ":last":
-                            redata = redata.slice(-1);
-                            break;
-                        default:
-                            var expr_five;
-                            if (expr_five = expr_third.match(/:eq\((.+?)\)/)) {
-                                var e1 = parseInt(expr_five[1]);
-                                redata = redata.slice(e1, e1 > 0 ? e1 + 1 : undefined);
-                                break;
-                            }
-                            if (expr_five = expr_third.match(/:lt\((.+?)\)/)) {
-                                redata = redata.slice(0, expr_five[1]);
-                                break;
-                            }
-                            if (expr_five = expr_third.match(/:gt\((.+?)\)/)) {
-                                redata = redata.slice(expr_five[1] + 1);
-                                break;
-                            }
+                    //补全正则2数组的反括号
+                    var notMatch_2_kuohao = notMatch_2.match(/\(/g);
+                    var kuohao_len = notMatch_2_kuohao ? notMatch_2_kuohao.length : 0;
+                    for (var i = 0; i < kuohao_len; i++) {
+                        notMatch_2 += ")";
                     }
+
+                    //获取相应关键元素
+                    var ruleInEle = findEles(owner, notMatch_1);
+                    var ruleOutEle = findEles(owner, notMatch_1 + notMatch_2);
+                    ruleInEle.forEach(function(e) {
+                        ruleOutEle.indexOf(e) == -1 && redata.push(e);
+                    }, this);
+                } else if (1 in speMatch) {
+                    //判断是否有匹配，先获取前级匹配的内容
+                    redata = findEles(owner, speMatch[1]);
+                }
+
+                //根据匹配式筛选资源
+                var expr_third = speMatch[2];
+                switch (expr_third) {
+                    case ":odd":
+                        redata = redata.filter(function(e, i) {
+                            return !((i + 1) % 2);
+                        });
+                        break;
+                    case ":even":
+                        redata = redata.filter(function(e, i) {
+                            return (i + 1) % 2;
+                        });
+                        break;
+                    case ":first":
+                        redata = [redata[0]];
+                        break;
+                    case ":last":
+                        redata = redata.slice(-1);
+                        break;
+                    default:
+                        var expr_five;
+                        if (expr_five = expr_third.match(/:eq\((.+?)\)/)) {
+                            var e1 = parseInt(expr_five[1]);
+                            redata = redata.slice(e1, e1 > 0 ? e1 + 1 : undefined);
+                            break;
+                        }
+                        if (expr_five = expr_third.match(/:lt\((.+?)\)/)) {
+                            redata = redata.slice(0, expr_five[1]);
+                            break;
+                        }
+                        if (expr_five = expr_third.match(/:gt\((.+?)\)/)) {
+                            redata = redata.slice(parseInt(expr_five[1]) + 1);
+                            break;
+                        }
                 }
             } else {
                 redata = owner.querySelectorAll(expr);
@@ -136,7 +157,9 @@
     var transToEles = function(str) {
         var par = document.createElement('div');
         par.innerHTML = str;
-        return par.children;
+        var ch = makeArray(par.children);
+        par.innerHTML = "";
+        return ch;
     };
 
     //main
