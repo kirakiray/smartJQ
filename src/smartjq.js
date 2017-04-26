@@ -65,86 +65,135 @@
         return arr1;
     };
 
-    //SmartFinder
+    //SmartFinder---------start
+    //匹配数组中的专用元素并返回
+    var fliterDedicatedEles = function(redata, selecter) {
+        switch (selecter) {
+            case ":odd":
+                redata = redata.filter(function(e, i) {
+                    return !((i + 1) % 2);
+                });
+                break;
+            case ":even":
+                redata = redata.filter(function(e, i) {
+                    return (i + 1) % 2;
+                });
+                break;
+            case ":first":
+                redata = [redata[0]];
+                break;
+            case ":last":
+                redata = redata.slice(-1);
+                break;
+            default:
+                var expr_five;
+                if (expr_five = selecter.match(/:eq\((.+?)\)/)) {
+                    var e1 = parseInt(expr_five[1]);
+                    redata = redata.slice(e1, e1 > 0 ? e1 + 1 : undefined);
+                    break;
+                }
+                if (expr_five = selecter.match(/:lt\((.+?)\)/)) {
+                    redata = redata.slice(0, expr_five[1]);
+                    break;
+                }
+                if (expr_five = selecter.match(/:gt\((.+?)\)/)) {
+                    redata = redata.slice(parseInt(expr_five[1]) + 1);
+                    break;
+                }
+        }
+
+        return redata;
+    };
+
+    var spe_expr = /(.*)(:even|:odd|:gt\(.+?\)|:lt\(.+?\)|:eq\(.+?\)|:first(?!-)|:last(?!-))(.*)/;
     //查找元素的方法
     var findEles = function(owner, expr) {
         var redata = [];
-        if (0 in owner) {
-            each(owner, function(i, e) {
-                merge(redata, findEles(e, expr));
-            });
-        } else {
-            //只会得到单个的筛选表达式
-            var spe_expr = /(.+)(:even|:odd|:gt\(.+?\)|:lt\(.+?\)|:eq\(.+?\)|:first(?!-)|:last(?!-))/;
-            var speMatch = expr.match(spe_expr);
 
-            if (speMatch) {
-                //原生not()不支持指定选择器
-                //确认是否有not查找器
-                var notMatch = expr.match(/(.+?):not\((.+?)\)/)
-                if (notMatch) {
-                    var notMatch_1 = notMatch[1],
-                        notMatch_2 = notMatch[2];
+        //判断表达式是否空
+        if (!expr) {
+            return owner.length ? owner : [owner];
+        }
 
-                    //补全正则2数组的反括号
-                    var notMatch_2_kuohao = notMatch_2.match(/\(/g);
-                    var kuohao_len = notMatch_2_kuohao ? notMatch_2_kuohao.length : 0;
-                    for (var i = 0; i < kuohao_len; i++) {
-                        notMatch_2 += ")";
+        //判断是否有专属选择器
+        var speMatch = expr.match(spe_expr);
+
+        //存在专属字符进入专属字符通道
+        if (speMatch) {
+            //not有对专用字符有特殊的处理渠道
+            if (expr.match(/(.+?):not\((.+?)\)/)) {
+                //筛选not关键信息
+                //拆分括号
+                var notStrArr = expr.replace(/([\(\)])/g, "$1&").split('&');
+
+                //搜索到第一个not后开始计数
+                var nCount = 0;
+                var nAction = 0;
+                var beforestr = "";
+                var targetStr = "";
+                var afterStr = "";
+                notStrArr.forEach(function(e) {
+                    if (!nAction) {
+                        if (e.search(/:not\(/) > -1) {
+                            nAction = 1;
+                            nCount++;
+                            //加上非not字符串
+                            beforestr += e.replace(/:not\(/, "");
+                        } else {
+                            beforestr += e;
+                        }
+                    } else {
+                        if (e.search(/\(/) > -1) {
+                            nCount++;
+                        } else if (e.search(/\)/) > -1) {
+                            nCount--;
+                        }
+                        if (nAction == 1 && !nCount) {
+                            nAction = 2;
+                        } else if (nAction == 2) {
+                            afterStr += e;
+                        } else {
+                            targetStr += e;
+                        }
                     }
+                });
 
-                    //获取相应关键元素
-                    var ruleInEle = findEles(owner, notMatch_1);
-                    var ruleOutEle = findEles(owner, notMatch_1 + notMatch_2);
-                    ruleInEle.forEach(function(e) {
-                        ruleOutEle.indexOf(e) == -1 && redata.push(e);
-                    }, this);
-                } else if (1 in speMatch) {
-                    //判断是否有匹配，先获取前级匹配的内容
-                    redata = findEles(owner, speMatch[1]);
-                }
+                //获取相应关键元素
+                var ruleInEle = findEles(owner, beforestr);
+                var ruleOutEle = findEles(owner, beforestr + targetStr);
+                ruleInEle.forEach(function(e) {
+                    ruleOutEle.indexOf(e) == -1 && redata.push(e);
+                }, this);
 
-                //根据匹配式筛选资源
-                var expr_third = speMatch[2];
-                switch (expr_third) {
-                    case ":odd":
-                        redata = redata.filter(function(e, i) {
-                            return !((i + 1) % 2);
-                        });
-                        break;
-                    case ":even":
-                        redata = redata.filter(function(e, i) {
-                            return (i + 1) % 2;
-                        });
-                        break;
-                    case ":first":
-                        redata = [redata[0]];
-                        break;
-                    case ":last":
-                        redata = redata.slice(-1);
-                        break;
-                    default:
-                        var expr_five;
-                        if (expr_five = expr_third.match(/:eq\((.+?)\)/)) {
-                            var e1 = parseInt(expr_five[1]);
-                            redata = redata.slice(e1, e1 > 0 ? e1 + 1 : undefined);
-                            break;
-                        }
-                        if (expr_five = expr_third.match(/:lt\((.+?)\)/)) {
-                            redata = redata.slice(0, expr_five[1]);
-                            break;
-                        }
-                        if (expr_five = expr_third.match(/:gt\((.+?)\)/)) {
-                            redata = redata.slice(parseInt(expr_five[1]) + 1);
-                            break;
-                        }
+                //查找后续元素
+                if (afterStr) {
+                    redata = findEles(redata, afterStr);
                 }
+            } else {
+                //没有not就好说
+                //查找元素后，匹配特有字符
+                redata = findEles(owner, speMatch[1]);
+                redata = fliterDedicatedEles(redata, speMatch[2]);
+
+                //查找后续元素
+                if (speMatch[3]) {
+                    redata = findEles(redata, speMatch[3]);
+                }
+            }
+        } else {
+            //没有的话直接查找元素
+            if (owner.length) {
+                owner.forEach(function(e) {
+                    merge(redata, findEles(e, expr));
+                });
             } else {
                 redata = owner.querySelectorAll(expr);
             }
         }
+
         return makeArray(redata);
     };
+    //SmartFinder---------end
 
     //判断元素是否符合条件
     var judgeEle = function(ele, expr) {
