@@ -67,37 +67,70 @@
 
     //SmartFinder---------start
     //匹配数组中的专用元素并返回
-    var fliterDedicatedEles = function(redata, selecter) {
+    var fliterDedicatedEles = function(beforeData, selecter) {
+        var redata = [];
         switch (selecter) {
             case ":odd":
-                redata = redata.filter(function(e, i) {
+                redata = beforeData.filter(function(e, i) {
                     return !((i + 1) % 2);
                 });
                 break;
             case ":even":
-                redata = redata.filter(function(e, i) {
+                redata = beforeData.filter(function(e, i) {
                     return (i + 1) % 2;
                 });
                 break;
+            case ":parent":
+                redata = beforeData.filter(function(e) {
+                    return !!e.innerHTML;
+                });
+                break;
             case ":first":
-                redata = [redata[0]];
+                redata = [beforeData[0]];
                 break;
             case ":last":
-                redata = redata.slice(-1);
+                redata = beforeData.slice(-1);
+                break;
+            case ":header":
+                redata = findEles(beforeData, "h1,h2,h3,h4,h5");
+                break;
+            case ":hidden":
+                beforeData.forEach(function(e) {
+                    if (getComputedStyle(e).display == "none") {
+                        redata.push(e);
+                    }
+                });
                 break;
             default:
                 var expr_five;
                 if (expr_five = selecter.match(/:eq\((.+?)\)/)) {
                     var e1 = parseInt(expr_five[1]);
-                    redata = redata.slice(e1, e1 > 0 ? e1 + 1 : undefined);
+                    redata = beforeData.slice(e1, e1 > 0 ? e1 + 1 : undefined);
                     break;
                 }
                 if (expr_five = selecter.match(/:lt\((.+?)\)/)) {
-                    redata = redata.slice(0, expr_five[1]);
+                    redata = beforeData.slice(0, expr_five[1]);
                     break;
                 }
                 if (expr_five = selecter.match(/:gt\((.+?)\)/)) {
-                    redata = redata.slice(parseInt(expr_five[1]) + 1);
+                    redata = beforeData.slice(parseInt(expr_five[1]) + 1);
+                    break;
+                }
+                if (expr_five = selecter.match(/:has\((.+?)\)/)) {
+                    beforeData.forEach(function(e) {
+                        var findele = findEles(e, expr_five[1]);
+                        if (0 in findele) {
+                            redata.push(e);
+                        }
+                    });
+                    break;
+                }
+                if (expr_five = selecter.match(/:contains\((.+?)\)/)) {
+                    beforeData.forEach(function(e) {
+                        if (e.innerHTML.search(expr_five[1]) > -1) {
+                            redata.push(e);
+                        }
+                    });
                     break;
                 }
         }
@@ -105,7 +138,7 @@
         return redata;
     };
 
-    var spe_expr = /(.*)(:even|:odd|:gt\(.+?\)|:lt\(.+?\)|:eq\(.+?\)|:first(?!-)|:last(?!-))(.*)/;
+    var spe_expr = /(.*)(:even|:odd|:header|:parent|:hidden|:eq\(.+?\)|:gt\(.+?\)|:lt\(.+?\)|:has\(.+?\)|:contains\(.+?\)|:first(?!-)|:last(?!-))(.*)/;
     //查找元素的方法
     var findEles = function(owner, expr) {
         var redata = [];
