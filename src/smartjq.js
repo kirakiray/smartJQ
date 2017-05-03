@@ -1306,8 +1306,9 @@
     })
 
     //动画
+    //@set---fn.animate---start
     //获取立方根的方法
-    var getCubeRoot = (function() {
+    var getCbrt = (function() {
         if (Math.cbrt) {
             return Math.cbrt;
         } else {
@@ -1321,17 +1322,11 @@
     //动画函数主体
     prototypeObj.animate = function(prop, arg2, arg3, arg4) {
         var animateTime = 300,
-            easing, callback;
+            easing = 'swing',
+            callback;
 
         //对齐参数
         switch (getType(arg2)) {
-            case "string":
-                if (/\D/.test(arg2)) {
-                    easing = arg2;
-                    callback = arg3;
-                    break;
-                }
-                arg2 = parseFloat(arg2);
             case "number":
                 animateTime = arg2
                 if (getType(arg3) == "string") {
@@ -1341,8 +1336,20 @@
                     callback = arg3;
                 }
                 break;
+            case "string":
+                if (/\D/.test(arg2)) {
+                    easing = arg2;
+                    callback = arg3;
+                    break;
+                }
+                arg2 = parseFloat(arg2);
             case "function":
                 callback = arg2;
+                break;
+            case "object":
+                animateTime = arg2.speed;
+                easing = arg2.easing;
+                callback = arg2.callback;
                 break;
         }
 
@@ -1350,28 +1357,48 @@
         var getFrame = function(t) {
             //默认就是得到返回的
             return t;
-            // return Bezier.ease(t);
         };
         //判断是否有动画曲线
-        if (easing) {
-            // if (!/cubic-bezier/.test(easing)) {
-
-            // }
-            //替换相应字符串
-            easing = easing.replace('cubic-bezier(', "").replace(")", "");
-
-            var easingArr = easing.split(',');
-            console.log(easingArr);
-
+        if (easing && easing != "linear") {
             //得到坐标点
-            var p1x = parseFloat(easingArr[0]),
-                p1y = parseFloat(easingArr[1]),
-                p2x = parseFloat(easingArr[2]),
+            var p1x, p1y, p2x, p2y;
+
+            if (/cubic-bezier/.test(easing)) {
+                //替换相应字符串
+                easing = easing.replace('cubic-bezier(', "").replace(")", "");
+                var easingArr = easing.split(',');
+                //得到坐标点
+                p1x = parseFloat(easingArr[0]);
+                p1y = parseFloat(easingArr[1]);
+                p2x = parseFloat(easingArr[2]);
                 p2y = parseFloat(easingArr[3]);
+            } else {
+                switch (easing) {
+                    case "ease":
+                        p1x = 0.25, p1y = 0.1, p2x = 0.25, p2y = 1;
+                        break;
+                    case "ease-in":
+                    case "easeIn":
+                        p1x = 0.42, p1y = 0, p2x = 1, p2y = 1;
+                        break;
+                    case "ease-out":
+                    case "easeOut":
+                        p1x = 0, p1y = 0, p2x = 0.58, p2y = 1;
+                        break;
+                    case "swing":
+                    case "ease-in-out":
+                    case "easeInOut":
+                        p1x = 0.42, p1y = 0, p2x = 0.58, p2y = 1;
+                        break;
+                }
+            }
 
             //筛选到最后，使用盛金公式法求解t
-            //区间在0-1之间，绝对不会出现a不会出现负数情况
+            //区间在0-1之间，a绝对不会出现负数或大于1的情况
             getFrame = function(tt) {
+                if (tt == 0 || tt == 1) {
+                    return tt;
+                }
                 var a = 1 + 3 * p1x - 3 * p2x;
                 var b = 3 * p2x - 6 * p1x;
                 var c = 3 * p1x;
@@ -1382,85 +1409,32 @@
                 var C = c * c - 3 * b * d;
                 var delta = B * B - 4 * A * C;
 
-                var Y1 = A * b + 3 * a * (-B + Math.sqrt(delta)) / 2;
-                var Y2 = A * b + 3 * a * (-B - Math.sqrt(delta)) / 2;
+                var t;
+                if (delta > 0) {
+                    var Y1 = A * b + 3 * a * (-B + Math.sqrt(delta)) / 2;
+                    var Y2 = A * b + 3 * a * (-B - Math.sqrt(delta)) / 2;
 
-                //t只会在区间0-1，综合测试后得到的这个0到1区间的值
-                var t = (-b - (getCubeRoot(Y1) + getCubeRoot(Y2))) / (3 * a);
-
+                    //t只会在区间0-1，综合测试后得到的这个0到1区间的值
+                    t = (-b - (getCbrt(Y1) + getCbrt(Y2))) / (3 * a);
+                    // } else if (delta < 0) {
+                } else {
+                    var Y = (2 * A * b - 3 * a * B) / (2 * Math.sqrt(A * A * A));
+                    var angle = Math.acos(Y) / 3;
+                    t = (-b + Math.sqrt(A) * (Math.cos(angle) - Math.sqrt(3) * Math.sin(angle))) / (3 * a);
+                }
                 var by = Math.pow(t, 3) + (3 * p1y * t * Math.pow(1 - t, 2)) + (3 * p2y * Math.pow(t, 2) * (1 - t));
                 return by;
             };
-
-
-            //使用Bezier库辅助测试
-            // getFrame = Bezier.unitBezier(p1x, p1y, p2x, p2y);
-
-            //盛金公式法测试---- (测试成功)
-            //先打印盛金公式条件△
-            // var a = 1 + 3 * p1x - 3 * p2x;
-            // var b = 3 * p2x - 6 * p1x;
-            // var c = 3 * p1x;
-            // var d = -0.5;
-
-            // var A = b * b - 3 * a * c;
-            // var B = b * c - 9 * a * d;
-            // var C = c * c - 3 * b * d;
-            // var delta = B * B - 4 * A * C;
-
-            // console.log('a=>', a);
-            // console.log('A=>', A);
-            // console.log('B=>', B);
-            // console.log('△=>', delta);
-
-            // var Y1 = A * b + 3 * a * (-B + Math.sqrt(delta)) / 2;
-            // var Y2 = A * b + 3 * a * (-B - Math.sqrt(delta)) / 2;
-
-            // console.log("Y1=>", Y1, "   Y2=>", Y2);
-
-            // var x1 = (-b - (getCubeRoot(Y1) + getCubeRoot(Y2))) / (3 * a);
-            // // var x3_real = (-b + getCubeRoot(Y1)) / (3 * a);
-            // // var x2_virtual = ((Math.sqrt(3) / 2) * (getCubeRoot(Y1) - getCubeRoot(Y2))) / (3 * a);
-            // // var x3_virtual = -x2_virtual;
-
-            // console.log("x1", x1);
-            // // console.log("x3_real", x3_real);
-            // // console.log("x2_virtual", x2_virtual);
-            // // console.log("x3_virtual", x3_virtual);
-
-            // var t = x1;
-            // var by = Math.pow(t, 3) + (3 * p1y * t * Math.pow(1 - t, 2)) + (3 * p2y * Math.pow(t, 2) * (1 - t));
-            // console.log('by=>', by);
-
-
-            //映射法----（不使用这个方案，映射对象获取太慢）
-            //先记录一遍映射数据
-            // var pointMap = {},
-            //     bx, by;
-
-            // //保留两位小数点
-            // for (var t = 0.01; t < 1.01; t += 0.01) {
-            //     bx = Math.pow(t, 3) + (3 * x1 * t * Math.pow(1 - t, 2)) + (3 * x2 * Math.pow(t, 2) * (1 - t));
-            //     by = Math.pow(t, 3) + (3 * y1 * t * Math.pow(1 - t, 2)) + (3 * y2 * Math.pow(t, 2) * (1 - t));
-            //     pointMap[bx.toFixed(2)] = by;
-            // }
-
-            // getFrame = function(t) {
-            //     if (!t) {
-            //         return 0;
-            //     } else {
-            //         return pointMap[t.toFixed(2)];
-            //     }
-            // };
         }
 
+        var animationId;
+        var funArr = [];
 
         each(this, function(i, tar) {
             var computeStyleObj = getComputedStyle(tar);
             each(prop, function(name, value) {
                 //获取当前值
                 var nowValue = parseFloat(computeStyleObj[name]);
-                // console.log(nowValue);
 
                 if (nowValue) {
                     //修正值
@@ -1469,31 +1443,41 @@
                     //获取差值
                     var diffVal = value - nowValue;
 
-                    var animeFun = function(timestamp) {
-                        //当前进度
-                        var nowPercentage = (timestamp > animateTime ? animateTime : timestamp) / animateTime;
-
-                        // console.log('animeFun =>', timestamp, nowPercentage);
-
+                    funArr.push(function(nowPercentage) {
                         //设置当前值
                         tar.style[name] = nowValue + diffVal * getFrame(nowPercentage) + "px";
-
-                        if (timestamp <= animateTime) {
-                            requestAnimationFrame(animeFun);
-                        } else {
-                            animeFun = null;
-                            callback && callback();
-                        }
-                    };
-
-                    //点火
-                    animeFun(0);
+                    });
                 }
             });
         });
-        // getFrame = null;
+
+        var startTime;
+        var animeFun = function(timestamp) {
+            //记录开始时间
+            startTime || (startTime = timestamp);
+
+            //获取进度时间
+            var diffTime = timestamp - startTime;
+
+            //当前进度
+            var nowPercentage = (diffTime > animateTime ? animateTime : diffTime) / animateTime;
+            funArr.forEach(function(e) {
+                e(nowPercentage);
+            });
+            if (diffTime <= animateTime) {
+                animationId = requestAnimationFrame(animeFun);
+            } else {
+                funArr = getFrame = animeFun = null;
+                callback && callback();
+            }
+        };
+
+        //点火
+        animeFun(0);
+
         return this;
     };
+    //@set---fn.animate---end
 
     //init
     var $ = function(selector, context) {
