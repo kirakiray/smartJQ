@@ -1298,12 +1298,14 @@
         }
     });
 
+    //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---start
     //设置event
     each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
-        prototypeObj[e] = function(callback) {
-            callback ? this.on(e, callback) : this.trigger(e);
-        }
-    })
+            prototypeObj[e] = function(callback) {
+                callback ? this.on(e, callback) : this.trigger(e);
+            }
+        })
+        //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---end
 
     //动画
     //@set---fn.animate---start
@@ -1378,23 +1380,20 @@
                         p1x = 0.25, p1y = 0.1, p2x = 0.25, p2y = 1;
                         break;
                     case "ease-in":
-                    case "easeIn":
                         p1x = 0.42, p1y = 0, p2x = 1, p2y = 1;
                         break;
                     case "ease-out":
-                    case "easeOut":
                         p1x = 0, p1y = 0, p2x = 0.58, p2y = 1;
                         break;
                     case "swing":
                     case "ease-in-out":
-                    case "easeInOut":
                         p1x = 0.42, p1y = 0, p2x = 0.58, p2y = 1;
                         break;
                 }
             }
 
             //筛选到最后，使用盛金公式法求解t
-            //区间在0-1之间，a绝对不会出现负数或大于1的情况
+            //区间在0-1之间，t绝对不会出现负数或大于1的情况
             getFrame = function(tt) {
                 if (tt == 0 || tt == 1) {
                     return tt;
@@ -1527,6 +1526,7 @@
         }
     });
 
+    //@set---$.Event---start
     $.Event = function(oriEvent, props) {
         var _this = this;
 
@@ -1582,6 +1582,7 @@
             this._ips = true;
         }
     };
+    //@set---$.Event---end
 
     glo.$ = $;
     glo.smartyJQ = smartyJQ;
