@@ -3,10 +3,13 @@
     //common
     var SMARTKEY = "_s_" + new Date().getTime();
     var SMARTEVENTKEY = SMARTKEY + "_e";
-
+ 
     //function
     var arrlyslice = Array.prototype.slice;
     var makeArray = function(arrobj) {
+        // if (arrobj instanceof Array) {
+        //     return arrobj;
+        // }
         return arrlyslice.call(arrobj);
     };
 
@@ -1298,6 +1301,56 @@
         }
     });
 
+
+
+    //init
+    var $ = function(selector, context) {
+        if (selector instanceof smartyJQ) {
+            return selector;
+        }
+        if (!selector) {
+            return $([]);
+        }
+        return new smartyJQ(selector, context);
+    };
+    $.fn = $.prototype = smartyJQ.fn;
+
+    //在$上的方法
+    extend($, {
+        extend: extend,
+        each: each,
+        makearray: makeArray,
+        merge: merge,
+        type: getType,
+        isPlainObject: function(val) {
+            for (var i in val) {
+                return true;
+            }
+            return false;
+        },
+        proxy: function(arg1, arg2) {
+            var args = makeArray(arguments).slice(2);
+            var tarfun, context;
+
+            //修正必要参数
+            var arg1type = getType(arg1);
+            if (arg1type == "object") {
+                tarfun = arg1[arg2];
+                context = arg1;
+            } else if (arg1type == "function") {
+                tarfun = arg1;
+                context = arg2;
+            }
+
+            return function() {
+                tarfun.apply(context, args);
+            };
+        },
+        isFunction: function(tar) {
+            return getType(tar) == "function";
+        }
+    });
+
     //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---start
     //设置event
     each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
@@ -1446,6 +1499,16 @@
                         //设置当前值
                         tar.style[name] = nowValue + diffVal * getFrame(nowPercentage) + "px";
                     });
+                } else {
+                    nowValue = tar[name];
+
+                    //获取差值
+                    var diffVal = value - nowValue;
+
+                    funArr.push(function(nowPercentage) {
+                        //设置当前值
+                        tar[name] = nowValue + diffVal * getFrame(nowPercentage);
+                    });
                 }
             });
         });
@@ -1477,54 +1540,6 @@
         return this;
     };
     //@set---fn.animate---end
-
-    //init
-    var $ = function(selector, context) {
-        if (selector instanceof smartyJQ) {
-            return selector;
-        }
-        if (!selector) {
-            return $([]);
-        }
-        return new smartyJQ(selector, context);
-    };
-    $.fn = $.prototype = smartyJQ.fn;
-
-    //在$上的方法
-    extend($, {
-        extend: extend,
-        each: each,
-        makearray: makeArray,
-        merge: merge,
-        type: getType,
-        isPlainObject: function(val) {
-            for (var i in val) {
-                return true;
-            }
-            return false;
-        },
-        proxy: function(arg1, arg2) {
-            var args = makeArray(arguments).slice(2);
-            var tarfun, context;
-
-            //修正必要参数
-            var arg1type = getType(arg1);
-            if (arg1type == "object") {
-                tarfun = arg1[arg2];
-                context = arg1;
-            } else if (arg1type == "function") {
-                tarfun = arg1;
-                context = arg2;
-            }
-
-            return function() {
-                tarfun.apply(context, args);
-            };
-        },
-        isFunction: function(tar) {
-            return getType(tar) == "function";
-        }
-    });
 
     //@set---$.Event---start
     $.Event = function(oriEvent, props) {
