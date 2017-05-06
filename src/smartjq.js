@@ -3,13 +3,10 @@
     //common
     var SMARTKEY = "_s_" + new Date().getTime();
     var SMARTEVENTKEY = SMARTKEY + "_e";
- 
+
     //function
     var arrlyslice = Array.prototype.slice;
     var makeArray = function(arrobj) {
-        // if (arrobj instanceof Array) {
-        //     return arrobj;
-        // }
         return arrlyslice.call(arrobj);
     };
 
@@ -1319,7 +1316,7 @@
     extend($, {
         extend: extend,
         each: each,
-        makearray: makeArray,
+        makeArray: makeArray,
         merge: merge,
         type: getType,
         isPlainObject: function(val) {
@@ -1361,7 +1358,7 @@
         //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---end
 
     //动画
-    //@set---fn.animate---start
+    //@set---fn.animate fn.stop---start
     //获取立方根的方法
     var getCbrt = (function() {
         if (Math.cbrt) {
@@ -1376,9 +1373,16 @@
 
     //动画函数主体
     prototypeObj.animate = function(prop, arg2, arg3, arg4) {
-        var animateTime = 300,
+        var animateTime = 400,
             easing = 'swing',
             callback;
+        var _this = this;
+        //以下为增强选项
+        var delay = 0,
+            progress, start;
+
+        //设置 _task array
+        _this._tasks || (_this._tasks = []);
 
         //对齐参数
         switch (getType(arg2)) {
@@ -1402,9 +1406,12 @@
                 callback = arg2;
                 break;
             case "object":
-                animateTime = arg2.speed;
-                easing = arg2.easing;
-                callback = arg2.callback;
+                arg2.duration && (animateTime = arg2.duration);
+                arg2.easing && (easing = arg2.easing);
+                arg2.complete && (callback = arg2.complete);
+                arg2.delay && (delay = arg2.delay);
+                arg2.start && (start = arg2.start);
+                arg2.progress && (progress = arg2.progress);
                 break;
         }
 
@@ -1468,7 +1475,6 @@
 
                     //t只会在区间0-1，综合测试后得到的这个0到1区间的值
                     t = (-b - (getCbrt(Y1) + getCbrt(Y2))) / (3 * a);
-                    // } else if (delta < 0) {
                 } else {
                     var Y = (2 * A * b - 3 * a * B) / (2 * Math.sqrt(A * A * A));
                     var angle = Math.acos(Y) / 3;
@@ -1482,37 +1488,6 @@
         var animationId;
         var funArr = [];
 
-        each(this, function(i, tar) {
-            var computeStyleObj = getComputedStyle(tar);
-            each(prop, function(name, value) {
-                //获取当前值
-                var nowValue = parseFloat(computeStyleObj[name]);
-
-                if (nowValue) {
-                    //修正值
-                    value = parseFloat(value);
-
-                    //获取差值
-                    var diffVal = value - nowValue;
-
-                    funArr.push(function(nowPercentage) {
-                        //设置当前值
-                        tar.style[name] = nowValue + diffVal * getFrame(nowPercentage) + "px";
-                    });
-                } else {
-                    nowValue = tar[name];
-
-                    //获取差值
-                    var diffVal = value - nowValue;
-
-                    funArr.push(function(nowPercentage) {
-                        //设置当前值
-                        tar[name] = nowValue + diffVal * getFrame(nowPercentage);
-                    });
-                }
-            });
-        });
-
         var startTime;
         var animeFun = function(timestamp) {
             //记录开始时间
@@ -1523,23 +1498,110 @@
 
             //当前进度
             var nowPercentage = (diffTime > animateTime ? animateTime : diffTime) / animateTime;
+            nowPercentage = getFrame(nowPercentage)
             funArr.forEach(function(e) {
                 e(nowPercentage);
             });
+
+            //运行进度函数
+            progress && progress(nowPercentage);
+
             if (diffTime <= animateTime) {
                 animationId = requestAnimationFrame(animeFun);
             } else {
-                funArr = getFrame = animeFun = null;
-                callback && callback();
+                animateEnd(1);
             }
         };
 
-        //点火
-        animeFun(0);
+        var animateEnd = function(isEnd) {
+            //清除动画
+            cancelAnimationFrame(animationId);
+
+            if (isEnd) {
+                funArr.forEach(function(e) {
+                    e(1);
+                });
+                callback && callback();
+            }
+
+            //内存回收
+            callback = funArr = getFrame = animeFun = null;
+            delete _this._aEnd;
+
+            //有下一个任务就运行下一个任务
+            var nextTask = _this._tasks.shift();
+            if (nextTask) {
+                nextTask(0);
+            } else {
+                delete _this._tasks;
+                delete _this._isRT;
+            }
+            _this = null;
+        };
+
+        var runanime = function() {
+            _this._aEnd = animateEnd;
+
+            //添加运行函数
+            each(_this, function(i, tar) {
+                var computeStyleObj = getComputedStyle(tar);
+                each(prop, function(name, value) {
+                    //获取当前值
+                    var nowValue = parseFloat(computeStyleObj[name]);
+
+                    if (nowValue) {
+                        //修正值
+                        value = parseFloat(value);
+
+                        //获取差值
+                        var diffVal = value - nowValue;
+
+                        funArr.push(function(p) {
+                            //设置当前值
+                            tar.style[name] = nowValue + diffVal * p + "px";
+                        });
+                    } else {
+                        nowValue = tar[name];
+
+                        //获取差值
+                        var diffVal = value - nowValue;
+
+                        funArr.push(function(p) {
+                            //设置当前值
+                            tar[name] = nowValue + diffVal * p;
+                        });
+                    }
+                });
+            });
+
+            setTimeout(function() {
+                start && start();
+                animeFun && animeFun(0);
+            }, delay);
+        };
+
+        if (_this._isRT) {
+            _this._tasks.push(runanime);
+        } else {
+            runanime();
+        }
+
+        //设置动画进程开始
+        _this._isRT = 1;
 
         return this;
     };
-    //@set---fn.animate---end
+
+    prototypeObj.stop = function(clearQueue, gotoEnd) {
+        if (clearQueue) {
+            this._tasks = [];
+        }
+        var aEndArg = 0;
+        gotoEnd && (aEndArg = 1);
+        this._aEnd(aEndArg);
+    }
+
+    //@set---fn.animate fn.stop---end
 
     //@set---$.Event---start
     $.Event = function(oriEvent, props) {
