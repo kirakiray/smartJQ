@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>animate</title>
     <script src="../src/smartjq.js"></script>
-    <script src="jquery-3.1.1.js"></script>
+    <!--<script src="jquery-3.1.1.js"></script>-->
     <style>
         .a {
             width: 50px;
@@ -17,7 +17,7 @@
         
         .testanime {
             /*animation: testanime 2s cubic-bezier(0.66, 0.22, 0.41, 0.78);*/
-            animation: testanime 2.5s ease-in-out;
+            animation: testanime 1.5s ease-in-out;
             animation-fill-mode: forwards;
         }
         
@@ -100,8 +100,11 @@
     var a = $('#tar').animate({
         width: 200
     }, {
-        duration: 2500,
-        easing: "swing"
+        duration: 1500,
+        easing: "swing",
+        start: function() {
+            console.log(arguments);
+        }
     }).animate({
         height: 200
     }, {

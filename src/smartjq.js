@@ -1379,7 +1379,7 @@
         var _this = this;
         //以下为增强选项
         var delay = 0,
-            progress, start;
+            progress, start, queue = 1;
 
         //设置 _task array
         _this._tasks || (_this._tasks = []);
@@ -1412,6 +1412,7 @@
                 arg2.delay && (delay = arg2.delay);
                 arg2.start && (start = arg2.start);
                 arg2.progress && (progress = arg2.progress);
+                (arg2.queue != undefined) && (queue = arg2.queue)
                 break;
         }
 
@@ -1529,12 +1530,14 @@
             delete _this._aEnd;
 
             //有下一个任务就运行下一个任务
-            var nextTask = _this._tasks.shift();
-            if (nextTask) {
-                nextTask(0);
-            } else {
-                delete _this._tasks;
-                delete _this._isRT;
+            if (queue) {
+                var nextTask = _this._tasks.shift();
+                if (nextTask) {
+                    nextTask(0);
+                } else {
+                    delete _this._tasks;
+                    delete _this._isRT;
+                }
             }
             _this = null;
         };
@@ -1580,10 +1583,10 @@
             }, delay);
         };
 
-        if (_this._isRT) {
-            _this._tasks.push(runanime);
-        } else {
+        if (!_this._isRT || !queue) {
             runanime();
+        } else {
+            _this._tasks.push(runanime);
         }
 
         //设置动画进程开始
