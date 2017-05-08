@@ -1006,10 +1006,6 @@
 
             var newArr = [];
             each(smartEventObjs, function(i, handleObj) {
-                // var newEventObject = new $.Event(oriEvent);
-                //合并自定义数据
-                // oriEvent && oriEvent._props && extend(newEventObject, oriEvent._props);
-
                 //设置事件对象
                 var ct = newEventObject.delegateTarget = ele;
 
@@ -1050,13 +1046,18 @@
                     newArr.push(handleObj);
                 }
             });
-            smartEventData[eventName] = newArr;
+            if (!(0 in newArr)) {
+                delete smartEventData[eventName];
+            } else {
+                smartEventData[eventName] = newArr;
+            }
             smartEventObjs = null;
         },
         //注册事件
         on: function(arg1, arg2, arg3, arg4, isOne) {
             //@use---fn._tr
             //@use---fn._ge
+            //@use---$.Event
             var selectors, data, _this = this;
 
             if (getType(arg1) == 'object') {
@@ -1132,10 +1133,13 @@
             return this;
         },
         one: function(event, selector, data, callback) {
+            //@use---fn.on
             return this.on(event, selector, data, callback, 1);
         },
         //触发事件
         trigger: function(eventName, data) {
+            //@use---fn._tr
+            //@use---$.Event
             return each(this, function(i, tar) {
                 var event = $.Event(eventName);
                 //拥有EventTarget的就触发
@@ -1178,43 +1182,47 @@
                 var smartEventData = ele[SMARTEVENTKEY];
                 if (!smartEventData) return
 
-                var arg2Type = getType(selector);
-
-                switch (getType(types)) {
-                    case "string":
-                        var smartEventData_types = smartEventData[types];
-                        if (!selector) {
-                            delete smartEventData[types];
-                        } else if (arg2Type == "function") {
-                            smartEventData[types] = smartEventData_types.filter(function(e) {
-                                return e.f == selector ? 0 : 1;
-                            });
-                        } else if (arg2Type == "string") {
-                            if (!fn) {
-                                smartEventData[types] = smartEventData_types.filter(function(e) {
-                                    return e.s == selector ? 0 : 1;
-                                });
-                            } else {
-                                smartEventData[types] = smartEventData_types.filter(function(e) {
-                                    return (e.s == selector && e.f == fn) ? 0 : 1;
-                                });
-                            }
-                        }
-                        break;
-                    case "undefined":
-                        for (var i in smartEventData) {
-                            delete smartEventData[i];
-                        }
-                        break;
-                    case "object":
-                        var _this;
-                        each(types, function(k, v) {
-                            _this.off(k, v);
-                        });
-                        return;
+                if (!types) {
+                    for (var k in smartEventData) {
+                        delete smartEventData[k];
+                    }
+                    return;
                 }
+
+                var arg2Type = getType(selector);
+                each(types.split(' '), function(ii, eventName) {
+                    switch (getType(eventName)) {
+                        case "string":
+                            var smartEventData_eventName = smartEventData[eventName];
+                            if (!selector) {
+                                delete smartEventData[eventName];
+                            } else if (arg2Type == "function") {
+                                smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
+                                    return e.f == selector ? 0 : 1;
+                                });
+                            } else if (arg2Type == "string") {
+                                if (!fn) {
+                                    smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
+                                        return e.s == selector ? 0 : 1;
+                                    });
+                                } else {
+                                    smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
+                                        return (e.s == selector && e.f == fn) ? 0 : 1;
+                                    });
+                                }
+                            }
+                            break;
+                            // case "undefined":
+                            //     break;
+                        case "object":
+                            var _this;
+                            each(eventName, function(k, v) {
+                                _this.off(k, v);
+                            });
+                            return;
+                    }
+                });
             });
-            // return this;
         },
         bind: function(event, data, callback) {
             return this.on(event, data, callback);
@@ -1239,6 +1247,7 @@
         },
         clone: function(isDeep) {
             //@use---fn._tr
+            //@use---$.Event
             var arr = [];
 
             //克隆自定义方法和自定义数据
@@ -1253,7 +1262,7 @@
                             prototypeObj._tr(tarele, eventName, $.Event(oriEvent));
                         });
                     });
-                    tarele[SMARTEVENTKEY] = eventData;
+                    tarele[SMARTEVENTKEY] = extend({}, eventData);
                 }
 
                 //设定数据
@@ -1663,6 +1672,78 @@
         }
     };
     //@set---$.Event---end
+
+
+    //@set---$.Deferred---start
+    //@use---fn.one
+    //@use---fn.off
+    //_p是内置事件名
+    var _PROMISE_DONE = "_resolved";
+    var _PROMISE_REJECT = "_rejected";
+    var _PROMISE_PENDING = "_pending";
+    $.Deferred = function() {
+        if (this instanceof $.Deferred) {
+            this._state = _PROMISE_PENDING;
+        } else {
+            return new $.Deferred();
+        }
+    };
+    $.Deferred.prototype = {
+        notify: function(data) {
+            $(this).trigger(_PROMISE_PENDING, data);
+        },
+        progress: function(callback) {
+            var _this = this;
+            $(_this).on(_PROMISE_PENDING, function(e, data) {
+                callback(data);
+            });
+            return _this;
+        },
+        resolve: function(data) {
+            $(this).trigger(_PROMISE_DONE, data);
+        },
+        done: function(callback) {
+            var _this = this;
+            $(_this).one(_PROMISE_DONE, function(e, data) {
+                _this._state = _PROMISE_DONE;
+                callback(data);
+                //清除无用事件
+                $(_this).off(_PROMISE_REJECT + " " + _PROMISE_PENDING);
+            });
+            return _this;
+        },
+        reject: function(data) {
+            $(this).trigger(_PROMISE_REJECT, data);
+        },
+        fail: function(callback) {
+            var _this = this;
+            $(_this).one(_PROMISE_REJECT, function(e, data) {
+                _this._state = _PROMISE_REJECT;
+                callback(data);
+                //清除无用事件
+                $(_this).off(_PROMISE_DONE + " " + _PROMISE_PENDING);
+            });
+            return _this;
+        },
+        always: function(callback) {
+            $(this).one(_PROMISE_DONE + " " + _PROMISE_REJECT, function(e, data) {
+                callback(data);
+            });
+            return this;
+        },
+        state: function() {
+            return this._state.replace("_", "");
+        },
+        promise: function() {
+            var newDeferred = new $.Deferred();
+            //继承事件
+            $(this).on(_PROMISE_DONE + " " + _PROMISE_REJECT + " " + _PROMISE_PENDING, function(e, data) {
+                $(newDeferred).trigger(e.type, data);
+            });
+            return newDeferred;
+        }
+    };
+    //@set---$.Deferred---end
 
     glo.$ = $;
     glo.smartyJQ = smartyJQ;
