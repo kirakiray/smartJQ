@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Deferred Test</title>
+    <script src="../src/smartjq.js"></script>
+    <!--<script src="jquery-3.1.1.js"></script>-->
+</head>
+
+<body>
+</body>
+<script>
+    var wait = function(c) {
+        var dtd = $.Deferred(); // 新建一个deferred对象
+        var tasks = function() {
+            console.log('内部执行完毕');　　　
+            // dtd.reject(c * 2); // 改变deferred对象的执行状态
+            dtd.resolve(c * 2); // 改变deferred对象的执行状态
+        };
+        setTimeout(function() {
+            dtd.notify(10);
+            setTimeout(function() {
+                dtd.notify(20);
+            }, 100);
+        }, 100);
+        setTimeout(tasks, 1000);　　　　
+        // return dtd;　　
+        return dtd.promise();
+    };
+
+    var a = wait(100)
+        .progress(function(d) {
+            console.log('progres=>', d);
+            console.log('当前的状态=>', a.state());
+        })
+        .done(function(d) {
+            console.log('外部执行完了', d);
+        })
+        .fail(function(d) {
+            console.warn('失败了 =>', d);
+        })
+        .always(function(d) {
+            console.log('最后肯定会运行的', arguments);
+            console.log('当前的状态222=>', a.state());
+        })
+        .done(function(d) {
+            console.log('外部执行完222', d)
+        });
+
+    console.log(a);
+</script>
+
+</html>

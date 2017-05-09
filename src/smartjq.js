@@ -1745,7 +1745,191 @@
     };
     //@set---$.Deferred---end
 
+    //@set---$.ajax $.ajaxSetup---start
+    //@use---$.Deferred
+    //@use---$.extend
+    //@use---$.each
+    //@use---fn.on
+    //@use---fn.trigger
+    var ajaxDefaults = {
+        type: "GET",
+        url: "",
+        // context: "",
+        // data: "",
+        dataType: "json",
+        // headers: "",
+        jsonp: "callback",
+        jsonpCallback: SMARTKEY + "_c",
+        mimeType: "",
+        username: null,
+        password: null,
+        // statusCode: {},
+        success: "",
+        // timeout: "",
+        global: 1,
+        // xhr: "",
+        async: true
+    };
+    var ajax = function(options) {
+        var defaults = extend({
+            beforeSend: "",
+            error: "",
+            dataFilter: "",
+            success: "",
+            complete: ""
+        }, ajaxDefaults, options);
+
+        //根据dataType做不同操作
+        var dataType = defaults.dataType.toLowerCase();
+
+        //生成返回的deferred对象
+        var deferred = new $.Deferred();
+
+        //绑定函数
+        deferred.done(function(e) {
+            defaults.success && defaults.success(e);
+        });
+        deferred.fail(function(e) {
+            defaults.error && defaults.error(e);
+        });
+        deferred.always(function(e) {
+            defaults.complete && defaults.complete(e);
+        });
+
+        if (dataType == "jsonp") {
+            var script = $('<script src="' + defaults.url + ((defaults.url.search(/\?(.+)/) > -1) ? "&" : "?") + defaults.jsonp + "=" + defaults.jsonpCallback + '" />')[0];
+            window[defaults.jsonpCallback] = function(data) {
+                deferred.resolve(data);
+                delete window[defaults.jsonpCallback];
+                $(ajaxDefaults).trigger('success');
+                $(ajaxDefaults).trigger('complete');
+            };
+            // script.onload = function() {};
+            script.onerror = function(e) {
+                deferred.reject(e);
+                $(ajaxDefaults).trigger('error');
+                $(ajaxDefaults).trigger('complete');
+            };
+            $('head').append(script);
+
+            return deferred;
+        }
+
+        //发送请求主体
+        var xhr = defaults.xhr || new XMLHttpRequest();
+
+        //设置专用函数
+        var deferredObj = {
+            //状态
+            readyState: 0,
+            //注销请求的方法
+            abort: function() {
+                xhr.abort();
+            },
+            getResponseHeader: function(name) {
+                return xhr.getResponseHeader(name);
+            }
+        };
+        $.extend(deferred, deferredObj);
+
+        //设置返回数据类型
+        xhr.responseType = dataType;
+
+        //注册状态改变事件
+        xhr.addEventListener('readystatechange', function(e) {
+            deferred.readyState = xhr.readyState;
+            //判断响应
+            if (defaults.statusCode && defaults.statusCode[xhr.status]) {
+                defaults.statusCode[xhr.status]();
+            }
+        });
+        xhr.addEventListener('load', function(e) {
+            deferred.resolve(e.result);
+            $(ajaxDefaults).trigger('success', e);
+            $(ajaxDefaults).trigger('complete', e);
+        });
+        xhr.addEventListener('error', function(e) {
+            deferred.reject(e);
+            $(ajaxDefaults).trigger('error', e);
+            $(ajaxDefaults).trigger('complete', e);
+        });
+
+        //设置timeout
+        defaults.timeout && (xhr.timeout = defaults.timeout);
+        xhr.addEventListener('timeout', function() {
+            $(ajaxDefaults).trigger('stop');
+        });
+
+        //设置请求头
+        defaults.headers && $.each(defaults.headers, function(k, v) {
+            xhr.setRequestHeader(k, v);
+        });
+
+        //MIME
+        defaults.mimeType && xhr.overrideMimeType(defaults.mimeType);
+
+        //设置请求类型
+        xhr.open(defaults.type, defaults.url, defaults.async, defaults.username, defaults.password);
+
+        $(ajaxDefaults).trigger('start');
+
+        //发送请求
+        xhr.send(defaults.data);
+
+        $(ajaxDefaults).trigger('send');
+
+        return deferred;
+    };
+    $.ajax = ajax;
+    $.ajaxSetup = function(options) {
+        extend(ajaxDefaults, options);
+    };
+    // var setAjaxFun = function(arr, func) {
+    //     arr.forEach(function(fname) {
+    //         $["ajax" + fname.replace(/(^\w)(.+)/, function(a, b, c) {
+    //             return b.toUpperCase() + c
+    //         })] = function(callback) {
+    //             $(ajaxDefaults).on(fname, function(e, event) {
+    //                 callback(event, xhr, defaults);
+    //             });
+    //         }
+    //     });
+    // };
+    // $.ajaxSuccess = function(callback) {
+    //     $(ajaxDefaults).on('success', function(e, event) {
+    //         callback(event, xhr, defaults);
+    //     });
+    // };
+    // $.ajaxError = function(callback) {
+    //     $(ajaxDefaults).on('error', function(e, event) {
+    //         callback(event, xhr, defaults);
+    //     });
+    // };
+    // $.ajaxComplete = function(callback) {
+    //     $(ajaxDefaults).on('complete', function(e, event) {
+    //         callback(event, xhr, defaults);
+    //     });
+    // };
+    ['success', 'error', 'complete'].forEach(function(fname) {
+        $["ajax" + fname.replace(/(^\w)(.+)/, function(a, b, c) {
+            return b.toUpperCase() + c
+        })] = function(callback) {
+            $(ajaxDefaults).on(fname, function(e, event) {
+                callback(event, xhr, defaults);
+            });
+        }
+    });
+    $.ajaxSend = function(callback) {
+        $(ajaxDefaults).on('send', callback);
+    };
+    $.ajaxStart = function(callback) {
+        $(ajaxDefaults).on('start', callback);
+    };
+    $.ajaxStop = function(callback) {
+        $(ajaxDefaults).on('stop', callback);
+    };
+    //@set---$.ajax $.ajaxSetup---end
+
     glo.$ = $;
     glo.smartyJQ = smartyJQ;
-
 })(window);
