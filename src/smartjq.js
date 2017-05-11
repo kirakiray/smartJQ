@@ -252,7 +252,7 @@
     };
 
     //main
-    function smartyJQ(arg1, arg2) {
+    function smartJQ(arg1, arg2) {
         //只有一个参数的情况
         var a1type = getType(arg1);
         switch (a1type) {
@@ -287,7 +287,7 @@
                 }, false);
                 break;
             default:
-                if (arg1 instanceof smartyJQ) {
+                if (arg1 instanceof smartJQ) {
                     return arg1;
                 } else if (arg1 instanceof Array) {
                     merge(this, arg1);
@@ -299,7 +299,7 @@
 
     var prototypeObj = Object.create(Array.prototype);
 
-    smartyJQ.fn = smartyJQ.prototype = prototypeObj;
+    smartJQ.fn = smartJQ.prototype = prototypeObj;
 
     extend(prototypeObj, {
         //设置样式
@@ -473,7 +473,7 @@
         },
         html: function(val) {
             //@use---fn.prop
-            if (val instanceof smartyJQ) {
+            if (val instanceof smartJQ) {
                 //市面上有好多插件使用不规范写法，下面针对不规范写法做兼容，有需要以后会去除掉
                 each(this, function(i, e) {
                     e.innerHTML = "";
@@ -766,7 +766,7 @@
                     });
                     break;
                 default:
-                    if (expr instanceof smartyJQ) {
+                    if (expr instanceof smartJQ) {
                         each(this, function(i, e) {
                             each(expr, function(i, tar) {
                                 (e == tar) && arr.push(e);
@@ -888,7 +888,7 @@
                         }
                     });
                 });
-            } else if (arg instanceof smartyJQ || arg.nodeType) {
+            } else if (arg instanceof smartJQ || arg.nodeType) {
                 arg.nodeType && (arg = [arg]);
                 var $this = this;
                 each(arg, function(i, tar) {
@@ -924,7 +924,7 @@
             } else if (ele.nodeType) {
                 tar = ele;
                 owner = this;
-            } else if (ele instanceof smartyJQ) {
+            } else if (ele instanceof smartJQ) {
                 tar = ele[0];
                 owner = this;
             } else if (getType(ele) == "string") {
@@ -1311,23 +1311,27 @@
 
     //init
     var $ = function(selector, context) {
-        if (selector instanceof smartyJQ) {
+        if (selector instanceof smartJQ) {
             return selector;
         }
         if (!selector) {
             return $([]);
         }
-        return new smartyJQ(selector, context);
+        return new smartJQ(selector, context);
     };
-    $.fn = $.prototype = smartyJQ.fn;
+    $.fn = $.prototype = smartJQ.fn;
 
     //在$上的方法
     extend($, {
+        // expando: SMARTKEY,
         extend: extend,
         each: each,
         makeArray: makeArray,
         merge: merge,
         type: getType,
+        // trim: function(text) {
+        //     return text.trim();
+        // },
         isPlainObject: function(val) {
             for (var i in val) {
                 return true;
@@ -1362,6 +1366,7 @@
     each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
             prototypeObj[e] = function(callback) {
                 callback ? this.on(e, callback) : this.trigger(e);
+                return this;
             }
         })
         //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---end
@@ -1677,6 +1682,7 @@
     //@set---$.Deferred---start
     //@use---fn.one
     //@use---fn.off
+    //@use---$.each
     //_p是内置事件名
     var _PROMISE_DONE = "_resolved";
     var _PROMISE_REJECT = "_rejected";
@@ -1688,20 +1694,16 @@
             return new $.Deferred();
         }
     };
-    $.Deferred.prototype = {
-        notify: function(data) {
-            $(this).trigger(_PROMISE_PENDING, data);
-        },
-        progress: function(callback) {
-            var _this = this;
-            $(_this).on(_PROMISE_PENDING, function(e, data) {
-                callback(data);
-            });
-            return _this;
-        },
-        resolve: function(data) {
-            $(this).trigger(_PROMISE_DONE, data);
-        },
+    var deferredPrototype = $.Deferred.prototype = {
+        // notify: function(data) {
+        //     $(this).trigger(_PROMISE_PENDING, data);
+        // },
+        // resolve: function(data) {
+        //     $(this).trigger(_PROMISE_DONE, data);
+        // },
+        // reject: function(data) {
+        //     $(this).trigger(_PROMISE_REJECT, data);
+        // },
         done: function(callback) {
             var _this = this;
             $(_this).one(_PROMISE_DONE, function(e, data) {
@@ -1712,9 +1714,6 @@
             });
             return _this;
         },
-        reject: function(data) {
-            $(this).trigger(_PROMISE_REJECT, data);
-        },
         fail: function(callback) {
             var _this = this;
             $(_this).one(_PROMISE_REJECT, function(e, data) {
@@ -1722,6 +1721,13 @@
                 callback(data);
                 //清除无用事件
                 $(_this).off(_PROMISE_DONE + " " + _PROMISE_PENDING);
+            });
+            return _this;
+        },
+        progress: function(callback) {
+            var _this = this;
+            $(_this).on(_PROMISE_PENDING, function(e, data) {
+                callback(data);
             });
             return _this;
         },
@@ -1743,6 +1749,32 @@
             return newDeferred;
         }
     };
+    //设置触发
+    $.each({
+        'notify': _PROMISE_PENDING,
+        'resolve': _PROMISE_DONE,
+        'reject': _PROMISE_REJECT
+    }, function(name, eventName) {
+        deferredPrototype[name] = function(data) {
+            $(this).trigger(eventName, data);
+        }
+    });
+
+    // $.each({
+    //     "done": [_PROMISE_DONE, _PROMISE_REJECT],
+    //     "fail": [_PROMISE_REJECT, _PROMISE_DONE]
+    // }, function(name, arg) {
+    //     deferredPrototype[name] = function(callback) {
+    //         var _this = this;
+    //         $(_this).one(arg[0], function(e, data) {
+    //             _this._state = arg[0];
+    //             callback(data);
+    //             //清除无用事件
+    //             $(_this).off(arg[1] + " " + _PROMISE_PENDING);
+    //         });
+    //         return _this;
+    //     }
+    // });
     //@set---$.Deferred---end
 
     //@set---$.ajax $.ajaxSetup---start
@@ -1751,6 +1783,7 @@
     //@use---$.each
     //@use---fn.on
     //@use---fn.trigger
+    var jsonpCallback_count = 0;
     var ajaxDefaults = {
         type: "GET",
         url: "",
@@ -1759,7 +1792,9 @@
         dataType: "json",
         // headers: "",
         jsonp: "callback",
-        jsonpCallback: SMARTKEY + "_c",
+        jsonpCallback: function() {
+            return SMARTKEY + "_c" + jsonpCallback_count++;
+        },
         mimeType: "",
         username: null,
         password: null,
@@ -1797,10 +1832,12 @@
         });
 
         if (dataType == "jsonp") {
-            var script = $('<script src="' + defaults.url + ((defaults.url.search(/\?(.+)/) > -1) ? "&" : "?") + defaults.jsonp + "=" + defaults.jsonpCallback + '" />')[0];
-            window[defaults.jsonpCallback] = function(data) {
+            var callbackName = defaults.jsonpCallback;
+            getType(callbackName) == "function" && (callbackName = callbackName());
+            var script = $('<script src="' + defaults.url + ((defaults.url.search(/\?(.+)/) > -1) ? "&" : "?") + defaults.jsonp + "=" + callbackName + '" />')[0];
+            window[callbackName] = function(data) {
                 deferred.resolve(data);
-                delete window[defaults.jsonpCallback];
+                delete window[callbackName];
                 $(ajaxDefaults).trigger('success');
                 $(ajaxDefaults).trigger('complete');
             };
@@ -1844,7 +1881,7 @@
             }
         });
         xhr.addEventListener('load', function(e) {
-            deferred.resolve(e.result);
+            deferred.resolve(this.response);
             $(ajaxDefaults).trigger('success', e);
             $(ajaxDefaults).trigger('complete', e);
         });
@@ -1874,7 +1911,14 @@
         $(ajaxDefaults).trigger('start');
 
         //发送请求
-        xhr.send(defaults.data);
+        var data = defaults.data;
+        if (data && !(data instanceof FormData)) {
+            data = new FormData();
+            $.each(defaults.data, function(k, v) {
+                data.append(k, v);
+            });
+        }
+        xhr.send(data);
 
         $(ajaxDefaults).trigger('send');
 
@@ -1884,17 +1928,6 @@
     $.ajaxSetup = function(options) {
         extend(ajaxDefaults, options);
     };
-    // var setAjaxFun = function(arr, func) {
-    //     arr.forEach(function(fname) {
-    //         $["ajax" + fname.replace(/(^\w)(.+)/, function(a, b, c) {
-    //             return b.toUpperCase() + c
-    //         })] = function(callback) {
-    //             $(ajaxDefaults).on(fname, function(e, event) {
-    //                 callback(event, xhr, defaults);
-    //             });
-    //         }
-    //     });
-    // };
     // $.ajaxSuccess = function(callback) {
     //     $(ajaxDefaults).on('success', function(e, event) {
     //         callback(event, xhr, defaults);
@@ -1910,26 +1943,23 @@
     //         callback(event, xhr, defaults);
     //     });
     // };
-    ['success', 'error', 'complete'].forEach(function(fname) {
-        $["ajax" + fname.replace(/(^\w)(.+)/, function(a, b, c) {
-            return b.toUpperCase() + c
-        })] = function(callback) {
-            $(ajaxDefaults).on(fname, function(e, event) {
-                callback(event, xhr, defaults);
+    // $.ajaxSend = function(callback) {
+    //     $(ajaxDefaults).on('send', callback);
+    // };
+    // $.ajaxStart = function(callback) {
+    //     $(ajaxDefaults).on('start', callback);
+    // };
+    // $.ajaxStop = function(callback) {
+    //     $(ajaxDefaults).on('stop', callback);
+    // };
+    ['Success', 'Error', 'Complete', 'Send', 'Start', 'Stop'].forEach(function(fname) {
+        $["ajax" + fname] = function(callback) {
+            $(ajaxDefaults).on(fname.toLowerCase(), function(e, event) {
+                event ? callback(event, xhr, defaults) : callback();
             });
         }
     });
-    $.ajaxSend = function(callback) {
-        $(ajaxDefaults).on('send', callback);
-    };
-    $.ajaxStart = function(callback) {
-        $(ajaxDefaults).on('start', callback);
-    };
-    $.ajaxStop = function(callback) {
-        $(ajaxDefaults).on('stop', callback);
-    };
     //@set---$.ajax $.ajaxSetup---end
 
-    glo.$ = $;
-    glo.smartyJQ = smartyJQ;
+    glo.smartJQ = glo.$ = $;
 })(window);
