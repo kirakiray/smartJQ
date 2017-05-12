@@ -408,32 +408,32 @@ var jqdatas = [{
             val: "$.post",
             $: 1
         }, {
-            val: "ajaxComplete",
-            fn: 1
+            val: "$.ajaxComplete",
+            $: 1
         }, {
-            val: "ajaxError",
-            fn: 1
+            val: "$.ajaxError",
+            $: 1
         }, {
-            val: "ajaxSend",
-            fn: 1
+            val: "$.ajaxSend",
+            $: 1
         }, {
-            val: "ajaxStart",
-            fn: 1
+            val: "$.ajaxStart",
+            $: 1
         }, {
-            val: "ajaxStop",
-            fn: 1
+            val: "$.ajaxStop",
+            $: 1
         }, {
-            val: "ajaxSuccess",
-            fn: 1
+            val: "$.ajaxSuccess",
+            $: 1
         }, {
             val: "$.ajaxSetup",
             $: 1
         }, {
-            val: "serialize",
-            fn: 1
+            val: "$.serialize",
+            $: 1
         }, {
-            val: "serializearray",
-            fn: 1
+            val: "$.serializearray",
+            $: 1
         }]
     }, {
         title: "工具",
@@ -521,6 +521,39 @@ var jqdatas = [{
         }, {
             val: "$.proxy",
             $: 1
+        }]
+    }, {
+        title: "Deferred",
+        props: [{
+            val: "$.Deferred",
+            $: 1
+        }, {
+            val: "notify",
+            is: "$.Deferred"
+        }, {
+            val: "resolve",
+            is: "$.Deferred"
+        }, {
+            val: "reject",
+            is: "$.Deferred"
+        }, {
+            val: "progress",
+            is: "$.Deferred"
+        }, {
+            val: "done",
+            is: "$.Deferred"
+        }, {
+            val: "fail",
+            is: "$.Deferred"
+        }, {
+            val: "always",
+            is: "$.Deferred"
+        }, {
+            val: "state",
+            is: "$.Deferred"
+        }, {
+            val: "promise",
+            is: "$.Deferred"
         }]
     }, {
         title: "jquery对象访问",

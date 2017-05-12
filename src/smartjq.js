@@ -150,6 +150,8 @@
     var findEles = function(owner, expr) {
         var redata = [];
 
+        expr = expr.trim();
+
         //判断表达式是否空
         if (!expr) {
             return owner.length ? owner : [owner];
@@ -227,7 +229,18 @@
                     merge(redata, findEles(e, expr));
                 });
             } else {
-                redata = owner.querySelectorAll(expr);
+                //查看看是否有原生querySelectorAll支持但是有缺陷的表达方式
+                var matchData;
+                if (matchData = expr.match(/^>(\S*) *(.*)/)) {
+                    if (1 in matchData) {
+                        var expr2 = matchData[1];
+                        makeArray(owner.children).forEach(function(e) {
+                            judgeEle(e, expr2) && redata.push(e);
+                        });
+                    }
+                } else {
+                    redata = owner.querySelectorAll(expr);
+                }
             }
         }
 
@@ -238,6 +251,9 @@
     //判断元素是否符合条件
     var judgeEle = function(ele, expr) {
         var fadeParent = document.createElement('div');
+        if (ele == document) {
+            return false;
+        }
         fadeParent.appendChild(ele.cloneNode(false));
         return 0 in findEles(fadeParent, expr) ? true : false;
     };
@@ -1014,8 +1030,14 @@
 
                 var delegatetargets = handleObj.s;
                 if (delegatetargets) {
-                    var tarparent = $(newEventObject.target).parentsUntil(ele, delegatetargets);
-                    if (tarparent.length) {
+                    var tarparent, targetEle = newEventObject.target;
+                    if (targetEle.parentNode == ele && judgeEle(targetEle, delegatetargets)) {
+                        tarparent = [targetEle];
+                    } else {
+                        var tarparent = $(targetEle).parentsUntil(ele, delegatetargets);
+                    }
+
+                    if (0 in tarparent) {
                         ct = tarparent[0];
                         cancall = 1;
                     }
@@ -1777,7 +1799,7 @@
     // });
     //@set---$.Deferred---end
 
-    //@set---$.ajax $.ajaxSetup---start
+    //@set---$.ajax $.ajaxSetup $.ajaxSuccess $.ajaxError $.ajaxComplete $.ajaxSend $.ajaxStart $.ajaxStop---start
     //@use---$.Deferred
     //@use---$.extend
     //@use---$.each
@@ -1959,7 +1981,7 @@
             });
         }
     });
-    //@set---$.ajax $.ajaxSetup---end
+    //@set---$.ajax $.ajaxSetup $.ajaxSuccess $.ajaxError $.ajaxComplete $.ajaxSend $.ajaxStart $.ajaxStop---end
 
     glo.smartJQ = glo.$ = $;
 })(window);
