@@ -312,8 +312,7 @@ var jqdatas = [{
             val: "toggle",
             fn: 1
         }, {
-            val: "$.Event",
-            $: 1
+            val: "$.Event"
         }]
     }, {
         title: "事件",
@@ -390,143 +389,106 @@ var jqdatas = [{
     }, {
         title: "ajax",
         props: [{
-            val: "$.ajax",
-            $: 1
+            val: "$.ajax"
         }, {
             val: "load",
             fn: 1
         }, {
-            val: "$.get",
-            $: 1
+            val: "$.get"
         }, {
-            val: "$.getJSON",
-            $: 1
+            val: "$.getJSON"
         }, {
-            val: "$.getScript",
-            $: 1
+            val: "$.getScript"
         }, {
-            val: "$.post",
-            $: 1
+            val: "$.post"
         }, {
-            val: "$.ajaxComplete",
-            $: 1
+            val: "ajaxComplete",
+            fn: 1
         }, {
-            val: "$.ajaxError",
-            $: 1
+            val: "ajaxError",
+            fn: 1
         }, {
-            val: "$.ajaxSend",
-            $: 1
+            val: "ajaxSend",
+            fn: 1
         }, {
-            val: "$.ajaxStart",
-            $: 1
+            val: "ajaxStart",
+            fn: 1
         }, {
-            val: "$.ajaxStop",
-            $: 1
+            val: "ajaxStop",
+            fn: 1
         }, {
-            val: "$.ajaxSuccess",
-            $: 1
+            val: "ajaxSuccess",
+            fn: 1
         }, {
-            val: "$.ajaxSetup",
-            $: 1
+            val: "$.ajaxSetup"
         }, {
-            val: "$.serialize",
-            $: 1
+            val: "$.serialize"
         }, {
-            val: "$.serializearray",
-            $: 1
+            val: "$.serializearray"
         }]
     }, {
         title: "工具",
         props: [{
-            val: "$.support",
-            $: 1
+            val: "$.support"
         }, {
-            val: "$.browser",
-            $: 1
+            val: "$.browser"
         }, {
-            val: "$.browser.version",
-            $: 1
+            val: "$.browser.version"
         }, {
-            val: "$.boxModel",
-            $: 1
+            val: "$.boxModel"
         }, {
-            val: "$.each",
-            $: 1
+            val: "$.each"
         }, {
-            val: "$.extend",
-            $: 1
+            val: "$.extend"
         }, {
-            val: "$.grep",
-            $: 1
+            val: "$.grep"
         }, {
-            val: "$.makearray",
-            $: 1
+            val: "$.makearray"
         }, {
-            val: "$.map",
-            $: 1
+            val: "$.map"
         }, {
-            val: "$.inarray",
-            $: 1
+            val: "$.inarray"
         }, {
-            val: "$.toarray",
-            $: 1
+            val: "$.toarray"
         }, {
-            val: "$.merge",
-            $: 1
+            val: "$.merge"
         }, {
-            val: "$.unique",
-            $: 1
+            val: "$.unique"
         }, {
-            val: "$.parseJSON",
-            $: 1
+            val: "$.parseJSON"
         }, {
-            val: "$.noop",
-            $: 1
+            val: "$.noop"
         }, {
-            val: "$.proxy",
-            $: 1
+            val: "$.proxy"
         }, {
-            val: "$.contains",
-            $: 1
+            val: "$.contains"
         }, {
-            val: "$.type",
-            $: 1
+            val: "$.type"
         }, {
-            val: "$.isarray",
-            $: 1
+            val: "$.isarray"
         }, {
-            val: "$.isFunction",
-            $: 1
+            val: "$.isFunction"
         }, {
-            val: "$.isEmptyObject",
-            $: 1
+            val: "$.isEmptyObject"
         }, {
-            val: "$.isPlainObject",
-            $: 1
+            val: "$.isPlainObject"
         }, {
-            val: "$.isWindow",
-            $: 1
+            val: "$.isWindow"
         }, {
-            val: "$.isNumeric",
-            $: 1
+            val: "$.isNumeric"
         }, {
-            val: "$.trim",
-            $: 1
+            val: "$.trim"
         }, {
-            val: "$.param",
-            $: 1
+            val: "$.param"
         }, {
-            val: "$.error",
-            $: 1
+            val: "$.error"
         }, {
-            val: "$.proxy",
-            $: 1
+            val: "$.proxy"
         }]
     }, {
         title: "Deferred",
         props: [{
-            val: "$.Deferred",
-            $: 1
+            val: "$.Deferred"
         }, {
             val: "notify",
             is: "$.Deferred"
@@ -585,17 +547,16 @@ var jqdatas = [{
             val: "removeData",
             fn: 1
         }, {
-            val: "$.data",
-            $: 1
+            val: "$.data"
         }]
     }, {
         title: "插件机制",
         props: [{
-            val: "jQuery.fn.extend",
+            val: "$.fn.extend",
         }, {
-            val: "jQuery.extend",
+            val: "$.extend",
         }, {
-            val: "jQuery.noConflict",
+            val: "$.noConflict",
         }]
     }
     // , {

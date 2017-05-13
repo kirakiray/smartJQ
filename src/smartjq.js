@@ -1799,7 +1799,7 @@
     // });
     //@set---$.Deferred---end
 
-    //@set---$.ajax $.ajaxSetup $.ajaxSuccess $.ajaxError $.ajaxComplete $.ajaxSend $.ajaxStart $.ajaxStop---start
+    //@set---$.ajax $.get $.post $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---start
     //@use---$.Deferred
     //@use---$.extend
     //@use---$.each
@@ -1829,11 +1829,11 @@
     };
     var ajax = function(options) {
         var defaults = extend({
-            beforeSend: "",
-            error: "",
-            dataFilter: "",
-            success: "",
-            complete: ""
+            // beforeSend: "",
+            // error: "",
+            // dataFilter: "",
+            // success: "",
+            // complete: ""
         }, ajaxDefaults, options);
 
         //根据dataType做不同操作
@@ -1841,6 +1841,8 @@
 
         //生成返回的deferred对象
         var deferred = new $.Deferred();
+
+        var defaultsUrl = defaults.url;
 
         //绑定函数
         deferred.done(function(e) {
@@ -1856,7 +1858,7 @@
         if (dataType == "jsonp") {
             var callbackName = defaults.jsonpCallback;
             getType(callbackName) == "function" && (callbackName = callbackName());
-            var script = $('<script src="' + defaults.url + ((defaults.url.search(/\?(.+)/) > -1) ? "&" : "?") + defaults.jsonp + "=" + callbackName + '" />')[0];
+            var script = $('<script src="' + defaultsUrl + ((defaultsUrl.search(/\?(.+)/) > -1) ? "&" : "?") + defaults.jsonp + "=" + callbackName + '" />')[0];
             window[callbackName] = function(data) {
                 deferred.resolve(data);
                 delete window[callbackName];
@@ -1927,12 +1929,7 @@
         //MIME
         defaults.mimeType && xhr.overrideMimeType(defaults.mimeType);
 
-        //设置请求类型
-        xhr.open(defaults.type, defaults.url, defaults.async, defaults.username, defaults.password);
-
-        $(ajaxDefaults).trigger('start');
-
-        //发送请求
+        //发送请求的数据处理
         var data = defaults.data;
         if (data && !(data instanceof FormData)) {
             data = new FormData();
@@ -1940,6 +1937,21 @@
                 data.append(k, v);
             });
         }
+
+        //判定发送类型
+        if (defaults.type == "GET" && defaultsUrl && defaults.data) {
+            $.each(defaults.data, function(k, v) {
+                defaultsUrl += ((defaultsUrl.search(/\?(.+)/) > -1) ? "&" : "?") + k + "=" + v;
+            });
+            data = undefined;
+        }
+
+        //设置请求类型
+        xhr.open(defaults.type, defaultsUrl, defaults.async, defaults.username, defaults.password);
+
+        $(ajaxDefaults).trigger('start');
+
+        //发送请求
         xhr.send(data);
 
         $(ajaxDefaults).trigger('send');
@@ -1947,6 +1959,41 @@
         return deferred;
     };
     $.ajax = ajax;
+    // $.get = function(url, data, callback, type) {
+    //     return ajax({
+    //         url: url,
+    //         type: "GET",
+    //         data: data,
+    //         success: callback,
+    //         dataType: type
+    //     });
+    // };
+    // $.post = function(url, data, callback, type) {
+    //     return ajax({
+    //         url: url,
+    //         type: "POST",
+    //         data: data,
+    //         success: callback,
+    //         dataType: type
+    //     });
+    // };
+    ['get', 'post'].forEach(function(e) {
+        $[e] = function(url, data, callback, type) {
+            return ajax({
+                url: url,
+                type: e.toUpperCase(),
+                data: data,
+                success: callback,
+                dataType: type
+            });
+        };
+    });
+    $.getJSON = function(url, data, callback) {
+        return $.get(url, data, callback, "json");
+    };
+    // $.getScript = function(url, callback) {
+    //     return $.get(url, undefined, callback, "script");
+    // };
     $.ajaxSetup = function(options) {
         extend(ajaxDefaults, options);
     };
@@ -1975,13 +2022,14 @@
     //     $(ajaxDefaults).on('stop', callback);
     // };
     ['Success', 'Error', 'Complete', 'Send', 'Start', 'Stop'].forEach(function(fname) {
-        $["ajax" + fname] = function(callback) {
+        $.fn["ajax" + fname] = function(callback) {
+            var _this = this;
             $(ajaxDefaults).on(fname.toLowerCase(), function(e, event) {
-                event ? callback(event, xhr, defaults) : callback();
+                event ? callback.call(_this, event) : callback.call(_this);
             });
         }
     });
-    //@set---$.ajax $.ajaxSetup $.ajaxSuccess $.ajaxError $.ajaxComplete $.ajaxSend $.ajaxStart $.ajaxStop---end
+    //@set---$.ajax $.get $.post $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---end
 
     glo.smartJQ = glo.$ = $;
 })(window);

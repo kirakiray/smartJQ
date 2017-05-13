@@ -10,10 +10,22 @@ require('view/CheckGroup').done(function(Group) {
 
         //填充选项
         e.props.forEach(function(e) {
-            groupObj.appendItem({
+            var itemOption = {
                 val: e.val,
                 name: e.val
-            });
+            };
+
+            //判断是否fn
+            if (e.fn) {
+                itemOption.name = "$.fn." + e.val;
+            }
+
+            //判断是否is
+            if (e.is) {
+                itemOption.name = e.is;
+            }
+
+            groupObj.appendItem(itemOption);
         });
 
         //手动排序
@@ -34,21 +46,16 @@ require('view/CheckGroup').done(function(Group) {
     $('.group li label').addClass('disable').find('input').attr('disabled', 'disabled');
 
     //将有的东西展示出来
-    //在fn上的
-    for (var i in $.fn) {
-        var tar = $('[data-name="' + i + '"]');
-        if (tar) {
-            tar.removeClass('disable').find('input').removeAttr('disabled');
+    $('.f_item').each(function(i, e) {
+        var pointName = $(e).data('point');
+        try {
+            if (eval(pointName)) {
+                $(e).removeClass('disable').find('input').removeAttr('disabled');
+            }
+        } catch (e) {
+            console.log('not defined => ', pointName);
         }
-    }
-
-    //在$上的
-    for (var i in $) {
-        var tar = $('[data-name="$.' + i + '"]');
-        if (tar) {
-            tar.removeClass('disable').find('input').removeAttr('disabled');
-        }
-    }
+    });
 
     //展示出来
     $('.main').show();
