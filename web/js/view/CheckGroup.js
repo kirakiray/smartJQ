@@ -11,7 +11,7 @@ define(function(require, exports, module) {
             name: ""
         };
         $.extend(defaults, options);
-        var ele = $('<li><label class="f_item" data-point="' + defaults.name + '"><input type="checkbox">' + (defaults.val || defaults.name) + '</label></li>');
+        var ele = $('<li><label class="f_item"><input type="checkbox" data-point="' + defaults.name + '">' + (defaults.val || defaults.name) + '</label></li>');
 
         this.uk_list.append(ele);
     };

@@ -1014,7 +1014,7 @@
         },
         //smartEvent事件触发器
         _tr: function(ele, eventName, newEventObject, triggerData) {
-            //@use---fn.parentsUntil
+            //@use---fn.parents
             var smartEventData = ele[SMARTEVENTKEY];
             if (!smartEventData) return
 
@@ -1023,26 +1023,23 @@
             var newArr = [];
             each(smartEventObjs, function(i, handleObj) {
                 //设置事件对象
-                var ct = newEventObject.delegateTarget = ele;
+                var currentTarget = newEventObject.delegateTarget = ele;
 
                 //是否可以call
-                var cancall = 0;
+                var cancall = 1;
 
-                var delegatetargets = handleObj.s;
-                if (delegatetargets) {
-                    var tarparent, targetEle = newEventObject.target;
-                    if (targetEle.parentNode == ele && judgeEle(targetEle, delegatetargets)) {
-                        tarparent = [targetEle];
-                    } else {
-                        var tarparent = $(targetEle).parentsUntil(ele, delegatetargets);
-                    }
+                var delegateFilter = handleObj.s;
+                if (delegateFilter) {
+                    var targetEle = newEventObject.target,
+                        tarparent = $(targetEle).parents(delegateFilter);
 
                     if (0 in tarparent) {
-                        ct = tarparent[0];
-                        cancall = 1;
+                        currentTarget = tarparent[0];
+                    } else if (judgeEle(targetEle, delegateFilter)) {
+                        currentTarget = targetEle;
+                    } else {
+                        cancall = 0;
                     }
-                } else {
-                    cancall = 1;
                 }
 
                 if (cancall) {
@@ -1051,11 +1048,11 @@
 
                     //设置数据
                     newEventObject.data = handleObj.d;
-                    newEventObject.currentTarget = ct;
+                    newEventObject.currentTarget = currentTarget;
                     newEventObject.target || (newEventObject.target = ele);
 
                     //运行事件函数
-                    var f = handleObj.f.bind(ct);
+                    var f = handleObj.f.bind(currentTarget);
                     triggerData ? f(newEventObject, triggerData) : f(newEventObject);
 
                     //判断是否阻止事件继续运行下去
@@ -1351,9 +1348,6 @@
         makeArray: makeArray,
         merge: merge,
         type: getType,
-        // trim: function(text) {
-        //     return text.trim();
-        // },
         isPlainObject: function(val) {
             for (var i in val) {
                 return true;

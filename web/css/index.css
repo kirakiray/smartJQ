@@ -18,17 +18,17 @@ body {
     margin: 0 25px 0 0;
 }
 
-.top_bar .uk-navbar-nav li:hover > a {
+.top_bar .uk-navbar-nav li:hover>a {
     background-color: transparent;
     color: white;
 }
 
-.top_bar .uk-navbar-nav li.uk-active > a {
+.top_bar .uk-navbar-nav li.uk-active>a {
     background-color: #2ba3d2;
     color: white;
 }
 
-.top_bar .uk-navbar-nav li > a {
+.top_bar .uk-navbar-nav li>a {
     font-family: "Proxima Nova", "Helvetica Neue", Helvetica, "PingFang SC", "Microsoft YaHei", 微软雅黑, Arial, sans-serif;
 }
 
@@ -36,6 +36,7 @@ body {
     float: left;
     color: #ccc;
     font-size: 25px;
+    font-family: cursive;
 }
 
 .main {

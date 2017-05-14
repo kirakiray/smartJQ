@@ -46,15 +46,20 @@ require('view/CheckGroup').done(function(Group) {
     $('.group li label').addClass('disable').find('input').attr('disabled', 'disabled');
 
     //将有的东西展示出来
-    $('.f_item').each(function(i, e) {
+    $('.f_item > input').each(function(i, e) {
         var pointName = $(e).data('point');
         try {
             if (eval(pointName)) {
-                $(e).removeClass('disable').find('input').removeAttr('disabled');
+                $(e).removeAttr('disabled').parent().removeClass('disable');
             }
         } catch (e) {
             console.log('not defined => ', pointName);
         }
+    });
+
+    //点解选中后，查看页面是否有同样名的也勾选上（主要解决is勾选）
+    $('#main_list').on("change", 'input', function(e) {
+        console.log(this);
     });
 
     //展示出来
