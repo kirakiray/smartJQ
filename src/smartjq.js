@@ -1380,12 +1380,12 @@
     //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---start
     //设置event
     each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
-            prototypeObj[e] = function(callback) {
-                callback ? this.on(e, callback) : this.trigger(e);
-                return this;
-            }
-        })
-        //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---end
+        prototypeObj[e] = function(callback) {
+            callback ? this.on(e, callback) : this.trigger(e);
+            return this;
+        }
+    });
+    //@set------end
 
     //动画
     //@set---fn.animate fn.stop---start
@@ -1634,7 +1634,7 @@
         this._aEnd(aEndArg);
     }
 
-    //@set---fn.animate fn.stop---end
+    //@set------end
 
     //@set---$.Event---start
     $.Event = function(oriEvent, props) {
@@ -1692,7 +1692,7 @@
             this._ips = true;
         }
     };
-    //@set---$.Event---end
+    //@set------end
 
 
     //@set---$.Deferred---start
@@ -1791,7 +1791,7 @@
     //         return _this;
     //     }
     // });
-    //@set---$.Deferred---end
+    //@set------end
 
     //@set---$.ajax $.get $.post $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---start
     //@use---$.Deferred
@@ -2023,7 +2023,7 @@
             });
         }
     });
-    //@set---$.ajax $.get $.post $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---end
+    //@set------end
 
     glo.smartJQ = glo.$ = $;
 })(window);

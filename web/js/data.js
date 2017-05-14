@@ -268,7 +268,8 @@ var jqdatas = [{
         title: "页面载入",
         props: [{
             val: "ready",
-            fn: 1
+            //base代表默认一定会支持的
+            base: 1
         }]
     }, {
         title: "事件处理",

@@ -25,6 +25,10 @@ require('view/CheckGroup').done(function(Group) {
                 itemOption.name = e.is;
             }
 
+            if (e.base) {
+                itemOption.base = 1;
+            }
+
             groupObj.appendItem(itemOption);
         });
 
@@ -43,7 +47,7 @@ require('view/CheckGroup').done(function(Group) {
     });
 
     //将所有的input都disable
-    $('.group li label').addClass('disable').find('input').attr('disabled', 'disabled');
+    // $('.group li label').addClass('disable').find('input').attr('disabled', 'disabled');
 
     //将有的东西展示出来
     $('.f_item > input').each(function(i, e) {
@@ -59,11 +63,44 @@ require('view/CheckGroup').done(function(Group) {
 
     //点解选中后，查看页面是否有同样名的也勾选上（主要解决is勾选）
     $('#main_list').on("change", 'input', function(e) {
-        console.log(this);
+        var datapoint = $(this).data('point');
+
+        //all datapoint elements
+        var allele = $('[data-point="' + datapoint + '"]');
+        if (allele.length <= 1) {
+            return;
+        }
+        var checked = this.checked;
+        allele.prop('checked', checked);
     });
 
     //展示出来
     $('.main').show();
+
+    //获取js文件内容
+    fetch('../src/smartjq.js')
+        .then(function(respone) {
+            return respone.text();
+        })
+        .then(function(text) {
+            //查找所有set的属性
+            var setMethonArr = text.match(/\/\/@set---(.+)---start/g);
+
+            //去除回车
+            text = text.replace(/\n/g, " ");
+
+            setMethonArr.forEach(function(e) {
+                //制作匹配正则表达式
+                var tarExp = new RegExp((e.replace(/\./g, '\\.').replace(/\$/g, "\\$") + '(.+)//@set------end'));
+
+                //获取匹配对象
+                var tarArr = text.match(tarExp);
+
+                //匹配到的正文内容
+
+                console.log(tarArr)
+            });
+        });
 
     console.log('len =>', jqdatas.length);
 });
