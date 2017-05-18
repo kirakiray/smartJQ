@@ -269,6 +269,13 @@
 
     //main
     function smartJQ(arg1, arg2) {
+        this.init(arg1, arg2);
+    };
+
+    var prototypeObj = Object.create(Array.prototype);
+
+    //初始化函数
+    prototypeObj.init = function(arg1, arg2) {
         //只有一个参数的情况
         var a1type = getType(arg1);
         switch (a1type) {
@@ -311,9 +318,7 @@
                     this.push(arg1);
                 }
         }
-    };
-
-    var prototypeObj = Object.create(Array.prototype);
+    }
 
     smartJQ.fn = smartJQ.prototype = prototypeObj;
 
@@ -1347,7 +1352,10 @@
         each: each,
         makeArray: makeArray,
         merge: merge,
-        type: getType,
+        type: getType
+    });
+
+    extend($, {
         isPlainObject: function(val) {
             for (var i in val) {
                 return true;
@@ -1378,6 +1386,8 @@
     });
 
     //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---start
+    //@use---fn.on
+    //@use---fn.trigger
     //设置event
     each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
         prototypeObj[e] = function(callback) {
@@ -1793,7 +1803,7 @@
     // });
     //@set------end
 
-    //@set---$.ajax $.get $.post $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---start
+    //@set---$.ajax $.get $.post $.getJSON $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---start
     //@use---$.Deferred
     //@use---$.extend
     //@use---$.each

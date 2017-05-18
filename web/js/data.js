@@ -386,6 +386,9 @@ var jqdatas = [{
         }, {
             val: "unload",
             fn: 1
+        }, {
+            val: "contextmenu",
+            fn: 1
         }]
     }, {
         title: "ajax",

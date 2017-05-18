@@ -3,6 +3,7 @@ define(function(require, exports, module) {
         this.ele = $('<div class="group"><h3 class="group_title">' + title + '</h3><ul class="uk-list"></ul></div>');
         this.uk_list = this.ele.find('.uk-list');
     };
+
     Group.prototype.appendItem = function(options) {
         var defaults = {
             val: "",
@@ -17,7 +18,6 @@ define(function(require, exports, module) {
             ele.find('input').prop('checked', true);
             ele.find('label').removeClass('disable');
         }
-
     };
 
     return Group;
