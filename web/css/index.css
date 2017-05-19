@@ -61,3 +61,11 @@ body {
 .group .disable {
     color: #aaa;
 }
+
+.will_select {
+    background-color: #f3f9e5;
+    box-sizing: border-box;
+    padding: 0 2px 0 0;
+    border: #cddfaf solid 1px;
+    border-radius: 3px;
+}

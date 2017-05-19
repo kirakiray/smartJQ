@@ -18,7 +18,7 @@
     //合并对象
     var extend = function(def) {
         var args = makeArray(arguments).slice(1);
-        each(args, function(i, opt) {
+        arrayEach(args, function(opt) {
             for (var key in opt) {
                 def[key] = opt[key];
             }
@@ -26,36 +26,23 @@
         return def;
     };
 
-    //集大成each
-    var each = (function() {
-        var arreach;
-        if ([].some) {
-            arreach = function(arrobj, func) {
-                makeArray(arrobj).some(function(e, i) {
-                    return func(i, e) === false;
-                });
-            };
-        } else {
-            arreach = function(arrobj, func) {
-                for (var len = arrobj.length, i = 0; i < len; i++) {
-                    if (func(i, arrobj[i]) === false) {
-                        break;
-                    };
-                }
-            };
+    //arr类型的遍历
+    var arrayEach = function(arr, func) {
+        if (!arr instanceof Array) arr = makeArray(arr);
+        arr.some(function(e, i) {
+            return func(e, i) === false;
+        });
+        return arr;
+    };
+
+    //obj类型的遍历
+    var objEach = function(obj, func) {
+        var i;
+        for (i in obj) {
+            func(i, obj[i]);
         }
-        return function(obj, func) {
-            if (!obj) return;
-            if ('length' in obj) {
-                arreach(obj, func);
-            } else if (getType(obj) == "object") {
-                for (var i in obj) {
-                    func(i, obj[i]);
-                }
-            }
-            return obj;
-        };
-    })();
+        return obj;
+    }
 
     //合并数组
     var merge = function(arr1, arr2) {
@@ -290,9 +277,9 @@
                     if (arg2type == "string") {
                         //参数2有的情况下
                         var parnodes = findEles(document, arg2);
-                        each(parnodes, function(i, e) {
+                        arrayEach(parnodes, function(e) {
                             var tareles = findEles(e, arg1);
-                            each(tareles, function(i, e) {
+                            arrayEach(tareles, function(e) {
                                 if (eles.indexOf(e) == -1) {
                                     eles.push(e);
                                 }
@@ -327,8 +314,8 @@
         css: function(name, value) {
             //第一个是对象类型
             if (getType(name) == "object") {
-                each(this, function(i, e) {
-                    each(name, function(n, v) {
+                arrayEach(this, function(e) {
+                    objEach(name, function(n, v) {
                         var psv = parseFloat(v);
                         if (psv && psv == v) {
                             v += "px";
@@ -337,7 +324,7 @@
                     });
                 });
             } else if (getType(name) == "string" && value != undefined) {
-                each(this, function(i, e) {
+                arrayEach(this, function(e) {
                     e.style[name] = value;
                 });
             } else if (getType(name) == "string" && !value) {
@@ -378,7 +365,7 @@
             };
         },
         _sc: function(key, val) {
-            return val == undefined ? this[0][key] : each(this, function(i, tar) {
+            return val == undefined ? this[0][key] : arrayEach(this, function(tar) {
                 tar[key] = val;
             });
         },
@@ -394,7 +381,7 @@
             //@use---fn.css
             switch (getType(val)) {
                 case "function":
-                    return each(this, function(i, tar) {
+                    return arrayEach(this, function(tar, i) {
                         var $tar = $(tar);
                         var reval = val.call(tar, i, parseFloat($tar.css(key)));
                         reval && $tar[key](reval);
@@ -404,7 +391,7 @@
                 case "number":
                     val += "px";
                 case "string":
-                    return each(this, function(i, tar) {
+                    return arrayEach(this, function(tar) {
                         $(tar).css(key, val);
                     });
             }
@@ -436,14 +423,14 @@
                     if (value == undefined) {
                         return _this[0].getAttribute(name);
                     } else {
-                        each(_this, function(i, tar) {
+                        arrayEach(_this, function(tar) {
                             tar.setAttribute(name, value);
                         });
                     }
                     break;
                 case "object":
-                    each(name, function(k, v) {
-                        each(_this, function(i, tar) {
+                    objEach(name, function(k, v) {
+                        arrayEach(_this, function(tar) {
                             tar.setAttribute(k, v);
                         });
                     });
@@ -452,7 +439,7 @@
             return _this;
         },
         removeAttr: function(name) {
-            return each(this, function(i, tar) {
+            return arrayEach(this, function(tar) {
                 tar.removeAttribute(name);
             });
         },
@@ -463,19 +450,19 @@
                         var tar = this[0];
                         return tar[name];
                     } else if (getType(value) == "function") {
-                        each(this, function(i, e) {
+                        arrayEach(this, function(e, i) {
                             var revalue = value.call(e, i, e[name]);
                             (revalue != undefined) && (e[name] = revalue);
                         });
                     } else {
-                        each(this, function(i, e) {
+                        arrayEach(this, function(e) {
                             e[name] = value;
                         });
                     }
                     break;
                 case "object":
-                    each(this, function(i, e) {
-                        each(name, function(k, v) {
+                    arrayEach(this, function(e) {
+                        objEach(name, function(k, v) {
                             e[k] = v;
                         });
                     });
@@ -483,7 +470,7 @@
             return this;
         },
         removeProp: function(name) {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 // if (e instanceof EventTarget && name in e.cloneNode()) {
                 if (e.nodeType && name in e.cloneNode()) {
                     e[name] = "";
@@ -496,7 +483,7 @@
             //@use---fn.prop
             if (val instanceof smartJQ) {
                 //市面上有好多插件使用不规范写法，下面针对不规范写法做兼容，有需要以后会去除掉
-                each(this, function(i, e) {
+                arrayEach(this, function(e) {
                     e.innerHTML = "";
                     e.appendChild(val[0]);
                 });
@@ -513,7 +500,7 @@
             switch (getType(vals)) {
                 case "array":
                     var mapvals = function(option) {
-                        each(vals, function(i, val) {
+                        arrayEach(vals, function(val) {
                             var bool = false;
                             if (option.value == val) {
                                 bool = true;
@@ -528,9 +515,9 @@
                             }
                         });
                     };
-                    each(this, function(i, ele) {
+                    arrayEach(this, function(ele, i) {
                         if (0 in ele) {
-                            each(ele, function(i, option) {
+                            arrayEach(ele, function(option, i) {
                                 mapvals(option);
                             });
                         } else {
@@ -543,7 +530,7 @@
                     var tar = this[0];
                     if (tar.multiple) {
                         var rearr = [];
-                        each(tar, function(i, e) {
+                        arrayEach(tar, function(e) {
                             (e.selected || e.checked) && rearr.push(e.value);
                         });
                         return rearr;
@@ -554,17 +541,17 @@
             }
         },
         addClass: function(name) {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 e.classList.add(name);
             });
         },
         removeClass: function(name) {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 e.classList.remove(name);
             });
         },
         toggleClass: function(name) {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 e.classList.toggle(name);
             });
         },
@@ -579,8 +566,8 @@
             //最后的id
             var lastid = targets.length - 1;
 
-            each(ele, function(i, e) {
-                each(targets, function(i, tar) {
+            arrayEach(ele, function(e) {
+                arrayEach(targets, function(tar, i) {
                     if (i == lastid) {
                         func(e, tar);
                     } else {
@@ -656,7 +643,7 @@
         },
         wrap: function(val) {
             var valtype = getType(val);
-            each(this, function(i, tar) {
+            arrayEach(this, function(tar, i) {
                 var reval = val;
                 if (valtype == "function") {
                     reval = val.call(tar, i);
@@ -688,21 +675,13 @@
         },
         wrapInner: function(content) {
             //@use---fn.append
-            // var func = getType(structure) == "function";
-            // return this.each(function(index) {
-            //     var self = $(this),
-            //         contents = self.contents(),
-            //         dom = func ? structure.call(this, index) : structure
-            //     contents.length ? contents.wrapAll(dom) : self.append(dom)
-            // });
-
-            return each(this, function(i, tar) {
+            return arrayEach(this, function(tar, i) {
                 var c = content;
                 if (getType(content) == "function") {
                     c = content.call(tar, i);
                 }
                 c = $(c)[0];
-                each(tar.childNodes, function(i, tar) {
+                arrayEach(tar.childNodes, function(tar) {
                     c.appendChild(tar);
                 });
                 // c = $(c).append(makeArray(tar.childNodes));
@@ -710,12 +689,12 @@
             });
         },
         empty: function() {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 e.innerHTML = "";
             });
         },
         remove: function(expr) {
-            each(this, function(i, e) {
+            arrayEach(this, function(e) {
                 if (expr) {
                     if (!judgeEle(e, expr)) return;
                 }
@@ -724,15 +703,15 @@
         },
         offsetParent: function() {
             var arr = [];
-            each(this, function(i, e) {
+            arrayEach(this, function(e) {
                 arr.push(e.offsetParent || document.body);
             });
             return $(arr);
         },
         children: function(expr) {
             var eles = [];
-            each(this, function(i, e) {
-                e.nodeType && each(e.children, function(i, e) {
+            arrayEach(this, function(e) {
+                e.nodeType && arrayEach(e.children, function(e) {
                     if (expr) {
                         judgeEle(e, expr) && eles.push(e);
                     } else {
@@ -747,7 +726,7 @@
         },
         map: function(callback) {
             var arr = [];
-            each(this, function(i, e) {
+            arrayEach(this, function(e, i) {
                 var resulte = callback.call(e, i, e);
                 (resulte != undefined) && arr.push(resulte);
             });
@@ -772,14 +751,14 @@
             var arr = [];
             switch (getType(expr)) {
                 case "string":
-                    each(this, function(i, e) {
+                    arrayEach(this, function(e) {
                         if (judgeEle(e, expr)) {
                             arr.push(e);
                         }
                     });
                     break;
                 case "function":
-                    each(this, function(i, e) {
+                    arrayEach(this, function(e, i) {
                         var result = expr.call(e, i, e);
                         if (result) {
                             arr.push(e);
@@ -788,13 +767,13 @@
                     break;
                 default:
                     if (expr instanceof smartJQ) {
-                        each(this, function(i, e) {
-                            each(expr, function(i, tar) {
+                        arrayEach(this, function(e) {
+                            arrayEach(expr, function(tar) {
                                 (e == tar) && arr.push(e);
                             });
                         });
                     } else if (expr.nodeType) {
-                        each(this, function(i, e) {
+                        arrayEach(this, function(e) {
                             (e == expr) && arr.push(e);
                         });
                     }
@@ -814,7 +793,7 @@
         },
         _np: function(expr, key) {
             var arr = [];
-            each(this, function(i, tar) {
+            arrayEach(this, function(tar) {
                 tar = tar[key];
                 if (!tar || arr.indexOf(tar) != -1 || (expr && !judgeEle(tar, expr))) {
                     return;
@@ -851,7 +830,7 @@
                     getEle(nextEle);
                 }
             };
-            each(this, function(i, tar) {
+            arrayEach(this, function(tar) {
                 getEle(tar);
             });
             getEle = null;
@@ -901,9 +880,9 @@
             //@use---fn.parentsUntil
             var eles = [];
             if (getType(arg) == "string") {
-                each(this, function(i, e) {
+                arrayEach(this, function(e) {
                     var arr = findEles(e, arg);
-                    each(arr, function(i, e) {
+                    arrayEach(arr, function(e) {
                         if (eles.indexOf(e) == -1) {
                             eles.push(e);
                         }
@@ -912,7 +891,7 @@
             } else if (arg instanceof smartJQ || arg.nodeType) {
                 arg.nodeType && (arg = [arg]);
                 var $this = this;
-                each(arg, function(i, tar) {
+                arrayEach(arg, function(tar) {
                     var lastele = [].pop.call($(tar).parentsUntil($this));
                     if (lastele != document) {
                         eles.push(lastele);
@@ -924,7 +903,7 @@
         has: function(expr) {
             //@use---fn.find
             var arr = [];
-            each(this, function(i, tar) {
+            arrayEach(this, function(tar) {
                 if (0 in $(tar).find(expr)) {
                     arr.push(tar);
                 }
@@ -932,7 +911,7 @@
             return $(arr);
         },
         each: function(func) {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e, i) {
                 func.call(e, i, e);
             });
             // return this;
@@ -955,13 +934,13 @@
             return owner.indexOf(tar);
         },
         hide: function() {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 e.style['display'] = "none";
             });
             // return this;
         },
         show: function() {
-            return each(this, function(i, e) {
+            return arrayEach(this, function(e) {
                 e.style['display'] = "";
             });
             // return this;
@@ -989,16 +968,16 @@
 
                         return smartData[name] || tar.dataset[name];
                     } else {
-                        each(this, function(i, tar) {
+                        arrayEach(this, function(tar) {
                             smartData = prototypeObj._ge(tar, SMARTKEY);
                             smartData[name] = value;
                         });
                     }
                     break;
                 case "object":
-                    each(this, function(i, tar) {
+                    arrayEach(this, function(tar) {
                         smartData = prototypeObj._ge(tar, SMARTKEY);
-                        each(name, function(name, value) {
+                        objEach(name, function(name, value) {
                             smartData[name] = value;
                         });
                     });
@@ -1011,11 +990,10 @@
             return this;
         },
         removeData: function(name) {
-            return each(this, function(i, tar) {
+            return arrayEach(this, function(tar) {
                 var smartData = prototypeObj._ge(tar, SMARTKEY);
                 delete smartData[name];
             });
-            // return this;
         },
         //smartEvent事件触发器
         _tr: function(ele, eventName, newEventObject, triggerData) {
@@ -1026,7 +1004,7 @@
             var smartEventObjs = smartEventData[eventName];
 
             var newArr = [];
-            each(smartEventObjs, function(i, handleObj) {
+            smartEventObjs && arrayEach(smartEventObjs, function(handleObj, i) {
                 //设置事件对象
                 var currentTarget = newEventObject.delegateTarget = ele;
 
@@ -1091,7 +1069,7 @@
                 } else {
                     data = arg2;
                 }
-                each(arg1, function(eventName, callback) {
+                objEach(arg1, function(eventName, callback) {
                     _this.on(eventName, selectors, data, callback);
                 });
                 return;
@@ -1119,11 +1097,11 @@
                     break;
             }
 
-            each(eventArr, function(i, eventName) {
+            arrayEach(eventArr, function(eventName) {
                 //判断空
                 if (!eventName) return;
 
-                each(_this, function(i, tar) {
+                arrayEach(_this, function(tar) {
                     //事件寄宿对象
                     var smartEventData = prototypeObj._ge(tar, SMARTEVENTKEY);
                     var smartEventObj = smartEventData[eventName];
@@ -1164,7 +1142,7 @@
         trigger: function(eventName, data) {
             //@use---fn._tr
             //@use---$.Event
-            return each(this, function(i, tar) {
+            return arrayEach(this, function(tar) {
                 var event = $.Event(eventName);
                 //拥有EventTarget的就触发
                 // if (tar instanceof EventTarget) {
@@ -1202,7 +1180,7 @@
             });
         },
         off: function(types, selector, fn) {
-            return each(this, function(i, ele) {
+            return arrayEach(this, function(ele) {
                 var smartEventData = ele[SMARTEVENTKEY];
                 if (!smartEventData) return
 
@@ -1214,7 +1192,7 @@
                 }
 
                 var arg2Type = getType(selector);
-                each(types.split(' '), function(ii, eventName) {
+                arrayEach(types.split(' '), function(eventName) {
                     switch (getType(eventName)) {
                         case "string":
                             var smartEventData_eventName = smartEventData[eventName];
@@ -1240,7 +1218,7 @@
                             //     break;
                         case "object":
                             var _this;
-                            each(eventName, function(k, v) {
+                            objEach(eventName, function(k, v) {
                                 _this.off(k, v);
                             });
                             return;
@@ -1281,7 +1259,7 @@
 
                 if (eventData) {
                     //事件处理
-                    each(eventData, function(eventName) {
+                    objEach(eventData, function(eventName) {
                         tarele.addEventListener(eventName, function(oriEvent) {
                             prototypeObj._tr(tarele, eventName, $.Event(oriEvent));
                         });
@@ -1296,13 +1274,13 @@
                 var childs = ele.children;
                 var tarchild = tarele.children;
                 if (childs.length) {
-                    each(childs, function(i, e) {
+                    arrayEach(childs, function(e, i) {
                         mapCloneEvent(e, tarchild[i]);
                     });
                 }
             };
 
-            each(this, function(i, e) {
+            arrayEach(this, function(e) {
                 var cloneEle = e.cloneNode(true);
                 isDeep && mapCloneEvent(e, cloneEle);
                 arr.push(cloneEle);
@@ -1315,7 +1293,7 @@
         },
         add: function(expr, content) {
             var $this = this;
-            each($(expr, content), function(i, e) {
+            arrayEach($(expr, content), function(e) {
                 if ($this.indexOf(e) == -1) {
                     $this.push(e);
                 }
@@ -1324,7 +1302,7 @@
         },
         contents: function() {
             var arr = [];
-            each(this, function(i, tar) {
+            arrayEach(this, function(tar) {
                 merge(arr, tar.childNodes);
             });
             return $(arr);
@@ -1346,11 +1324,24 @@
     $.fn = $.prototype = smartJQ.fn;
 
     //在$上的方法
+    //随框架附赠的方法
+    //@must---$.extend
+    //@must---$.makearray
+    //@must---$.merge
+    //@must---$.type
     extend($, {
         // expando: SMARTKEY,
         extend: extend,
-        each: each,
-        makeArray: makeArray,
+        each: function(obj, func) {
+            if (obj instanceof Array) {
+                return arrayEach(obj, function(e, i) {
+                    func(i, e);
+                });
+            } else {
+                return objEach(obj, func);
+            }
+        },
+        makearray: makeArray,
         merge: merge,
         type: getType
     });
@@ -1389,7 +1380,7 @@
     //@use---fn.on
     //@use---fn.trigger
     //设置event
-    each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(i, e) {
+    arrayEach("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(e) {
         prototypeObj[e] = function(callback) {
             callback ? this.on(e, callback) : this.trigger(e);
             return this;
@@ -1586,9 +1577,9 @@
             _this._aEnd = animateEnd;
 
             //添加运行函数
-            each(_this, function(i, tar) {
+            arrayEach(_this, function(tar) {
                 var computeStyleObj = getComputedStyle(tar);
-                each(prop, function(name, value) {
+                objEach(prop, function(name, value) {
                     //获取当前值
                     var nowValue = parseFloat(computeStyleObj[name]);
 
@@ -1658,7 +1649,7 @@
 
         if (oriEvent && oriEvent.type) {
             //添加相关属性
-            each(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(i, e) {
+            arrayEach(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(e) {
                 (oriEvent[e] != undefined) && (_this[e] = oriEvent[e]);
             });
 
@@ -1721,15 +1712,6 @@
         }
     };
     var deferredPrototype = $.Deferred.prototype = {
-        // notify: function(data) {
-        //     $(this).trigger(_PROMISE_PENDING, data);
-        // },
-        // resolve: function(data) {
-        //     $(this).trigger(_PROMISE_DONE, data);
-        // },
-        // reject: function(data) {
-        //     $(this).trigger(_PROMISE_REJECT, data);
-        // },
         done: function(callback) {
             var _this = this;
             $(_this).one(_PROMISE_DONE, function(e, data) {
@@ -1786,21 +1768,6 @@
         }
     });
 
-    // $.each({
-    //     "done": [_PROMISE_DONE, _PROMISE_REJECT],
-    //     "fail": [_PROMISE_REJECT, _PROMISE_DONE]
-    // }, function(name, arg) {
-    //     deferredPrototype[name] = function(callback) {
-    //         var _this = this;
-    //         $(_this).one(arg[0], function(e, data) {
-    //             _this._state = arg[0];
-    //             callback(data);
-    //             //清除无用事件
-    //             $(_this).off(arg[1] + " " + _PROMISE_PENDING);
-    //         });
-    //         return _this;
-    //     }
-    // });
     //@set------end
 
     //@set---$.ajax $.get $.post $.getJSON $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---start
