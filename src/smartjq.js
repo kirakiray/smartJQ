@@ -1332,26 +1332,38 @@
     extend($, {
         // expando: SMARTKEY,
         extend: extend,
-        each: function(obj, func) {
-            if (obj instanceof Array) {
-                return arrayEach(obj, function(e, i) {
-                    func(i, e);
-                });
-            } else {
-                return objEach(obj, func);
-            }
-        },
         makearray: makeArray,
         merge: merge,
         type: getType
     });
 
     extend($, {
-        isPlainObject: function(val) {
-            for (var i in val) {
-                return true;
+        // proxy: function(obj, func) {
+        //     return func.bind(obj);
+        // },
+        // trim: function(str) {
+        //     return str.trim();
+        // },
+        // map: function(arr, func) {
+        //     Array.prototype.map.call(arr, func);
+        // },
+        // inArray: function(arr, tar) {
+        //     return Array.prototype.indexOf.call(arr, tar);
+        // },
+        // grep: function(arr, func) {
+        //     return Array.prototype.indexOf.filter(arr, func);
+        // },
+        // parseJSON: function(str) {
+        //     return JSON.parse(str);
+        // },
+        each: function(obj, func) {
+            if (obj.length && getType(obj) != "function") {
+                return arrayEach(obj, function(e, i) {
+                    func(i, e);
+                });
+            } else {
+                return objEach(obj, func);
             }
-            return false;
         },
         proxy: function(arg1, arg2) {
             var args = makeArray(arguments).slice(2);
@@ -1371,8 +1383,82 @@
                 tarfun.apply(context, args);
             };
         },
+        when: function() {
+            //函数容器
+            var funcArr = [];
+            var reobj = {
+                then: function(func) {
+                    funcArr.push(func);
+                }
+            };
+
+            //数据容器
+            var datas = [];
+
+            //计数器
+            var count = 0;
+
+            //完成函数
+            var okfun = function() {
+                count--;
+                if (count) {
+                    return;
+                }
+
+                arrayEach(funcArr, function(func) {
+                    func.apply(window, datas);
+                });
+
+                reobj = funcArr = datas = okfun = null;
+            };
+
+            var deferreds = makeArray(arguments);
+            arrayEach(deferreds, function(e, i) {
+                if (e instanceof $.Deferred) {
+                    //属于自带deferreds
+                    e.done(function(d) {
+                        datas[i] = d;
+                        okfun();
+                    })
+                } else if (window.Promise && e instanceof Promise) {
+                    //原生Promise
+                    e.then(function(d) {
+                        datas[i] = d;
+                        okfun();
+                    });
+                } else if (e._tasks) {
+                    //拥有_task属性（animate之类的）
+                    e._task.push(okfun);
+                } else if (typeof e == "object") {
+                    //自带对象
+                    datas[i] = e;
+                    setTimeout(okfun, 0);
+                } else {
+                    return;
+                }
+                count++;
+            });
+
+            return reobj;
+        },
         isFunction: function(tar) {
             return getType(tar) == "function";
+        },
+        isNumeric: function(tar) {
+            return getType(tar) == "number";
+        },
+        isArray: function(arr) {
+            return getType(arr) == "array";
+        },
+        isPlainObject: function(val) {
+            for (var i in val)
+                return true;
+            return false;
+        },
+        isEmptyObject: function(val) {
+            for (var i in val)
+                return false;
+            return true;
         }
     });
 
@@ -1930,24 +2016,6 @@
         return deferred;
     };
     $.ajax = ajax;
-    // $.get = function(url, data, callback, type) {
-    //     return ajax({
-    //         url: url,
-    //         type: "GET",
-    //         data: data,
-    //         success: callback,
-    //         dataType: type
-    //     });
-    // };
-    // $.post = function(url, data, callback, type) {
-    //     return ajax({
-    //         url: url,
-    //         type: "POST",
-    //         data: data,
-    //         success: callback,
-    //         dataType: type
-    //     });
-    // };
     ['get', 'post'].forEach(function(e) {
         $[e] = function(url, data, callback, type) {
             return ajax({
@@ -1962,36 +2030,9 @@
     $.getJSON = function(url, data, callback) {
         return $.get(url, data, callback, "json");
     };
-    // $.getScript = function(url, callback) {
-    //     return $.get(url, undefined, callback, "script");
-    // };
     $.ajaxSetup = function(options) {
         extend(ajaxDefaults, options);
     };
-    // $.ajaxSuccess = function(callback) {
-    //     $(ajaxDefaults).on('success', function(e, event) {
-    //         callback(event, xhr, defaults);
-    //     });
-    // };
-    // $.ajaxError = function(callback) {
-    //     $(ajaxDefaults).on('error', function(e, event) {
-    //         callback(event, xhr, defaults);
-    //     });
-    // };
-    // $.ajaxComplete = function(callback) {
-    //     $(ajaxDefaults).on('complete', function(e, event) {
-    //         callback(event, xhr, defaults);
-    //     });
-    // };
-    // $.ajaxSend = function(callback) {
-    //     $(ajaxDefaults).on('send', callback);
-    // };
-    // $.ajaxStart = function(callback) {
-    //     $(ajaxDefaults).on('start', callback);
-    // };
-    // $.ajaxStop = function(callback) {
-    //     $(ajaxDefaults).on('stop', callback);
-    // };
     ['Success', 'Error', 'Complete', 'Send', 'Start', 'Stop'].forEach(function(fname) {
         $.fn["ajax" + fname] = function(callback) {
             var _this = this;

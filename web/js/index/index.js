@@ -56,12 +56,13 @@ require('view/CheckGroup').done(function(Group) {
                 b.removeClass('disable');
             }
         } catch (e) {
-            console.log('not defined => ', pointName);
+            console.warn('not defined => ', pointName);
         }
     });
 
     //总体数据映射
     var smartJQTextData = {};
+    window.smartJQTextData = smartJQTextData;
 
     $('#main_list').on("change", 'input', function(e) {
         //点解选中后，查看页面是否有同样名的也勾选上（主要解决is勾选）
@@ -122,7 +123,7 @@ require('view/CheckGroup').done(function(Group) {
             //匹配到的正文内容
             var intext = tarArr[1];
 
-            console.log('oneGroupFuncNameArr=>', newoneGroupFuncNameArr);
+            // console.log('oneGroupFuncNameArr=>', newoneGroupFuncNameArr);
 
             //获取依赖功能
             var relyArr = [];
@@ -166,14 +167,35 @@ require('view/CheckGroup').done(function(Group) {
 
             //设置相关方法默认选中并且不能取消
             $('input[data-point="' + funcName + '"]').prop('checked', true).attr('disabled', 'disabled');
+
+            //写入映射
+            smartJQTextData[funcName] = {
+                type: "must"
+            };
         });
 
         //处理非共同体的方法
+        //在$上的
         $.each($, function(k, v) {
             //判断是否存在映射上，不存在的才是需要写入的
-            if (smartJQTextData['$.' + k]) {
-                // debugger;
+            //并且是函数
+            if (!smartJQTextData['$.' + k] && typeof $[k] == "function") {
+                smartJQTextData['$.' + k] = {
+                    type: "$",
+                    text: $[k].toString()
+                };
             }
+        });
+
+        //在fn上的
+        $.each($.fn, function(k, v) {
+            if (!smartJQTextData['$.fn.' + k] && typeof $.fn[k] == "function" && k != "init") {
+                smartJQTextData['$.fn.' + k] = {
+                    type: "fn",
+                    text: $.fn[k].toString()
+                };
+            }
+            debugger;
         });
 
         console.log(smartJQTextData);
