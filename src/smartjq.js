@@ -344,8 +344,8 @@
             // }
         },
         position: function() {
-            //@use---fn.css
-            //@use---fn.offset
+            //@use---$.fn.css
+            //@use---$.fn.offset
             //获取父元素
             var offsetParent = $(this[0].offsetParent);
             // var parentOffset = offsetParent.offset();
@@ -370,15 +370,15 @@
             });
         },
         scrollTop: function(val) {
-            //@use---fn._sc
+            //@use---$.fn._sc
             return this._sc('scrollTop', val);
         },
         scrollLeft: function(val) {
-            //@use---fn._sc
+            //@use---$.fn._sc
             return this._sc('scrollLeft', val);
         },
         _wh: function(key, val) {
-            //@use---fn.css
+            //@use---$.fn.css
             switch (getType(val)) {
                 case "function":
                     return arrayEach(this, function(tar, i) {
@@ -397,11 +397,11 @@
             }
         },
         height: function(val) {
-            //@use---fn._wh
+            //@use---$.fn._wh
             return this._wh("height", val);
         },
         width: function(val) {
-            //@use---fn._wh
+            //@use---$.fn._wh
             return this._wh("width", val);
         },
         innerHeight: function() {
@@ -480,7 +480,7 @@
             });
         },
         html: function(val) {
-            //@use---fn.prop
+            //@use---$.fn.prop
             if (val instanceof smartJQ) {
                 //市面上有好多插件使用不规范写法，下面针对不规范写法做兼容，有需要以后会去除掉
                 arrayEach(this, function(e) {
@@ -492,11 +492,11 @@
             }
         },
         text: function(val) {
-            //@use---fn.prop
+            //@use---$.fn.prop
             return this.prop('innerText', val);
         },
         val: function(vals) {
-            //@use---fn.prop
+            //@use---$.fn.prop
             switch (getType(vals)) {
                 case "array":
                     var mapvals = function(option) {
@@ -578,7 +578,7 @@
         },
         //元素操作
         append: function(ele) {
-            //@use---fn._ec
+            //@use---$.fn._ec
             //判断类型
             prototypeObj._ec(ele, this, function(e, tar) {
                 tar.appendChild(e);
@@ -586,24 +586,24 @@
             return this;
         },
         appendTo: function(tars) {
-            //@use---fn.append
+            //@use---$.fn.append
             this.append.call(tars, this);
             return this;
         },
         prepend: function(ele) {
-            //@use---fn._ec
+            //@use---$.fn._ec
             prototypeObj._ec(ele, this, function(e, tar) {
                 tar.insertBefore(e, tar.firstChild);
             });
             return this;
         },
         prependTo: function(tars) {
-            //@use---fn.prepend
+            //@use---$.fn.prepend
             this.prepend.call(tars, this);
             return this;
         },
         after: function(ele) {
-            //@use---fn._ec
+            //@use---$.fn._ec
             prototypeObj._ec(ele, this, function(e, tar) {
                 var parnode = tar.parentNode;
                 if (parnode.lastChild == tar) {
@@ -615,28 +615,28 @@
             return this;
         },
         insertAfter: function(tars) {
-            //@use---fn.after
+            //@use---$.fn.after
             this.after.call(tars, this);
             return this;
         },
         before: function(ele) {
-            //@use---fn._ec
+            //@use---$.fn._ec
             prototypeObj._ec(ele, this, function(e, tar) {
                 tar.parentNode.insertBefore(e, tar);
             });
             return this;
         },
         insertBefore: function(tars) {
-            //@use---fn.before
+            //@use---$.fn.before
             this.before.call(tars, this);
             return this;
         },
         replaceWith: function(newContent) {
-            //@use---fn.before
+            //@use---$.fn.before
             return this.before(newContent).remove();
         },
         replaceAll: function(tar) {
-            //@use---fn.replaceWith
+            //@use---$.fn.replaceWith
             tar = $(tar);
             tar.replaceWith(this);
             return this;
@@ -656,15 +656,15 @@
             });
         },
         unwrap: function() {
-            //@use---fn.parent
-            //@use---fn.replaceWith
+            //@use---$.fn.parent
+            //@use---$.fn.replaceWith
             this.parent().each(function(i, tar) {
                 $(tar).replaceWith(makeArray(this.childNodes))
             })
             return this
         },
         wrapAll: function(structure) {
-            //@use---fn.children
+            //@use---$.fn.children
             if (this[0]) {
                 $(this[0]).before(structure = $(structure))
                 var children
@@ -674,7 +674,7 @@
             return this
         },
         wrapInner: function(content) {
-            //@use---fn.append
+            //@use---$.fn.append
             return arrayEach(this, function(tar, i) {
                 var c = content;
                 if (getType(content) == "function") {
@@ -736,15 +736,15 @@
             return $([].slice.call(this, start, end));
         },
         eq: function(i) {
-            //@use---fn.slice
+            //@use---$.fn.slice
             return this.slice(i, i + 1 || undefined);
         },
         first: function() {
-            //@use---fn.eq
+            //@use---$.fn.eq
             return this.eq(0);
         },
         last: function() {
-            //@use---fn.eq
+            //@use---$.fn.eq
             return this.eq(-1);
         },
         filter: function(expr) {
@@ -781,13 +781,13 @@
             return $(arr);
         },
         not: function(expr) {
-            //@use---fn.filter
+            //@use---$.fn.filter
             return this.filter(function(i, e) {
                 return !judgeEle(e, expr);
             });
         },
         is: function(expr) {
-            //@use---fn.filter
+            //@use---$.fn.filter
             var tars = this.filter(expr);
             return !!tars.length;
         },
@@ -803,15 +803,15 @@
             return $(arr);
         },
         next: function(expr) {
-            //@use---fn._np
+            //@use---$.fn._np
             return this._np(expr, "nextElementSibling");
         },
         prev: function(expr) {
-            //@use---fn._np
+            //@use---$.fn._np
             return this._np(expr, "previousElementSibling");
         },
         parent: function(expr) {
-            //@use---fn._np
+            //@use---$.fn._np
             return this._np(expr, "parentNode");
         },
         _nu: function(key, filter, lastExpr) {
@@ -837,47 +837,47 @@
             return $(arr);
         },
         nextUntil: function(lastExpr, filter) {
-            //@use---fn._nu
+            //@use---$.fn._nu
             return this._nu('nextElementSibling', filter, lastExpr);
         },
         prevUntil: function(lastExpr, filter) {
-            //@use---fn._nu
+            //@use---$.fn._nu
             return this._nu('previousElementSibling', filter, lastExpr);
         },
         parentsUntil: function(lastExpr, filter) {
-            //@use---fn._nu
+            //@use---$.fn._nu
             return this._nu('parentNode', filter, lastExpr);
         },
         nextAll: function(filter) {
-            //@use---fn._nu
+            //@use---$.fn._nu
             return this._nu('nextElementSibling', filter);
         },
         prevAll: function(filter) {
-            //@use---fn._nu
+            //@use---$.fn._nu
             return this._nu('previousElementSibling', filter);
         },
         parents: function(filter) {
-            //@use---fn._nu
+            //@use---$.fn._nu
             return this._nu('parentNode', filter, document);
         },
         closest: function(selector, context) {
-            //@use---fn.parentsUntil
-            //@use---fn.parent
+            //@use---$.fn.parentsUntil
+            //@use---$.fn.parent
             var parentEles = $(selector).parent();
             context && parentEles.push(context);
             return this.parentsUntil(parentEles, selector);
         },
         siblings: function(expr) {
-            //@use---fn.parent
-            //@use---fn.children
-            //@use---fn.map
+            //@use---$.fn.parent
+            //@use---$.fn.children
+            //@use---$.fn.map
             var _this = this;
             return this.parent().children(expr).map(function() {
                 if (_this.indexOf(this) == -1) return this
             });
         },
         find: function(arg) {
-            //@use---fn.parentsUntil
+            //@use---$.fn.parentsUntil
             var eles = [];
             if (getType(arg) == "string") {
                 arrayEach(this, function(e) {
@@ -901,7 +901,7 @@
             return $(eles);
         },
         has: function(expr) {
-            //@use---fn.find
+            //@use---$.fn.find
             var arr = [];
             arrayEach(this, function(tar) {
                 if (0 in $(tar).find(expr)) {
@@ -955,7 +955,7 @@
             return obj[keyname];
         },
         data: function(name, value) {
-            //@use---fn._ge
+            //@use---$.fn._ge
             var smartData;
             switch (getType(name)) {
                 case "string":
@@ -997,7 +997,7 @@
         },
         //smartEvent事件触发器
         _tr: function(ele, eventName, newEventObject, triggerData) {
-            //@use---fn.parents
+            //@use---$.fn.parents
             var smartEventData = ele[SMARTEVENTKEY];
             if (!smartEventData) return
 
@@ -1057,8 +1057,8 @@
         },
         //注册事件
         on: function(arg1, arg2, arg3, arg4, isOne) {
-            //@use---fn._tr
-            //@use---fn._ge
+            //@use---$.fn._tr
+            //@use---$.fn._ge
             //@use---$.Event
             var selectors, data, _this = this;
 
@@ -1135,12 +1135,12 @@
             return this;
         },
         one: function(event, selector, data, callback) {
-            //@use---fn.on
+            //@use---$.fn.on
             return this.on(event, selector, data, callback, 1);
         },
         //触发事件
         trigger: function(eventName, data) {
-            //@use---fn._tr
+            //@use---$.fn._tr
             //@use---$.Event
             return arrayEach(this, function(tar) {
                 var event = $.Event(eventName);
@@ -1233,7 +1233,7 @@
             return this.off(event, callback)
         },
         triggerHandler: function(eventName, data) {
-            //@use---fn._tr
+            //@use---$.fn._tr
             var tar = this[0];
             tar && prototypeObj._tr(tar, eventName, $.Event(eventName), data);
             return this;
@@ -1248,7 +1248,7 @@
             return this.on('mouseenter', fnOver).on('mouseleave', fnOut || fnOver);
         },
         clone: function(isDeep) {
-            //@use---fn._tr
+            //@use---$.fn._tr
             //@use---$.Event
             var arr = [];
 
@@ -1462,9 +1462,9 @@
         }
     });
 
-    //@set---fn.blur fn.focus fn.focusin fn.focusout fn.resize fn.scroll fn.click fn.dblclick fn.mousedown fn.mouseup fn.mousemove fn.mouseover fn.mouseout fn.mouseenter fn.mouseleave fn.change fn.select fn.submit fn.keydown fn.keypress fn.keyup fn.contextmenu---start
-    //@use---fn.on
-    //@use---fn.trigger
+    //@set---$.fn.blur $.fn.focus $.fn.focusin $.fn.focusout $.fn.resize $.fn.scroll $.fn.click $.fn.dblclick $.fn.mousedown $.fn.mouseup $.fn.mousemove $.fn.mouseover $.fn.mouseout $.fn.mouseenter $.fn.mouseleave $.fn.change $.fn.select $.fn.submit $.fn.keydown $.fn.keypress $.fn.keyup $.fn.contextmenu---start
+    //@use---$.fn.on
+    //@use---$.fn.trigger
     //设置event
     arrayEach("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "), function(e) {
         prototypeObj[e] = function(callback) {
@@ -1475,7 +1475,7 @@
     //@set------end
 
     //动画
-    //@set---fn.animate fn.stop---start
+    //@set---$.fn.animate $.fn.stop---start
     //获取立方根的方法
     var getCbrt = (function() {
         if (Math.cbrt) {
@@ -1783,8 +1783,8 @@
 
 
     //@set---$.Deferred---start
-    //@use---fn.one
-    //@use---fn.off
+    //@use---$.fn.one
+    //@use---$.fn.off
     //@use---$.each
     //_p是内置事件名
     var _PROMISE_DONE = "_resolved";
@@ -1856,12 +1856,12 @@
 
     //@set------end
 
-    //@set---$.ajax $.get $.post $.getJSON $.ajaxSetup fn.ajaxSuccess fn.ajaxError fn.ajaxComplete fn.ajaxSend fn.ajaxStart fn.ajaxStop---start
+    //@set---$.ajax $.get $.post $.getJSON $.ajaxSetup $.fn.ajaxSuccess $.fn.ajaxError $.fn.ajaxComplete $.fn.ajaxSend $.fn.ajaxStart $.fn.ajaxStop---start
     //@use---$.Deferred
     //@use---$.extend
     //@use---$.each
-    //@use---fn.on
-    //@use---fn.trigger
+    //@use---$.fn.on
+    //@use---$.fn.trigger
     var jsonpCallback_count = 0;
     var ajaxDefaults = {
         type: "GET",

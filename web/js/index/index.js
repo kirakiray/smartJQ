@@ -85,8 +85,10 @@ require('view/CheckGroup').done(function(Group) {
                 $('input[data-point="' + e + '"]')[0].checked = checked;
             });
         }
-        console.log(tarData);
+        // console.log(tarData);
 
+        //依赖修正
+        checkRely();
     });
 
     //展示出来
@@ -106,14 +108,14 @@ require('view/CheckGroup').done(function(Group) {
             var oneGroupFuncNameArr = oneGroupFuncName[1].split(' ');
 
             //修正fn的内容
-            var newoneGroupFuncNameArr = oneGroupFuncNameArr.map(function(e) {
-                //判断是fn.开头的就添加$前置
-                var fixStr = e;
-                if (/^fn\./.test(e)) {
-                    fixStr = "$." + e;
-                }
-                return fixStr;
-            });
+            // var newoneGroupFuncNameArr = oneGroupFuncNameArr.map(function(e) {
+            //     //判断是fn.开头的就添加$前置
+            //     var fixStr = e;
+            //     if (/^fn\./.test(e)) {
+            //         fixStr = "$." + e;
+            //     }
+            //     return fixStr;
+            // });
 
             //制作匹配正文的正则表达式
             var tarExp = new RegExp((e.replace(/\./g, '\\.').replace(/\$/g, "\\$") + '([\\s\\S]+?)//@set------end'));
@@ -125,21 +127,22 @@ require('view/CheckGroup').done(function(Group) {
 
             // console.log('oneGroupFuncNameArr=>', newoneGroupFuncNameArr);
 
-            //获取依赖功能
-            var relyArr = [];
+            // var relyArr = [];
 
-            //根据正文获取依赖文件
-            var relytextArr = intext.match(/@use---(\S+)/g);
-            relytextArr && relytextArr.forEach(function(e) {
-                var relytext = e.match(/@use---(\S+)/);
-                if (1 in relytext) {
-                    relyArr.push(relytext[1]);
-                }
-            });
+            // //根据正文获取依赖文件
+            // var relytextArr = intext.match(/@use---(\S+)/g);
+            // relytextArr && relytextArr.forEach(function(e) {
+            //     var relytext = e.match(/@use---(\S+)/);
+            //     if (1 in relytext) {
+            //         relyArr.push(relytext[1]);
+            //     }
+            // });
+
+            var relyArr = findRely(intext);
 
             //映射记录
             //两个以上的记录到第一个映射上
-            newoneGroupFuncNameArr.forEach(function(e, i) {
+            oneGroupFuncNameArr.forEach(function(e, i) {
                 if (i == 0) {
                     //第一个
                     smartJQTextData[e] = {
@@ -151,10 +154,10 @@ require('view/CheckGroup').done(function(Group) {
                     }
                 } else {
                     smartJQTextData[e] = {
-                        to: newoneGroupFuncNameArr[0]
+                        to: oneGroupFuncNameArr[0]
                     };
                     //加入组
-                    smartJQTextData[newoneGroupFuncNameArr[0]].group.push(e);
+                    smartJQTextData[oneGroupFuncNameArr[0]].group.push(e);
                 }
             });
         });
@@ -189,16 +192,48 @@ require('view/CheckGroup').done(function(Group) {
 
         //在fn上的
         $.each($.fn, function(k, v) {
+            var intext = $.fn[k].toString();
+            var relydata = findRely(intext);
+
             if (!smartJQTextData['$.fn.' + k] && typeof $.fn[k] == "function" && k != "init") {
                 smartJQTextData['$.fn.' + k] = {
                     type: "fn",
-                    text: $.fn[k].toString()
+                    text: intext,
+                    rely: relydata
                 };
             }
-            debugger;
+            // debugger;
         });
 
         console.log(smartJQTextData);
+    };
+
+    //查看依赖的方法
+    function checkRely() {
+        //获取所有选中的选项
+        var checkedInput = $('input[type="checkbox"]:checked:not(:disabled)');
+
+        checkedInput.each(function(i, e) {
+            //获取相应的映射数据并进行设置依赖
+            var pointData = $(this).data('point');
+            console.log(pointData, smartJQTextData[pointData]);
+        });
+    }
+
+    //获取依赖的方法
+    function findRely(intext) {
+        var relyArr = [];
+
+        //根据正文获取依赖文件
+        var relytextArr = intext.match(/@use---(\S+)/g);
+        relytextArr && relytextArr.forEach(function(e) {
+            var relytext = e.match(/@use---(\S+)/);
+            if (1 in relytext) {
+                relyArr.push(relytext[1]);
+            }
+        });
+
+        return relyArr;
     };
 
     //获取js文件内容
