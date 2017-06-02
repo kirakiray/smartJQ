@@ -28,7 +28,7 @@
 
     //arr类型的遍历
     var arrayEach = function(arr, func) {
-        if (!arr instanceof Array) arr = makeArray(arr);
+        !(arr instanceof Array) && (arr = makeArray(arr));
         arr.some(function(e, i) {
             return func(e, i) === false;
         });
@@ -39,7 +39,9 @@
     var objEach = function(obj, func) {
         var i;
         for (i in obj) {
-            func(i, obj[i]);
+            if (func(i, obj[i]) == false) {
+                break;
+            };
         }
         return obj;
     }
@@ -914,7 +916,6 @@
             return arrayEach(this, function(e, i) {
                 func.call(e, i, e);
             });
-            // return this;
         },
         index: function(ele) {
             var owner, tar;
@@ -1214,8 +1215,6 @@
                                 }
                             }
                             break;
-                            // case "undefined":
-                            //     break;
                         case "object":
                             var _this;
                             objEach(eventName, function(k, v) {
@@ -1227,13 +1226,16 @@
             });
         },
         bind: function(event, data, callback) {
+            //@use---$.fn.on
             return this.on(event, data, callback);
         },
         unbind: function(event, callback) {
+            //@use---$.fn.off
             return this.off(event, callback)
         },
         triggerHandler: function(eventName, data) {
             //@use---$.fn._tr
+            //@use---$.Event
             var tar = this[0];
             tar && prototypeObj._tr(tar, eventName, $.Event(eventName), data);
             return this;

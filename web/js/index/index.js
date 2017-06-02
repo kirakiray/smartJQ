@@ -47,7 +47,7 @@ require('view/CheckGroup').done(function(Group) {
     });
 
     //将有的东西展示出来
-    $('.f_item > input').each(function(i, e) {
+    $('.main .f_item > input').each(function(i, e) {
         var pointName = $(e).data('point');
         try {
             if (eval(pointName)) {
@@ -79,13 +79,17 @@ require('view/CheckGroup').done(function(Group) {
         var tarData = smartJQTextData[datapoint];
         if (tarData.to) {
             tarData = smartJQTextData[tarData.to];
-            var groupData = tarData.group;
-            var checked = $('input[data-point="' + datapoint + '"]')[0].checked;
+        }
+        var groupData = tarData.group;
+        if (groupData) {
+            var checked = $('.main input[data-point="' + datapoint + '"]')[0].checked;
             groupData.forEach(function(e) {
-                $('input[data-point="' + e + '"]')[0].checked = checked;
+                $('.main input[data-point="' + e + '"]')[0].checked = checked;
             });
         }
-        // console.log(tarData);
+
+        //去除所有高亮依赖
+        $('.main .will_select').removeClass('will_select');
 
         //依赖修正
         checkRely();
@@ -169,7 +173,7 @@ require('view/CheckGroup').done(function(Group) {
             var funcName = e.match(/\/\/@must---(.+)/)[1];
 
             //设置相关方法默认选中并且不能取消
-            $('input[data-point="' + funcName + '"]').prop('checked', true).attr('disabled', 'disabled');
+            $('.main input[data-point="' + funcName + '"]').prop('checked', true).attr('disabled', 'disabled');
 
             //写入映射
             smartJQTextData[funcName] = {
@@ -211,13 +215,45 @@ require('view/CheckGroup').done(function(Group) {
     //查看依赖的方法
     function checkRely() {
         //获取所有选中的选项
-        var checkedInput = $('input[type="checkbox"]:checked:not(:disabled)');
+        var checkedInput = $('.main input[type="checkbox"]:checked:not(:disabled)');
 
-        checkedInput.each(function(i, e) {
-            //获取相应的映射数据并进行设置依赖
-            var pointData = $(this).data('point');
-            console.log(pointData, smartJQTextData[pointData]);
+        checkedInput.each(function() {
+            //查找依赖并设置样式
+            findRelyData(this, function(e) {
+                $('.main [data-point="' + e + '"]').parent().addClass('will_select');
+            });
         });
+
+        //查看高亮的api是否需要依赖
+        var needrely;
+        do {
+            needrely = 0;
+            var willSelectInputs = $('.main .will_select input');
+            willSelectInputs.forEach(function(e) {
+                findRelyData(e, function(e) {
+                    var tar = $('.main [data-point="' + e + '"]').parent();
+                    if (tar && tar.length && !tar.hasClass('will_select')) {
+                        tar.addClass('will_select');
+                        needrely = 1;
+                    }
+                });
+            });
+        } while (needrely);
+    }
+
+    //获取依赖数据（smartJQTextData）的方法
+    function findRelyData(ele, callback) {
+        //获取相应的映射数据并进行设置依赖
+        var pointDataStr = $(ele).data('point');
+        var pointData = smartJQTextData[pointDataStr];
+
+        //对应的依赖文件设置高亮
+        var relys = pointData.rely;
+        if (relys && relys.length) {
+            relys.forEach(function(e) {
+                callback && callback(e);
+            });
+        }
     }
 
     //获取依赖的方法
