@@ -44,7 +44,7 @@ body {
     margin-top: 30px;
 }
 
-.tishi_con:after {
+.tishi_con:before {
     content: "";
     display: block;
     position: absolute;
@@ -55,8 +55,45 @@ body {
     z-index: 10;
 }
 
+.tishi_con:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 .tishi_con_btns {
     float: right;
+    user-select: none;
+}
+
+.tishi_con_btns button {
+    margin-left: 3px;
+    vertical-align: middle;
+}
+
+.tishi_text {
+    display: none;
+}
+
+.tishi_con:hover .tishi_text {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    padding: 15px 20px;
+    display: block;
+    background-color: rgba(255, 255, 255, .95);
+    animation: tishi_text_anime ease .3s;
+}
+
+@keyframes tishi_text_anime {
+    0% {
+        opacity: 0;
+        transform: translate3d(-10px, 0, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 .main {

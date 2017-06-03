@@ -19,20 +19,28 @@
         <div class="uk-container uk-container-center">
             <div class="logo">smartJQ</div>
             <ul class="uk-navbar-nav uk-hidden-small">
-                <li class="uk-active"><a href="">选择下载</a></li>
+                <li class="uk-active" title="直接选择你需要用的jQuery方法，按 下载 按钮得到的库就是仅有你选择的方法在里面"><a href="">按需下载</a></li>
                 <li><a href="">输入依赖</a></li>
-                <li><a href="">下载</a></li>
+                <li><a href="">直接下载</a></li>
+                <li><a href="">jQuery兼容检测</a></li>
             </ul>
         </div>
     </nav>
     <div class="tishi_con uk-container uk-container-center">
         <label><input type="checkbox" checked>选中</label>
         <label><input type="checkbox">没选中</label>
-        <label class="will_select"><input type="checkbox">依赖</label>
+        <label class="will_select"><input type="checkbox">被依赖</label>
         <div class="tishi_con_btns">
-            <button class="uk-button uk-button-primary" type="button">下载</button>
-            <button class="uk-button uk-button-success" type="button">选中推荐</button>
-            <button class="uk-button uk-button-danger" type="button">取消选中</button>
+            <button class="uk-button uk-button-primary" type="button" id="download_btn">下载</button>
+            <button class="uk-button uk-button-success" type="button" id="select_recommond">选中推荐</button>
+            <button class="uk-button uk-button-danger" type="button" id="select_cancel">取消所有选中</button>
+        </div>
+        <div class="tishi_text">
+            选中的方法，将会加入到smartJQ中；
+            <br> 没选中的方法，不会在smartJQ里出现；
+            <br> 被依赖的方法，无论你选没选中，都会出现在smartJQ里；
+            <br> <br> 根据需要选择，按右方的 <span class="uk-button uk-button-mini  uk-button-primary">下载</span> 下载 smartJQ
+
         </div>
     </div>
     <div class="main uk-container uk-container-center" style="display:none;">

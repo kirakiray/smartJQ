@@ -486,8 +486,6 @@ var jqdatas = [{
             val: "$.param"
         }, {
             val: "$.error"
-        }, {
-            val: "$.proxy"
         }]
     }, {
         title: "Deferred",

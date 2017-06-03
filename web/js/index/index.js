@@ -2,49 +2,12 @@ sr.config({
     baseUrl: "js/"
 });
 
-require('view/CheckGroup').done(function(Group) {
+require('index/setCheck', 'compatable').done(function() {
+    //导出模块所有的方法
+    window.exportMethodsDatas = [];
 
-    //根据数据塞进去
-    jqdatas.forEach(function(e, i) {
-        var groupObj = new Group(e.title);
-
-        //填充选项
-        e.props.forEach(function(e) {
-            var itemOption = {
-                val: e.val,
-                name: e.val
-            };
-
-            //判断是否fn
-            if (e.fn) {
-                itemOption.name = "$.fn." + e.val;
-            }
-
-            //判断是否is
-            if (e.is) {
-                itemOption.name = e.is;
-            }
-
-            if (e.base) {
-                itemOption.base = 1;
-            }
-
-            groupObj.appendItem(itemOption);
-        });
-
-        //手动排序
-        if (i >= 0 && i < 3) {
-            $('.uk-grid >div:nth-child(1)').append(groupObj.ele);
-        } else if (i >= 3 && i < 7) {
-            $('.uk-grid >div:nth-child(2)').append(groupObj.ele);
-        } else if (i >= 7 && i < 10) {
-            $('.uk-grid >div:nth-child(3)').append(groupObj.ele);
-        } else if (i >= 10 && i < 12) {
-            $('.uk-grid >div:nth-child(4)').append(groupObj.ele);
-        } else if (i >= 12) {
-            $('.uk-grid >div:nth-child(5)').append(groupObj.ele);
-        }
-    });
+    //总体数据映射
+    var smartJQTextData = {};
 
     //将有的东西展示出来
     $('.main .f_item > input').each(function(i, e) {
@@ -59,10 +22,6 @@ require('view/CheckGroup').done(function(Group) {
             console.warn('not defined => ', pointName);
         }
     });
-
-    //总体数据映射
-    var smartJQTextData = {};
-    window.smartJQTextData = smartJQTextData;
 
     $('#main_list').on("change", 'input', function(e) {
         //点解选中后，查看页面是否有同样名的也勾选上（主要解决is勾选）
@@ -88,9 +47,6 @@ require('view/CheckGroup').done(function(Group) {
             });
         }
 
-        //去除所有高亮依赖
-        $('.main .will_select').removeClass('will_select');
-
         //依赖修正
         checkRely();
     });
@@ -111,36 +67,14 @@ require('view/CheckGroup').done(function(Group) {
             //用空格区分开并生成关联
             var oneGroupFuncNameArr = oneGroupFuncName[1].split(' ');
 
-            //修正fn的内容
-            // var newoneGroupFuncNameArr = oneGroupFuncNameArr.map(function(e) {
-            //     //判断是fn.开头的就添加$前置
-            //     var fixStr = e;
-            //     if (/^fn\./.test(e)) {
-            //         fixStr = "$." + e;
-            //     }
-            //     return fixStr;
-            // });
-
             //制作匹配正文的正则表达式
             var tarExp = new RegExp((e.replace(/\./g, '\\.').replace(/\$/g, "\\$") + '([\\s\\S]+?)//@set------end'));
 
             //获取相应的正文数组
             var tarArr = text.match(tarExp);
+
             //匹配到的正文内容
             var intext = tarArr[1];
-
-            // console.log('oneGroupFuncNameArr=>', newoneGroupFuncNameArr);
-
-            // var relyArr = [];
-
-            // //根据正文获取依赖文件
-            // var relytextArr = intext.match(/@use---(\S+)/g);
-            // relytextArr && relytextArr.forEach(function(e) {
-            //     var relytext = e.match(/@use---(\S+)/);
-            //     if (1 in relytext) {
-            //         relyArr.push(relytext[1]);
-            //     }
-            // });
 
             var relyArr = findRely(intext);
 
@@ -206,7 +140,6 @@ require('view/CheckGroup').done(function(Group) {
                     rely: relydata
                 };
             }
-            // debugger;
         });
 
         console.log(smartJQTextData);
@@ -214,37 +147,53 @@ require('view/CheckGroup').done(function(Group) {
 
     //查看依赖的方法
     function checkRely() {
+        //去除所有高亮依赖
+        $('.main .will_select').removeClass('will_select');
+        //还原导出数据
+        exportMethodsDatas = [];
+
         //获取所有选中的选项
         var checkedInput = $('.main input[type="checkbox"]:checked:not(:disabled)');
 
         checkedInput.each(function() {
             //查找依赖并设置样式
-            findRelyData(this, function(e) {
+            var $this = $(this);
+            if (exportMethodsDatas.indexOf($this.data('point')) == -1) {
+                exportMethodsDatas.push($this.data('point'));
+            }
+            findRelyData($this.data('point'), function(e) {
+                if (exportMethodsDatas.indexOf(e) == -1) {
+                    exportMethodsDatas.push(e);
+                }
                 $('.main [data-point="' + e + '"]').parent().addClass('will_select');
             });
         });
 
-        //查看高亮的api是否需要依赖
-        var needrely;
-        do {
-            needrely = 0;
-            var willSelectInputs = $('.main .will_select input');
-            willSelectInputs.forEach(function(e) {
-                findRelyData(e, function(e) {
-                    var tar = $('.main [data-point="' + e + '"]').parent();
-                    if (tar && tar.length && !tar.hasClass('will_select')) {
-                        tar.addClass('will_select');
-                        needrely = 1;
-                    }
+        if (checkedInput && checkedInput.length) {
+            //查看高亮的api是否需要依赖
+            var needrely;
+            do {
+                needrely = 0;
+                exportMethodsDatas.forEach(function(c) {
+                    findRelyData(c, function(e) {
+                        if (exportMethodsDatas.indexOf(e) == -1) {
+                            exportMethodsDatas.push(e);
+                        }
+                        var tar = $('.main [data-point="' + e + '"]').parent();
+                        if (tar && tar.length && !tar.hasClass('will_select')) {
+                            tar.addClass('will_select');
+                            needrely = 1;
+                        }
+                    });
                 });
-            });
-        } while (needrely);
+            } while (needrely);
+        }
     }
 
     //获取依赖数据（smartJQTextData）的方法
-    function findRelyData(ele, callback) {
+    function findRelyData(pointDataStr, callback) {
         //获取相应的映射数据并进行设置依赖
-        var pointDataStr = $(ele).data('point');
+        // var pointDataStr = $(ele).data('point');
         var pointData = smartJQTextData[pointDataStr];
 
         //对应的依赖文件设置高亮
@@ -272,12 +221,97 @@ require('view/CheckGroup').done(function(Group) {
         return relyArr;
     };
 
+    //初始化按钮
+    var initBtn = function(text) {
+        //核心代码
+        var coreCode = text.match(/\/\/@base---start([\s\S]+)\/\/@base---end/)[1];
+
+        //按钮功能
+        //点击取消选中
+        $('#select_cancel').click(function() {
+            $('.main [type=checkbox]').each(function() {
+                this.checked = false;
+            });
+            checkRely();
+        });
+
+        //点击推荐选中
+        $('#select_recommond').click(function() {
+            // 在一直次序的情况下选中想要的
+            $('.group:lt(10),.group:eq(13),.group:eq(14)').find('.f_item:not(.disable)').find('input[type="checkbox"]').prop('checked', true);
+            checkRely();
+        });
+
+        //点击下载
+        $('#download_btn').click(function() {
+            //获取关键代码
+            //fn上的代码
+            var fnCode = "";
+
+            //在$上的代码
+            var $_code = "";
+
+            //其他组代码
+            var groupCode = "";
+
+            exportMethodsDatas.forEach(function(e) {
+                var tar = smartJQTextData[e];
+
+                switch (tar.type) {
+                    case "fn":
+                        fnCode += e.replace('$.fn.', "") + ":" + tar.text + ",";
+                        break;
+                    case "$":
+                        $_code += e.replace('$.', "") + ":" + tar.text + ",";
+                        break;
+                    case "self":
+                        groupCode += tar.text;
+                        break;
+                }
+            });
+
+            //收尾
+            if (fnCode) {
+                fnCode = fnCode.slice(0, -1);
+                fnCode = "extend(prototypeObj, {" + fnCode + "});"
+            }
+            if ($_code) {
+                $_code = $_code.slice(0, -1);
+                $_code = "extend($, {" + $_code + "});"
+            }
+
+            //撰写script文本
+            var scriptText = "(function(glo) {";
+            //加入核心代码
+            scriptText += coreCode;
+            //加入选中的代码
+            scriptText += fnCode;
+            scriptText += $_code;
+            scriptText += groupCode;
+            scriptText += "})(window);";
+
+            //生成file文件
+            var smartJQFile = new File([scriptText], "smartJQ-rebuild.js", { type: 'application/javascript' });
+
+            var fileurl = URL.createObjectURL(smartJQFile);
+
+            var link = $('<a download="smartJQ-rebuild.js" href="' + fileurl + '" />');
+            link.click();
+
+            console.log('smartJQFile', smartJQFile);
+        });
+    };
+
     //获取js文件内容
     fetch('../src/smartjq.js')
         .then(function(respone) {
             return respone.text();
         })
-        .then(init);
+        .then(function(d) {
+            init(d);
+            initBtn(d);
+        });
+
 
     console.log('len =>', jqdatas.length);
 });

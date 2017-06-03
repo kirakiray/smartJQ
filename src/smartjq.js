@@ -1,4 +1,5 @@
 (function(glo) {
+    //@base---start
     "use strict";
     //common
     var SMARTKEY = "_s_" + new Date().getTime();
@@ -151,8 +152,13 @@
 
         //存在专属字符进入专属字符通道
         if (speMatch) {
-            //not有对专用字符有特殊的处理渠道
-            if (expr.match(/(.+?):not\((.+?)\)/)) {
+            if (/,/.test(expr)) {
+                //带有分组信息需要分开处理
+                expr.split(',').forEach(function(e) {
+                    merge(redata, findEles(owner, e));
+                });
+            } else if (expr.match(/(.+?):not\((.+?)\)/)) {
+                //not有对专用字符有特殊的处理渠道
                 //筛选not关键信息
                 //拆分括号
                 var notStrArr = expr.replace(/([\(\)])/g, "$1&").split('&');
@@ -310,6 +316,36 @@
     }
 
     smartJQ.fn = smartJQ.prototype = prototypeObj;
+
+    //init
+    var $ = function(selector, context) {
+        if (selector instanceof smartJQ) {
+            return selector;
+        }
+        if (!selector) {
+            return $([]);
+        }
+        return new smartJQ(selector, context);
+    };
+    $.fn = $.prototype = smartJQ.fn;
+
+    glo.smartJQ = glo.$ = $;
+
+    //在$上的方法
+    //随框架附赠的方法
+    //@must---$.extend
+    //@must---$.makearray
+    //@must---$.merge
+    //@must---$.type
+    extend($, {
+        // expando: SMARTKEY,
+        extend: extend,
+        makearray: makeArray,
+        merge: merge,
+        type: getType
+    });
+    //@base---end
+
 
     extend(prototypeObj, {
         //设置样式
@@ -1241,12 +1277,15 @@
             return this;
         },
         delegate: function(selector, types, data, fn) {
+            //@use---$.fn.on
             return this.on(types, selector, data, fn);
         },
         undelegate: function(selector, types, fn) {
+            //@use---$.fn.off
             return this.off(types, selector, fn);
         },
         hover: function(fnOver, fnOut) {
+            //@use---$.fn.on
             return this.on('mouseenter', fnOver).on('mouseleave', fnOut || fnOver);
         },
         clone: function(isDeep) {
@@ -1309,34 +1348,6 @@
             });
             return $(arr);
         }
-    });
-
-
-
-    //init
-    var $ = function(selector, context) {
-        if (selector instanceof smartJQ) {
-            return selector;
-        }
-        if (!selector) {
-            return $([]);
-        }
-        return new smartJQ(selector, context);
-    };
-    $.fn = $.prototype = smartJQ.fn;
-
-    //在$上的方法
-    //随框架附赠的方法
-    //@must---$.extend
-    //@must---$.makearray
-    //@must---$.merge
-    //@must---$.type
-    extend($, {
-        // expando: SMARTKEY,
-        extend: extend,
-        makearray: makeArray,
-        merge: merge,
-        type: getType
     });
 
     extend($, {
@@ -1463,6 +1474,64 @@
             return true;
         }
     });
+
+    //@set---$.Event---start
+    $.Event = function(oriEvent, props) {
+        var _this = this;
+
+        if (!(this instanceof $.Event)) {
+            return new $.Event(oriEvent, props);
+        } else if (oriEvent instanceof $.Event) {
+            return oriEvent;
+        }
+
+        if (oriEvent && oriEvent.type) {
+            //添加相关属性
+            arrayEach(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(e) {
+                (oriEvent[e] != undefined) && (_this[e] = oriEvent[e]);
+            });
+
+            //判断是否自定义事件
+            _this.originalEvent = oriEvent;
+        } else {
+            this.type = oriEvent;
+            props && extend(this, props);
+        }
+
+
+        this.returnValue = true;
+        this.cancelBubble = false;
+
+        _this.timeStamp || (_this.timeStamp = new Date().getTime());
+    };
+    //主体event对象
+    $.Event.prototype = {
+        isDefaultPrevented: function() {
+            return this.returnValue == false;
+        },
+        isPropagationStopped: function() {
+            return this.cancelBubble;
+        },
+        isImmediatePropagationStopped: function() {
+            return !!this._ips;
+        },
+        preventDefault: function() {
+            var originalEvent = this.originalEvent;
+            originalEvent && originalEvent.preventDefault();
+            this.returnValue = false;
+        },
+        stopPropagation: function() {
+            var originalEvent = this.originalEvent;
+            originalEvent && originalEvent.stopPropagation();
+            this.cancelBubble = true;
+        },
+        stopImmediatePropagation: function() {
+            var originalEvent = this.originalEvent;
+            originalEvent && originalEvent.stopImmediatePropagation();
+            this._ips = true;
+        }
+    };
+    //@set------end
 
     //@set---$.fn.blur $.fn.focus $.fn.focusin $.fn.focusout $.fn.resize $.fn.scroll $.fn.click $.fn.dblclick $.fn.mousedown $.fn.mouseup $.fn.mousemove $.fn.mouseover $.fn.mouseout $.fn.mouseenter $.fn.mouseleave $.fn.change $.fn.select $.fn.submit $.fn.keydown $.fn.keypress $.fn.keyup $.fn.contextmenu---start
     //@use---$.fn.on
@@ -1723,64 +1792,6 @@
         this._aEnd(aEndArg);
     }
 
-    //@set------end
-
-    //@set---$.Event---start
-    $.Event = function(oriEvent, props) {
-        var _this = this;
-
-        if (!(this instanceof $.Event)) {
-            return new $.Event(oriEvent, props);
-        } else if (oriEvent instanceof $.Event) {
-            return oriEvent;
-        }
-
-        if (oriEvent && oriEvent.type) {
-            //添加相关属性
-            arrayEach(['altKey', 'bubbles', 'cancelable', 'changedTouches', 'ctrlKey', 'detail', 'eventPhase', 'metaKey', 'pageX', 'pageY', 'shiftKey', 'view', 'char', 'charCode', 'key', 'keyCode', 'button', 'buttons', 'clientX', 'clientY', 'offsetX', 'offsetY', 'pointerId', 'pointerType', 'relatedTarget', 'screenX', 'screenY', 'target', 'targetTouches', 'timeStamp', 'toElement', 'touches', 'which'], function(e) {
-                (oriEvent[e] != undefined) && (_this[e] = oriEvent[e]);
-            });
-
-            //判断是否自定义事件
-            _this.originalEvent = oriEvent;
-        } else {
-            this.type = oriEvent;
-            props && extend(this, props);
-        }
-
-
-        this.returnValue = true;
-        this.cancelBubble = false;
-
-        _this.timeStamp || (_this.timeStamp = new Date().getTime());
-    };
-    //主体event对象
-    $.Event.prototype = {
-        isDefaultPrevented: function() {
-            return this.returnValue == false;
-        },
-        isPropagationStopped: function() {
-            return this.cancelBubble;
-        },
-        isImmediatePropagationStopped: function() {
-            return !!this._ips;
-        },
-        preventDefault: function() {
-            var originalEvent = this.originalEvent;
-            originalEvent && originalEvent.preventDefault();
-            this.returnValue = false;
-        },
-        stopPropagation: function() {
-            var originalEvent = this.originalEvent;
-            originalEvent && originalEvent.stopPropagation();
-            this.cancelBubble = true;
-        },
-        stopImmediatePropagation: function() {
-            var originalEvent = this.originalEvent;
-            originalEvent && originalEvent.stopImmediatePropagation();
-            this._ips = true;
-        }
-    };
     //@set------end
 
 
@@ -2044,6 +2055,4 @@
         }
     });
     //@set------end
-
-    glo.smartJQ = glo.$ = $;
 })(window);
