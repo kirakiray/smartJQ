@@ -26,7 +26,25 @@ define(function(require) {
                     itemOption.base = 1;
                 }
 
-                groupObj.appendItem(itemOption);
+                var checkEle = groupObj.appendItem(itemOption);
+
+                if (e.test) {
+                    try {
+                        if (eval(e.test)) {
+                            checkEle.find('label').removeClass('disable').find('input').removeAttr('disabled');
+                        }
+                    } catch (err) {
+                        console.warn('not defined => ', e.test);
+                    }
+                } else {
+                    try {
+                        if (eval(itemOption.name)) {
+                            checkEle.find('label').removeClass('disable').find('input').removeAttr('disabled');
+                        }
+                    } catch (e) {
+                        console.warn('not defined => ', itemOption.name);
+                    }
+                }
             });
 
             //手动排序

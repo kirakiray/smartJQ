@@ -3,15 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>smartJQ tools</title>
+    <title>smartJQ</title>
     <link rel="stylesheet" href="css/uikit.css">
+    <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/index.css">
-    <script src="js/data.js"></script>
-    <script src="js/sr.js"></script>
     <script src="../src/smartjq.js"></script>
-    <!--<script src="../test/jquery-3.1.1.js"></script>-->
-    <!--<script src="../test/zepto.js"></script>-->
-    <script src="js/index/index.js"></script>
 </head>
 
 <body>
@@ -19,38 +15,56 @@
         <div class="uk-container uk-container-center">
             <div class="logo">smartJQ</div>
             <ul class="uk-navbar-nav uk-hidden-small">
-                <li class="uk-active" title="直接选择你需要用的jQuery方法，按 下载 按钮得到的库就是仅有你选择的方法在里面"><a href="">按需下载</a></li>
+                <li class="uk-active"><a href="index.html">首页</a></li>
+                <li title="直接选择你需要用的jQuery方法，按 下载 按钮得到的库就是仅有你选择的方法在里面"><a href="inneed-page.html">按需下载</a></li>
                 <li><a href="">输入依赖</a></li>
-                <li><a href="">直接下载</a></li>
-                <li><a href="">jQuery兼容检测</a></li>
+                <li><a href="compat-page.html">jQueryAPI检测</a></li>
             </ul>
         </div>
     </nav>
-    <div class="tishi_con uk-container uk-container-center">
-        <label><input type="checkbox" checked>选中</label>
-        <label><input type="checkbox">没选中</label>
-        <label class="will_select"><input type="checkbox">被依赖</label>
-        <div class="tishi_con_btns">
-            <button class="uk-button uk-button-primary" type="button" id="download_btn">下载</button>
-            <button class="uk-button uk-button-success" type="button" id="select_recommond">选中推荐</button>
-            <button class="uk-button uk-button-danger" type="button" id="select_cancel">取消所有选中</button>
-        </div>
-        <div class="tishi_text">
-            选中的方法，将会加入到smartJQ中；
-            <br> 没选中的方法，不会在smartJQ里出现；
-            <br> 被依赖的方法，无论你选没选中，都会出现在smartJQ里；
-            <br> <br> 根据需要选择，按右方的 <span class="uk-button uk-button-mini  uk-button-primary">下载</span> 下载 smartJQ
-
-        </div>
-    </div>
-    <div class="main uk-container uk-container-center" style="display:none;">
-        <div class="uk-grid" id="main_list">
-            <div class="uk-width-1-5"></div>
-            <div class="uk-width-1-5"></div>
-            <div class="uk-width-1-5"></div>
-            <div class="uk-width-1-5"></div>
-            <div class="uk-width-1-5"></div>
-        </div>
+    <div class="uk-container uk-container-center">
+        <article class="main_article uk-article">
+            <h2>什么是smartJQ？</h2>
+            <p>smartJQ 是 jQuery 的重构压缩版，在 jQuery API 的模型上，黑盒情况下制作的库；</p>
+            <p>兼容所有现代化的浏览器，因为不需要像jQuery一样对旧版本浏览器（IE10之前）兼容，所以体积更小；</p>
+            <p></p>
+            <h2>应用场景</h2>
+            <p>项目不考虑太旧的浏览器的兼容性（比如mobile web、整合性webview应用等），需要使用jQuery的场合，但又嫌弃jQuery体积太大的情况下，可以选用smartJQ；</p>
+            <p>相比zepto和JSLite实现jQuery半成品式的功能，smartJQ做到更完整的功能，</p>
+            <p>体积比zepto和JSLite都要小，并且具有更灵活方便的 自选rebuild 功能；</p>
+            <h3>体积对比</h3>
+            <table class="uk-table uk-table-hover uk-table-striped">
+                <caption>源文件大小会被注释影响，对比的是压缩混淆后的体积</caption>
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>文件大小（混淆压缩后）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>jQuery-3.1.1</td>
+                        <td>87,268 字节</td>
+                    </tr>
+                    <tr>
+                        <td>jQuery-2.1.3</td>
+                        <td>84,189 字节</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #d05">smartJQ</td>
+                        <td>21,062 字节</td>
+                    </tr>
+                    <tr>
+                        <td>zepto.js</td>
+                        <td>26,314 字节</td>
+                    </tr>
+                    <tr>
+                        <td>JSLite</td>
+                        <td>21,067 字节</td>
+                    </tr>
+                </tbody>
+            </table>
+        </article>
     </div>
 </body>
 

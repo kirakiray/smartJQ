@@ -18,6 +18,8 @@ define(function(require, exports, module) {
             ele.find('input').prop('checked', true);
             ele.find('label').removeClass('disable');
         }
+
+        return ele;
     };
 
     return Group;

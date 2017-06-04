@@ -2,33 +2,19 @@ sr.config({
     baseUrl: "js/"
 });
 
-require('index/setCheck', 'compatable').done(function() {
+require('inneed-page/setCheck', 'compatable').done(function() {
     //导出模块所有的方法
     window.exportMethodsDatas = [];
 
     //总体数据映射
     var smartJQTextData = {};
 
-    //将有的东西展示出来
-    $('.main .f_item > input').each(function(i, e) {
-        var pointName = $(e).data('point');
-        try {
-            if (eval(pointName)) {
-                var a = $(e).removeAttr('disabled')
-                var b = a.parent();
-                b.removeClass('disable');
-            }
-        } catch (e) {
-            console.warn('not defined => ', pointName);
-        }
-    });
-
     $('#main_list').on("change", 'input', function(e) {
         //点解选中后，查看页面是否有同样名的也勾选上（主要解决is勾选）
         var datapoint = $(this).data('point');
 
         //all datapoint elements
-        var allele = $('[data-point="' + datapoint + '"]');
+        var allele = $('.main [data-point="' + datapoint + '"]:not(:disabled)');
         if (allele.length > 1) {
             var checked = this.checked;
             allele.prop('checked', checked);
@@ -43,7 +29,7 @@ require('index/setCheck', 'compatable').done(function() {
         if (groupData) {
             var checked = $('.main input[data-point="' + datapoint + '"]')[0].checked;
             groupData.forEach(function(e) {
-                $('.main input[data-point="' + e + '"]')[0].checked = checked;
+                $('.main input[data-point="' + e + '"]:not(:disabled)')[0].checked = checked;
             });
         }
 
@@ -253,6 +239,11 @@ require('index/setCheck', 'compatable').done(function() {
 
             //其他组代码
             var groupCode = "";
+
+            if (!exportMethodsDatas.length) {
+                alert('什么都没选你想干嘛？');
+                return;
+            }
 
             exportMethodsDatas.forEach(function(e) {
                 var tar = smartJQTextData[e];
