@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>jQuery脱库</title>
+    <link rel="stylesheet" href="css/uikit.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="../src/smartjq.js"></script>
+</head>
+
+<body>
+    <nav class="top_bar">
+        <div class="uk-container uk-container-center">
+            <div class="logo">smartJQ</div>
+            <ul class="uk-navbar-nav uk-hidden-small">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="inneed-page.html">按需下载</a></li>
+                <li class="uk-active"><a href="offjq-page.html">jQuery脱库</a></li>
+                <li><a href="compat-page.html">jQueryAPI检测</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="uk-container uk-container-center">
+        <article class="main_article uk-article">
+            <h2>什么是jQuery脱库？</h2>
+            <p>就是让 <span style="color:#000;">jQuery插件</span> 脱离对 jQuery 的依赖。</p>
+            <p>我们的主角 <span class="uk-text-large uk-text-primary">recordjq.js</span></p>
+            <h2>如何使用 recordjq.js ？</h2>
+            <p>
+                在jQuery后引入 recordjq.js，然后再引用你的插件；
+            </p>
+            <pre style="color:#000080;">
+                <code>
+    <span style="color: #998;">&lt;!-- jQuery文件 --&gt;</span>
+    &lt;<span>script</span> <span style="color:#008080;">src</span>=<span style="color:#d14;">"jquery.js"</span>&gt;</span><span></span><span >&lt;/<span>script</span>&gt;</span>
+    <span style="color: #998;">&lt;!-- recordjq.js --&gt;</span>
+    &lt;<span>script</span> <span style="color:#008080;">src</span>=<span style="color:#d14;">"recordjq.js"</span>&gt;</span><span></span><span >&lt;/<span>script</span>&gt;</span>
+    <span style="color: #998;">&lt;!-- 想要脱库的插件 --&gt;</span>
+    &lt;<span>script</span> <span style="color:#008080;">src</span>=<span style="color:#d14;">"cropper.js"</span>&gt;</span><span></span><span >&lt;/<span>script</span>&gt;</span></code>
+            </pre>
+            <p>在运行一段时间后，在控制台输入 <code>jqrecord.output()</code> 得到的字符串信息，复制粘贴到下面的输入框；</p>
+            <div class="uk-form">
+                <textarea id="parse_target" cols="30" rows="10"></textarea>
+            </div>
+            <p>
+                得到的 smartJQ 就是最小的依赖文件；这时候将这个文件的内容，粘贴到相关插件的匿名函数内，就能让插件脱离依赖。（依照插件提供的API，可能需要重新暴露函数来使用插件）</p>
+            <p>明眼人可能看穿了，它是用来记录jQuery API 接口是否使用的工具，然后在通过 <a href="inneed-page.html">按需加载</a> 来得到最小的库；</p>
+            <p>你可以使用这个功能，帮你的项目将smartJQ的文件降低到最小。（但笔者认为不必要，smartJQ已经很小了）</p>
+        </article>
+    </div>
+</body>
+
+</html>

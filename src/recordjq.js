@@ -30,6 +30,7 @@
 
     retofun($, $data);
     retofun($.fn, $fndata);
+
     //暴露到全局
     glo.jqrecord = {
         $: $data,

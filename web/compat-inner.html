@@ -36,8 +36,17 @@
 
         var init = function() {
             console.log('haha');
+            if (!window.$) {
+                document.body.innerHTML = "加载失败，请检查你拖拽的js文件";
+                document.body.style['height'] = "400px";
+                document.body.classList.add('abcenter');
+                return;
+            }
             require('data').require('inneed-page/setCheck').done(function() {
                 $('input[type=checkbox]').remove();
+
+                //改变颜色
+                $('.f_item.disable').removeClass('disable').addClass('uk-text-danger');
             });
         };
     </script>

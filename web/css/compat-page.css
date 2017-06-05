@@ -1,3 +1,7 @@
+.dragin-area {
+    flex-direction: column;
+}
+
 .open_tips {
     position: fixed;
     top: 0;
