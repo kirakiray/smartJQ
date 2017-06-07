@@ -31,7 +31,9 @@ define(function(require) {
                 if (e.test) {
                     try {
                         if (eval(e.test)) {
-                            checkEle.find('label').removeClass('disable').find('input').removeAttr('disabled');
+                            checkEle[0].querySelector('label').classList.remove('disable');
+                            checkEle[0].querySelector('input').removeAttribute('disabled');
+                            // checkEle.find('label').removeClass('disable').find('input').removeAttr('disabled');
                         }
                     } catch (err) {
                         console.warn('not defined => ', e.test);
@@ -39,7 +41,9 @@ define(function(require) {
                 } else {
                     try {
                         if (eval(itemOption.name)) {
-                            checkEle.find('label').removeClass('disable').find('input').removeAttr('disabled');
+                            checkEle[0].querySelector('label').classList.remove('disable');
+                            checkEle[0].querySelector('input').removeAttribute('disabled');
+                            // checkEle.find('label').removeClass('disable').find('input').removeAttr('disabled');
                         }
                     } catch (e) {
                         console.warn('not defined => ', itemOption.name);
@@ -49,15 +53,15 @@ define(function(require) {
 
             //手动排序
             if (i >= 0 && i < 3) {
-                $('.uk-grid >div:nth-child(1)').append(groupObj.ele);
+                $('.uk-grid >div:nth-child(1)')[0].appendChild(groupObj.ele[0]);
             } else if (i >= 3 && i < 7) {
-                $('.uk-grid >div:nth-child(2)').append(groupObj.ele);
+                $('.uk-grid >div:nth-child(2)')[0].appendChild(groupObj.ele[0]);
             } else if (i >= 7 && i < 10) {
-                $('.uk-grid >div:nth-child(3)').append(groupObj.ele);
+                $('.uk-grid >div:nth-child(3)')[0].appendChild(groupObj.ele[0]);
             } else if (i >= 10 && i < 12) {
-                $('.uk-grid >div:nth-child(4)').append(groupObj.ele);
+                $('.uk-grid >div:nth-child(4)')[0].appendChild(groupObj.ele[0]);
             } else if (i >= 12) {
-                $('.uk-grid >div:nth-child(5)').append(groupObj.ele);
+                $('.uk-grid >div:nth-child(5)')[0].appendChild(groupObj.ele[0]);
             }
         });
     });

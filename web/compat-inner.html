@@ -43,10 +43,18 @@
                 return;
             }
             require('data').require('inneed-page/setCheck').done(function() {
-                $('input[type=checkbox]').remove();
+                Array.prototype.slice.call($('input[type=checkbox]')).forEach(function(e) {
+                    e.remove();
+                });
+                // $('input[type=checkbox]').remove();
+                // $('input[type=checkbox]').remove();
 
                 //改变颜色
-                $('.f_item.disable').removeClass('disable').addClass('uk-text-danger');
+                Array.prototype.slice.call($('.f_item.disable')).forEach(function(e) {
+                    e.classList.remove('disable')
+                    e.classList.add('uk-text-danger');
+                });
+                // $('.f_item.disable').removeClass('disable').addClass('uk-text-danger');
             });
         };
     </script>
