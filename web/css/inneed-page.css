@@ -1,0 +1,100 @@
+.tishi_con {
+    position: relative;
+    margin-top: 30px;
+}
+
+.tishi_con label {
+    margin-right: 10px;
+}
+
+.tishi_con:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    z-index: 10;
+}
+
+.tishi_con:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.tishi_con_btns {
+    float: right;
+    user-select: none;
+}
+
+.tishi_con_btns button {
+    margin-left: 3px;
+    vertical-align: middle;
+}
+
+.tishi_text {
+    display: none;
+}
+
+.tishi_con:hover .tishi_text {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    padding: 15px 20px;
+    display: block;
+    background-color: rgba(255, 255, 255, .95);
+    animation: tishi_text_anime ease .3s;
+}
+
+@keyframes tishi_text_anime {
+    0% {
+        opacity: 0;
+        transform: translate3d(-10px, 0, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.main .group_title {
+    margin-bottom: 8px;
+}
+
+.main .uk-list {
+    margin-top: 8px;
+}
+
+.group_title {
+    padding-left: 6px;
+    border-left: 3px solid #1FA2D6;
+    font-size: 16px;
+    line-height: 16px;
+}
+
+.group .disable {
+    color: #aaa;
+}
+
+.will_select {
+    background-color: #f3f9e5;
+    box-sizing: border-box;
+    padding: 0 2px 0 0;
+    border: #cddfaf solid 1px;
+    border-radius: 3px;
+}
+
+.loading_page:after {
+    display: block;
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+    width: 50px;
+    height: 50px;
+    background-color: #2ba3d2;
+    content: "";
+    z-index: 10;
+    animation: square-spin ease 3s infinite;
+}

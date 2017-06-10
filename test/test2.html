@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!--<script src="../src/smartjq.js"></script>-->
+    <script src="jquery-3.1.1.js"></script>
+</head>
+
+<body>
+    <div id="tar">
+        <a href="asd">asdasdasd</a>
+        <div>asdasdasdasd</div>
+    </div>
+</body>
+<script>
+    // var wait = function(dtd) {
+    //     var dtd = $.Deferred(); // 新建一个deferred对象
+    //     var tasks = function() {　　　
+    //         console.log('内部执行完毕');　　　
+    //         dtd.resolve(); // 改变deferred对象的执行状态
+    //         　　　　
+    //     };　　　　
+    //     setTimeout(tasks, 1000);　　　　
+    //     return dtd;　　
+    // };
+
+    // console.log(wait());
+
+    var a = new Promise((res, rej) => {
+        setTimeout(function() {
+            res({
+                ha: "hahaha"
+            });
+        }, 1000);
+    });
+
+    // a.then((data) => {
+    //     console.log(data);
+    // });
+
+    var b = Promise.all([a])
+        .then(function(data) {
+            console.log(data);
+        });
+
+    console.log(b);
+
+
+
+    // $.when(wait())
+    //     .done(function() {
+    //         console.log('成功了');
+    //     })
+    //     .fail(function() {
+    //         console.error('失败');
+    //     });
+</script>
+
+</html>

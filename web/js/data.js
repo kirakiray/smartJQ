@@ -268,7 +268,8 @@ var jqdatas = [{
     title: "页面载入",
     props: [{
         val: "ready",
-        fn: 1
+        //base代表默认一定会支持的
+        base: 1
     }]
 }, {
     title: "事件处理",
@@ -311,6 +312,8 @@ var jqdatas = [{
     }, {
         val: "toggle",
         fn: 1
+    }, {
+        val: "$.Event"
     }]
 }, {
     title: "事件",
@@ -383,27 +386,25 @@ var jqdatas = [{
     }, {
         val: "unload",
         fn: 1
+    }, {
+        val: "contextmenu",
+        fn: 1
     }]
 }, {
     title: "ajax",
     props: [{
-        val: "$.ajax",
-        $: 1
+        val: "$.ajax"
     }, {
         val: "load",
         fn: 1
     }, {
-        val: "$.get",
-        $: 1
+        val: "$.get"
     }, {
-        val: "$.getJSON",
-        $: 1
+        val: "$.getJSON"
     }, {
-        val: "$.getScript",
-        $: 1
+        val: "$.getScript"
     }, {
-        val: "$.post",
-        $: 1
+        val: "$.post"
     }, {
         val: "ajaxComplete",
         fn: 1
@@ -423,98 +424,123 @@ var jqdatas = [{
         val: "ajaxSuccess",
         fn: 1
     }, {
-        val: "$.ajaxSetup",
-        $: 1
+        val: "$.ajaxSetup"
     }, {
-        val: "serialize",
-        fn: 1
+        val: "$.serialize"
     }, {
-        val: "serializearray",
-        fn: 1
+        val: "$.serializearray"
     }]
 }, {
     title: "工具",
     props: [{
-        val: "$.support",
-        $: 1
+        val: "$.support"
     }, {
-        val: "$.browser",
-        $: 1
+        val: "$.browser"
     }, {
-        val: "$.browser.version",
-        $: 1
+        val: "$.browser.version"
     }, {
-        val: "$.boxModel",
-        $: 1
+        val: "$.boxModel"
     }, {
-        val: "$.each",
-        $: 1
+        val: "$.when"
     }, {
-        val: "$.extend",
-        $: 1
+        val: "$.each"
     }, {
-        val: "$.grep",
-        $: 1
+        val: "$.extend"
     }, {
-        val: "$.makearray",
-        $: 1
+        val: "$.grep"
     }, {
-        val: "$.map",
-        $: 1
+        val: "$.makearray"
     }, {
-        val: "$.inarray",
-        $: 1
+        val: "$.map"
     }, {
-        val: "$.toarray",
-        $: 1
+        val: "$.inarray"
     }, {
-        val: "$.merge",
-        $: 1
+        val: "$.toarray"
     }, {
-        val: "$.unique",
-        $: 1
+        val: "$.merge"
     }, {
-        val: "$.parseJSON",
-        $: 1
+        val: "$.unique"
     }, {
-        val: "$.noop",
-        $: 1
+        val: "$.parseJSON"
     }, {
-        val: "$.proxy",
-        $: 1
+        val: "$.noop"
     }, {
-        val: "$.contains",
-        $: 1
+        val: "$.proxy"
     }, {
-        val: "$.type",
-        $: 1
+        val: "$.contains"
     }, {
-        val: "$.isarray",
-        $: 1
+        val: "$.type"
     }, {
-        val: "$.isFunction",
-        $: 1
+        val: "$.isarray"
     }, {
-        val: "$.isEmptyObject",
-        $: 1
+        val: "$.isFunction"
     }, {
-        val: "$.isPlainObject",
-        $: 1
+        val: "$.isEmptyObject"
     }, {
-        val: "$.isWindow",
-        $: 1
+        val: "$.isPlainObject"
     }, {
-        val: "$.isNumeric",
-        $: 1
+        val: "$.isWindow"
     }, {
-        val: "$.trim",
-        $: 1
+        val: "$.isNumeric"
     }, {
-        val: "$.param",
-        $: 1
+        val: "$.trim"
     }, {
-        val: "$.error",
-        $: 1
+        val: "$.param"
+    }, {
+        val: "$.error"
+    }]
+}, {
+    title: "Deferred",
+    props: [{
+        val: "$.Deferred"
+    }, {
+        val: "notify",
+        is: "$.Deferred",
+        test: "$.Deferred().notify"
+    }, {
+        val: "notifyWith",
+        is: "$.Deferred",
+        test: "$.Deferred().notifyWith"
+    }, {
+        val: "resolve",
+        is: "$.Deferred",
+        test: "$.Deferred().resolve"
+    }, {
+        val: "resolveWith",
+        is: "$.Deferred",
+        test: "$.Deferred().resolveWith"
+    }, {
+        val: "reject",
+        is: "$.Deferred",
+        test: "$.Deferred().reject"
+    }, {
+        val: "rejectWith",
+        is: "$.Deferred",
+        test: "$.Deferred().rejectWith"
+    }, {
+        val: "progress",
+        is: "$.Deferred",
+        test: "$.Deferred().progress"
+    }, {
+        val: "done",
+        is: "$.Deferred",
+        test: "$.Deferred().done"
+    }, {
+        val: "fail",
+        is: "$.Deferred",
+        test: "$.Deferred().fail"
+    }, {
+        val: "always",
+        is: "$.Deferred",
+        test: "$.Deferred().always"
+    }, {
+        val: "state",
+        is: "$.Deferred",
+        test: "$.Deferred().state"
+    }, {
+        val: "promise",
+        is: "$.Deferred",
+        test: "$.Deferred().promise"
     }]
 }, {
     title: "jquery对象访问",
@@ -546,16 +572,15 @@ var jqdatas = [{
         val: "removeData",
         fn: 1
     }, {
-        val: "$.data",
-        $: 1
+        val: "$.data"
     }]
 }, {
     title: "插件机制",
     props: [{
-        val: "jQuery.fn.extend",
+        val: "$.fn.extend",
     }, {
-        val: "jQuery.extend",
+        val: "$.extend",
     }, {
-        val: "jQuery.noConflict",
+        val: "$.noConflict",
     }]
 }];

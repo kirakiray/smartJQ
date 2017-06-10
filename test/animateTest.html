@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>animate</title>
+    <script src="../src/smartjq.js"></script>
+    <!--<script src="jquery-3.1.1.js"></script>-->
+    <style>
+        .a {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+        }
+        
+        .testanime {
+            /*animation: testanime 2s cubic-bezier(0.66, 0.22, 0.41, 0.78);*/
+            animation: testanime 1.5s ease-in-out;
+            animation-fill-mode: forwards;
+        }
+        
+        @keyframes testanime {
+            0% {
+                width: 50px;
+                height: 50px;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width:400px;height:250px;">
+        <div class="a testanime"></div>
+    </div>
+
+    <div style="width:400px;height:250px;">
+        <div class="a" id="tar"></div>
+    </div>
+</body>
+<script>
+    // var a = $("#tar").animate({
+    //     width: 200,
+    //     height: 200
+    // }, 2500, "ease", function() {
+    //     console.log('结束了');
+    // });
+
+    // var a = $("#tar").animate({
+    //     width: 200
+    // }, 1000, function() {
+    //     console.log('结束了1');
+    // }).animate({
+    //     height: 200
+    // }, 1500, function() {
+    //     console.log('结束了2');
+    // });
+
+    // setTimeout(function() {
+    //     a.stop(1, 1);
+    // }, 500);
+
+
+
+
+
+    // var a = $('#tar').animate({
+    //     width: 200,
+    //     height: 200
+    // }, {
+    //     duration: 2500,
+    //     easing: "swing",
+    //     complete: function() {
+    //         console.log('完成了');
+    //     },
+    //     // progress: function() {
+    //     //     console.log(arguments);
+    //     // },
+    //     delay: 1000,
+    // });
+
+    // a.animate({
+    //     width: 400
+    // }, {
+    //     duration: 1000,
+    //     easing: "swing",
+    //     complete: function() {
+    //         console.log('完成了2');
+    //     },
+    //     delay: 1000,
+    // })
+
+
+
+    var a = $('#tar').animate({
+        width: 200
+    }, {
+        duration: 1500,
+        easing: "swing",
+        start: function() {
+            console.log(arguments);
+        }
+    }).animate({
+        height: 200
+    }, {
+        queue: false,
+        duration: 1000,
+        easing: "linear"
+    });
+
+    a.animate({
+        width: 400
+    }, {
+        duration: 1000,
+        easing: "swing"
+    });
+</script>
+
+</html>

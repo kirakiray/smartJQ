@@ -1,0 +1,88 @@
+body {
+    font-family: "Proxima Nova", "Helvetica Neue", Helvetica, "PingFang SC", "Microsoft YaHei", 微软雅黑, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.top_bar {
+    height: 60px;
+    line-height: 60px;
+    background-color: #000;
+}
+
+.top_bar .uk-navbar-nav {
+    margin: 10px 70px;
+    color: #666;
+}
+
+.top_bar .uk-navbar-nav li {
+    margin: 0 25px 0 0;
+}
+
+.top_bar .uk-navbar-nav li:hover>a {
+    background-color: transparent;
+    color: white;
+}
+
+.top_bar .uk-navbar-nav li.uk-active>a {
+    background-color: #2ba3d2;
+    color: white;
+}
+
+.top_bar .uk-navbar-nav li>a {
+    font-family: "Proxima Nova", "Helvetica Neue", Helvetica, "PingFang SC", "Microsoft YaHei", 微软雅黑, Arial, sans-serif;
+}
+
+.logo {
+    float: left;
+    color: #ccc;
+    font-size: 25px;
+    font-family: cursive;
+}
+
+.main {
+    margin-top: 30px;
+}
+
+.abcenter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@-webkit-keyframes square-spin {
+    25% {
+        -webkit-transform: perspective(100px) rotateX(180deg) rotateY(0);
+        transform: perspective(100px) rotateX(180deg) rotateY(0)
+    }
+    50% {
+        -webkit-transform: perspective(100px) rotateX(180deg) rotateY(180deg);
+        transform: perspective(100px) rotateX(180deg) rotateY(180deg)
+    }
+    75% {
+        -webkit-transform: perspective(100px) rotateX(0) rotateY(180deg);
+        transform: perspective(100px) rotateX(0) rotateY(180deg)
+    }
+    100% {
+        -webkit-transform: perspective(100px) rotateX(0) rotateY(0);
+        transform: perspective(100px) rotateX(0) rotateY(0)
+    }
+}
+
+@keyframes square-spin {
+    25% {
+        -webkit-transform: perspective(100px) rotateX(180deg) rotateY(0);
+        transform: perspective(100px) rotateX(180deg) rotateY(0)
+    }
+    50% {
+        -webkit-transform: perspective(100px) rotateX(180deg) rotateY(180deg);
+        transform: perspective(100px) rotateX(180deg) rotateY(180deg)
+    }
+    75% {
+        -webkit-transform: perspective(100px) rotateX(0) rotateY(180deg);
+        transform: perspective(100px) rotateX(0) rotateY(180deg)
+    }
+    100% {
+        -webkit-transform: perspective(100px) rotateX(0) rotateY(0);
+        transform: perspective(100px) rotateX(0) rotateY(0)
+    }
+}

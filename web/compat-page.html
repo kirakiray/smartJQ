@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryAPI检测</title>
+    <link rel="stylesheet" href="css/uikit.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/compat-page.css">
+    <script src="../src/smartjq.js"></script>
+    <!--<script src="../test/jquery-3.1.1.js"></script>-->
+    <style>
+        .dragin-area {
+            height: 600px;
+            margin-top: 60px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="top_bar">
+        <div class="uk-container uk-container-center">
+            <div class="logo">smartJQ</div>
+            <ul class="uk-navbar-nav uk-hidden-small">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="inneed-page.html">按需下载</a></li>
+                <li><a href="offjq-page.html">jQuery脱库</a></li>
+                <li class="uk-active"><a href="compat-page.html">jQueryAPI检测</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="uk-container uk-container-center">
+        <div class="dragin-area uk-block uk-block-muted abcenter">
+            <div>把jQuery、smartJQ、zepto、JSLite等类似的库拖拽到此处，查看他们对jQuery API的支持程度。</div>
+            <div><span style="color:#000;">黑色</span> 代表能使用</div>
+            <div><span class="uk-text-danger">红色</span> 代表不能使用</div>
+        </div>
+    </div>
+    <div class="open_tips" style="display:none;">
+        <div class="open_tips_in hasloading"></div>
+        <div class="open_tips_close">✕</div>
+    </div>
+</body>
+<script src="js/compat-page.js"></script>
+
+</html>

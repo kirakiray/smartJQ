@@ -74,12 +74,12 @@
             QUnit.test("css", function(assert) {
                 //测试获取样式
                 var t1f = $('.tar1_test1').css('font-size');
-                assert.ok(t1f == "13px", 'css get fontSize');
+                assert.ok(parseInt(t1f) == 13, 'css get fontSize');
 
                 //设置样式
                 $('.tar1_test2').css('font-size', "14px");
                 var t2f = $('.tar1_test2').css('font-size');
-                assert.ok((t2f == "14px"), 'css set fontSize');
+                assert.ok((parseInt(t2f) == 14), 'css set fontSize');
 
                 //object设置样式
                 $('.tar1_test3').css({
@@ -153,7 +153,7 @@
 
 
 
-    <div class="test_group" style="display:none;">
+    <div class="test_group">
         <input class="tar3a" type="checkbox" checked="checked">
         <input class="tar3a" type="checkbox" checked>
         <input class="tar3a_2" type="checkbox">
@@ -1011,14 +1011,14 @@
 
                 $('.tar17_con2_ele4').trigger('haha3');
             });
-            QUnit.test("event:preventDefault", function(assert) {
-                $('#tar17_link').on('click', function(e) {
-                    assert.ok(true, 'preventDefault ok');
-                    e.preventDefault();
-                });
+            // QUnit.test("event:preventDefault", function(assert) {
+            //     $('#tar17_link').on('click', function(e) {
+            //         assert.ok(true, 'preventDefault ok');
+            //         e.preventDefault();
+            //     });
 
-                $('#tar17_link').trigger('click');
-            });
+            //     $('#tar17_link').trigger('click');
+            // });
         </script>
     </div>
 

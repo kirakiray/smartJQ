@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>smartJQ 按需下载</title>
+    <link rel="stylesheet" href="css/uikit.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/inneed-page.css">
+    <script src="js/data.js"></script>
+    <script src="js/sr.js"></script>
+    <script src="../src/smartjq.js"></script>
+    <script src="js/inneed-page/main.js"></script>
+</head>
+
+<body>
+    <nav class="top_bar">
+        <div class="uk-container uk-container-center">
+            <div class="logo">smartJQ</div>
+            <ul class="uk-navbar-nav uk-hidden-small">
+                <li><a href="index.html">首页</a></li>
+                <li class="uk-active"><a href="">按需下载</a></li>
+                <li><a href="offjq-page.html">jQuery脱库</a></li>
+                <li><a href="compat-page.html">jQueryAPI检测</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="tishi_con uk-container uk-container-center">
+        <label><input type="checkbox" checked>选中</label>
+        <label><input type="checkbox">没选中</label>
+        <label class="will_select"><input type="checkbox">被依赖</label>
+        <label><input type="checkbox" disabled="disabled" checked>必选</label>
+        <label class="disable" style="color:#aaa"><input type="checkbox" disabled="disabled">不可选</label>
+        <div class="tishi_con_btns">
+            <button class="uk-button uk-button-primary" type="button" id="download_btn">下载</button>
+            <button class="uk-button uk-button-success" type="button" id="select_recommond">选中推荐</button>
+            <button class="uk-button uk-button-danger" type="button" id="select_cancel">取消所有选中</button>
+        </div>
+        <div class="tishi_text">
+            <span class="uk-text-primary">选中</span> 和 <span class="uk-text-primary">必选</span> 的方法，将会加入到smartJQ中；
+            <br> <span class="uk-text-danger">没选中</span> 和 <span class="uk-text-danger">不可选</span> 的方法，不会在smartJQ里出现；
+            <br> <span class="uk-text-success">被依赖</span> 的方法，无论你选没选中，都会出现在smartJQ里；
+            <br> <br> 根据需要选择，按右方的 <span class="uk-button uk-button-mini  uk-button-primary">下载</span> 下载 smartJQ
+
+        </div>
+    </div>
+    <div class="loading_page"></div>
+    <div class="main uk-container uk-container-center" style="display:none;">
+        <!--<div class="main uk-container uk-container-center">-->
+        <div class="uk-grid" id="main_list">
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+        </div>
+    </div>
+</body>
+
+</html>

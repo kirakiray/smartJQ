@@ -1,0 +1,70 @@
+.dragin-area {
+    flex-direction: column;
+}
+
+.open_tips {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .3);
+    z-index: 10;
+    animation: open_tips_anime ease.5s;
+}
+
+@keyframes open_tips_anime {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.open_tips_close {
+    position: absolute;
+    top: calc(2.5% + 60px);
+    right: 5%;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+}
+
+.open_tips_in {
+    position: absolute;
+    top: calc(2.5% + 60px);
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    background-color: white;
+}
+
+.open_tips_in iframe {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.open_tips_in.hasloading iframe {
+    opacity: 1;
+}
+
+.open_tips_in.hasloading:after {
+    display: block;
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+    width: 50px;
+    height: 50px;
+    background-color: #2ba3d2;
+    content: "";
+    z-index: 10;
+    animation: square-spin ease 3s infinite;
+}

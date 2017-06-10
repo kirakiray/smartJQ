@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <script src="js/sr.min.js"></script>
+    <link rel="stylesheet" href="css/uikit.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/inneed-page.css">
+</head>
+
+<body>
+    <div class="uk-grid" id="main_list" style="margin:30px auto;max-width:1000px">
+        <div class="uk-width-1-5"></div>
+        <div class="uk-width-1-5"></div>
+        <div class="uk-width-1-5"></div>
+        <div class="uk-width-1-5"></div>
+        <div class="uk-width-1-5"></div>
+    </div>
+    <script>
+        sr.config({
+            baseUrl: "js/"
+        });
+        window.addEventListener('message', function(e) {
+            var scriptText = e.data.scriptText;
+
+            //载入script
+            var script = document.createElement('script');
+            script.innerHTML = scriptText;
+            document.head.appendChild(script);
+            setTimeout(init, 500);
+        }, false);
+
+        var init = function() {
+            console.log('haha');
+            if (!window.$) {
+                document.body.innerHTML = "加载失败，请检查你拖拽的js文件";
+                document.body.style['height'] = "400px";
+                document.body.classList.add('abcenter');
+                return;
+            }
+            require('data').require('inneed-page/setCheck').done(function() {
+                Array.prototype.slice.call($('input[type=checkbox]')).forEach(function(e) {
+                    e.remove();
+                });
+                // $('input[type=checkbox]').remove();
+                // $('input[type=checkbox]').remove();
+
+                //改变颜色
+                Array.prototype.slice.call($('.f_item.disable')).forEach(function(e) {
+                    e.classList.remove('disable')
+                    e.classList.add('uk-text-danger');
+                });
+                // $('.f_item.disable').removeClass('disable').addClass('uk-text-danger');
+            });
+        };
+    </script>
+</body>
+
+</html>
