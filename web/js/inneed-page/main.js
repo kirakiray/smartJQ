@@ -176,10 +176,11 @@ require('inneed-page/setCheck', 'compatable').done(function() {
         }
     }
 
+    window.checkRely = checkRely;
+
     //获取依赖数据（smartJQTextData）的方法
     function findRelyData(pointDataStr, callback) {
         //获取相应的映射数据并进行设置依赖
-        // var pointDataStr = $(ele).data('point');
         var pointData = smartJQTextData[pointDataStr];
 
         //对应的依赖文件设置高亮
@@ -299,8 +300,10 @@ require('inneed-page/setCheck', 'compatable').done(function() {
             return respone.text();
         })
         .then(function(d) {
+            $('.loading_page').remove();
             init(d);
             initBtn(d);
+            $(window).trigger('main_ready');
         });
 
 

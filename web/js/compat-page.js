@@ -27,7 +27,7 @@ $('.open_tips_close').click(function() {
 
 //初始化
 function init(scriptText) {
-    var iframeEle = $('<iframe src="compat-inner.html"></iframe>');
+    var iframeEle = $('<iframe src="compat-page-inner.html"></iframe>');
 
     iframeEle.on('load', function() {
         iframeEle[0].contentWindow.postMessage({

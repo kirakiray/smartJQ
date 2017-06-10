@@ -85,3 +85,16 @@
     border: #cddfaf solid 1px;
     border-radius: 3px;
 }
+
+.loading_page:after {
+    display: block;
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+    width: 50px;
+    height: 50px;
+    background-color: #2ba3d2;
+    content: "";
+    z-index: 10;
+    animation: square-spin ease 3s infinite;
+}

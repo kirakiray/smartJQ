@@ -441,6 +441,8 @@ var jqdatas = [{
     }, {
         val: "$.boxModel"
     }, {
+        val: "$.when"
+    }, {
         val: "$.each"
     }, {
         val: "$.extend"

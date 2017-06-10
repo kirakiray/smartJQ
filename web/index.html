@@ -24,14 +24,25 @@
     </nav>
     <div class="uk-container uk-container-center">
         <article class="main_article uk-article">
-            <h2>什么是smartJQ？</h2>
+            <h2>什么是 smartJQ？</h2>
             <p>smartJQ 是 jQuery 的重构压缩版，在 jQuery API 的模型上，黑盒情况下制作的库；</p>
-            <p>兼容所有现代化的浏览器，因为不需要像jQuery一样对旧版本浏览器（IE10之前）兼容，所以体积更小；</p>
+            <p>兼容所有现代化的浏览器，因为不需要像 jQuery 一样对旧版本浏览器（IE10之前）兼容，所以体积小很多；</p>
             <p></p>
             <h2>应用场景</h2>
             <p>项目不考虑太旧的浏览器的兼容性（比如mobile web、整合性webview应用等），需要使用jQuery的场合，但又嫌弃jQuery体积太大的情况下，可以选用smartJQ；</p>
-            <p>相比zepto和JSLite实现jQuery半成品式的功能，smartJQ做到更完整的功能，</p>
-            <p>体积比zepto和JSLite都要小，并且具有更灵活方便的 自选rebuild 功能；</p>
+            <p>相比 zepto （JSLite等），smartJQ 覆盖更全的 jQuery API； </p>
+            <p>体积比 zepto 小，并且具有更灵活方便的
+                <a href="inneed-page.html">按需重构smartJQ</a> 功能；</p>
+            <h2>相对 zepto 的优势</h2>
+            <p>我们通常会使用 zepto 来代替 jQuery 做移动开发，因为zepto体积更精简；但是 zepto 相对 jQuery 有很多的不足；
+                <ul class="uk-list ">
+                    <li>特有的选择器的缺乏（:eq :odd :last 等等）</li>
+                    <li>事件和数据机制存在缺陷（api和 jQuery 有一定出入，例如clone没有提供深克隆等）</li>
+                    <li>缺乏 animate 方法（某些场景不能用 css3 animation 替代，例如滚动动画等）</li>
+                </ul>
+            </p>
+            <p class="uk-article-meta">插曲：作者本是想基于 jQuery 开发某个东西，但是 jQuery 太大，和在一起的大小超出预期；而 zepto 和 JSLite 的很多API存在缺陷，于是才有 smartJQ。</p>
+
             <h3>体积对比</h3>
             <table class="uk-table uk-table-hover uk-table-striped">
                 <caption>源文件大小会被注释影响，对比的是压缩混淆后的体积</caption>
@@ -52,7 +63,7 @@
                     </tr>
                     <tr>
                         <td style="color: #d05">smartJQ</td>
-                        <td>21,062 字节</td>
+                        <td>20,767 字节</td>
                     </tr>
                     <tr>
                         <td>zepto.js</td>
@@ -64,6 +75,10 @@
                     </tr>
                 </tbody>
             </table>
+            <h2>smartJQ 的定位</h2>
+            <p>smartJQ 的定位是 zepto 的替代品，和 zepto 是竞争关系，smartJQ 有的 zepto 不一定有，zepto 有的 smartJQ 做的比它更好；</p>
+            <p>smartJQ 和 jQuery 是互补关系；smartJQ 解决了 jQuery 的文件太大的问题，jQuery弥补了兼容性问题。</p>
+            <p>smartJQ 的生成实例，是通过扩展 Array.prototype 达到类jQuery的实例化的效果，所以 smartJQ 生成的对象不仅能使用jQuery API提供的方法，也能使用Array原生提供的方法。（考虑兼容性还是不要当成Array类型使用）</p>
         </article>
     </div>
 </body>

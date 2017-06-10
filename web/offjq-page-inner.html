@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <script src="js/data.js"></script>
+    <script src="js/sr.js"></script>
+    <script src="../src/smartjq.js"></script>
+    <script src="js/inneed-page/main.js"></script>
+</head>
+
+<body>
+    <div id="download_btn"></div>
+    <div class="main" style="display:none;">
+        <div class="uk-grid" id="main_list">
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+            <div class="uk-width-1-5"></div>
+        </div>
+    </div>
+</body>
+<script>
+    var data, is_ready;
+    var source;
+    window.addEventListener('message', function(e) {
+        data = e.data;
+        source = e.source;
+        if (is_ready) {
+            init();
+        }
+    }, false);
+
+    $(window).on('main_ready', function() {
+        is_ready = 1;
+        if (data) {
+            init();
+        }
+    });
+
+    function init() {
+        console.log('可以开始了', data);
+
+        //选中
+        $.each(data.$, function(k, v) {
+            $('[data-point="$.' + k + '"]').prop('checked', true);
+        });
+
+        $.each(data.$fn, function(k, v) {
+            $('[data-point="$.fn.' + k + '"]').prop('checked', true);
+        });
+
+        checkRely();
+
+        //下载
+        $('#download_btn').click();
+
+        source.postMessage('click_ok', source.location.href);
+    }
+</script>
+
+</html>
