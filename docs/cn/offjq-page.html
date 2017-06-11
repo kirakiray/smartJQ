@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>jQuery脱库</title>
-    <link rel="stylesheet" href="css/uikit.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/index.css">
-    <script src="../src/smartjq.js"></script>
-    <script src="js/offjq-page.js"></script>
+    <link rel="stylesheet" href="../css/uikit.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../../src/smartjq.js"></script>
+    <script src="../js/offjq-page.js"></script>
 </head>
 
 <body>
@@ -27,8 +27,9 @@
         <article class="main_article uk-article">
             <h2>什么是jQuery脱库？</h2>
             <p>就是让 <span style="color:#000;">jQuery插件</span> 脱离对 jQuery 的依赖。</p>
+            <p>你的项目初始时没考虑使用jQuery（例如使用 Angular 等为主框架的项目），但到了后期想用某个jQuery插件，又不想把这个jQuery打包进你的项目，这时候脱库是你的最佳选择； </p>
             <p>虽然叫 jQuery脱库，但也只是把插件需要 jQuery API 的部分单独拿出来再打包一个库。</p>
-            <p>需要用到另一个库，这次的主角是 <span class="uk-text-large uk-text-primary">recordjq.js</span>，和 smartJQ 在同一个目录。</p>
+            <p>需要用到另一个库，这次的主角是 <a href="../src/recordjq.js" target="_blank" class="uk-text-large uk-text-primary">recordjq.js</a>，和 smartJQ 在同一个目录。</p>
             <h2>如何使用 recordjq.js ？</h2>
             <p>
                 在jQuery后引入 recordjq.js，然后再引用你的插件；
