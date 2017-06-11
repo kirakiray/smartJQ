@@ -1,5 +1,5 @@
 sr.config({
-    baseUrl: "js/"
+    baseUrl: "../js/"
 });
 
 require('inneed-page/setCheck', 'compatable').done(function() {
@@ -295,7 +295,7 @@ require('inneed-page/setCheck', 'compatable').done(function() {
     };
 
     //获取js文件内容
-    fetch('../src/smartjq.js')
+    fetch('../../src/smartjq.js')
         .then(function(respone) {
             return respone.text();
         })
