@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;">
     <title>smartJQ</title>
     <link rel="stylesheet" href="../css/uikit.css">
     <link rel="stylesheet" href="../css/base.css">
@@ -57,7 +58,7 @@
                 </ul>
             </p>
             <p class="uk-article-meta">插曲：作者本是想基于 jQuery 开发某个框架（不考虑ie的框架），但是 jQuery 太大，和在一起的大小超出预期；而 zepto 和 JSLite 的很多API存在缺陷，于是才有 smartJQ。</p>
-
+            <p>而 smartJQ 补充了上面的缺陷。</p>
             <h3>体积对比</h3>
             <table class="uk-table uk-table-hover uk-table-striped">
                 <caption>源文件大小会被注释影响，对比的是压缩混淆后的体积</caption>
@@ -106,6 +107,8 @@
             <p><a target="_blank" href="https://github.com/stefanpenner/es6-promise">Promise</a></p>
             <h3>其他</h3>
             <p>smartJQ 没有编写<code>jQuery Callbacks API</code>，因为用的太少了；</p>
+            <p>smartJQ的 <code>animate</code> 方法，提供了 <span class="uk-text-primary">cubic-bezier</span> 支持，曲线部分你能使用 css3 动画中的动画曲线表达式（包括字符串形式 ease ease-in ease-in-out ease-out）；delay 方法嵌入到参数里了。</p>
+            <p>感谢 zepto 和 jQuery，smartJQ 部分参考了它们的代码，没有它们就没有 smartJQ；</p>
         </article>
     </div>
 </body>
