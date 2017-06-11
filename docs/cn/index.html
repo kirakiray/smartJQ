@@ -100,6 +100,7 @@
             <p>smartJQ 和 jQuery 是互补关系；smartJQ 解决了 jQuery 的文件太大的问题，jQuery弥补了兼容性问题。</p>
             <p>如果想要研究 jQuery 原理，可以来看看 smartJQ 源代码，没有兼容代码的累赘，相对代码量更少，核心代码少，灵活，通俗易懂；</p>
             <p>smartJQ 的生成实例，是通过扩展 Array.prototype 达到 类jQuery 的实例化的效果，所以 smartJQ 生成的对象不仅能使用jQuery API提供的方法，也能使用Array原生提供的方法。（考虑兼容性还是不要当成Array类型使用）</p>
+            <p>smartJQ 兼容 IE11 及以上（Edge）;</p>
             <h2>使用推荐</h2>
             <p>建议不启用 <code>$.ajax</code> 和 <code>$.Deferred</code>，推荐使用 <code>Fetch</code>或<code>XMLHttpRequest</code> 和 <code>Promise</code> 替代；</p>
             <p>兼容问题上可以 polyfill 解决： </p>
@@ -109,6 +110,7 @@
             <p>smartJQ 没有编写<code>jQuery Callbacks API</code>，因为用的太少了；</p>
             <p>smartJQ的 <code>animate</code> 方法，提供了 <span class="uk-text-primary">cubic-bezier</span> 支持，曲线部分你能使用 css3 动画中的动画曲线表达式（包括字符串形式 ease ease-in ease-in-out ease-out）；delay 方法嵌入到参数里了。</p>
             <p>感谢 zepto 和 jQuery，smartJQ 部分参考了它们的代码，没有它们就没有 smartJQ；</p>
+            <p>项目初期可能有测试不足的地方，若发现bug欢迎 <a href="https://github.com/kirakiray/smartJQ/issues/new" target="_blank">提交</a></p>
         </article>
     </div>
 </body>
