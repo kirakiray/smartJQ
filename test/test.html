@@ -201,7 +201,7 @@
             QUnit.test("html", function(assert) {
                 assert.ok($('.tar3b_ele1').html() == "<span>haha</span>", 'get html ok');
                 $('.tar3b_ele2').html('<span style="color:red;">haha2</span>');
-                assert.ok($('.tar3b_ele2').html() == '<span style="color:red;">haha2</span>', 'set html ok');
+                assert.ok($('.tar3b_ele2').html().replace(': ', ":") == '<span style="color:red;">haha2</span>', 'set html ok');
                 $('.tar3b_ele3').html(function(i, html) {
                     return html + "__" + i;
                 });

@@ -541,6 +541,8 @@
         val: function(vals) {
             //@use---$.fn.prop
             switch (getType(vals)) {
+                case STR_string:
+                    vals = [vals];
                 case "array":
                     var mapvals = function(option) {
                         arrayEach(vals, function(val) {
