@@ -1010,7 +1010,7 @@
                         }
                         smartData = prototypeObj._ge(tar, SMARTKEY);
 
-                        return smartData[name] || tar.dataset[name];
+                        return smartData[name] || (tar.dataset && tar.dataset[name]) || tar.getAttribute('data-' + name);
                     } else {
                         arrayEach(this, function(tar) {
                             smartData = prototypeObj._ge(tar, SMARTKEY);
