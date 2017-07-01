@@ -268,8 +268,8 @@
     };
 
     //main
-    function smartJQ(arg1, arg2) {
-        this.init(arg1, arg2);
+    function smartJQ(selector, context) {
+        return this.init(selector, context);
     };
 
     var prototypeObj = Object.create(Array.prototype);
@@ -318,23 +318,19 @@
                     this.push(arg1);
                 }
         }
+        return this;
     }
-
-    smartJQ.fn = smartJQ.prototype = prototypeObj;
 
     //init
     var $ = function(selector, context) {
-        if (selector instanceof smartJQ) {
-            return selector;
-        }
         if (!selector) {
             return $([]);
         }
         return new smartJQ(selector, context);
     };
-    $.fn = $.prototype = smartJQ.fn;
+    $.fn = $.prototype = smartJQ.fn = smartJQ.prototype = prototypeObj;
 
-    glo.smartJQ = glo.$ = $;
+    glo.$ = $;
 
     //在$上的方法
     //随框架附赠的方法
@@ -573,6 +569,9 @@
                     return this;
                 case STR_undefined:
                     var tar = this[0];
+                    if (!tar) {
+                        return;
+                    }
                     if (tar.multiple) {
                         var rearr = [];
                         arrayEach(tar, function(e) {
