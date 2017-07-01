@@ -298,6 +298,8 @@
                                 }
                             });
                         });
+                    } else if (arg2 instanceof Element) {
+                        eles = findEles(arg2, arg1);
                     } else if (!arg2) {
                         eles = findEles(document, arg1);
                     }
@@ -331,6 +333,7 @@
     $.fn = $.prototype = smartJQ.fn = smartJQ.prototype = prototypeObj;
 
     glo.$ = $;
+    // glo.smartJQ = smartJQ;
 
     //在$上的方法
     //随框架附赠的方法
@@ -460,7 +463,8 @@
             switch (getType(name)) {
                 case STR_string:
                     if (value == UNDEFINED) {
-                        return _this[0].getAttribute(name);
+                        var tar = _this[0];
+                        return tar.getAttribute && tar.getAttribute(name);
                     } else {
                         arrayEach(_this, function(tar) {
                             tar.setAttribute(name, value);
