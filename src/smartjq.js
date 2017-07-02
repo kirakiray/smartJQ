@@ -342,7 +342,7 @@
     //@must---$.merge
     //@must---$.type
     extend($, {
-        // expando: SMARTKEY,
+        expando: SMARTKEY,
         extend: extend,
         makearray: makeArray,
         merge: merge,
