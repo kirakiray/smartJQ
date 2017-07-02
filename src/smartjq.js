@@ -262,7 +262,7 @@
     var transToEles = function(str) {
         var par = document.createElement('div');
         par.innerHTML = str;
-        var ch = makeArray(par.children);
+        var ch = makeArray(par.childNodes);
         par.innerHTML = "";
         return ch;
     };
