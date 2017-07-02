@@ -1369,7 +1369,7 @@
 
     extend($, {
         each: function(obj, func) {
-            if (obj.length && getType(obj) != STR_function) {
+            if ("length" in obj && getType(obj) != STR_function) {
                 return arrayEach(obj, function(e, i) {
                     func(i, e);
                 });
