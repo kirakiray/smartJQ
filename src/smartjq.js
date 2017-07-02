@@ -610,7 +610,10 @@
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
             targets = $(targets);
-            ele = $(ele);
+            // ele = $(ele);
+            if (getType(ele) == "string") {
+                ele = [document.createTextNode(ele)];
+            }
             //最后的id
             var lastid = targets.length - 1;
 
@@ -681,6 +684,7 @@
         },
         replaceWith: function(newContent) {
             //@use---$.fn.before
+            newContent = $(newContent);
             return this.before(newContent).remove();
         },
         replaceAll: function(tar) {
