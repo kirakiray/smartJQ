@@ -612,7 +612,7 @@
             targets = $(targets);
             // ele = $(ele);
             if (getType(ele) == "string") {
-                ele = $(transToEles(ele));
+                ele = transToEles(ele);
             }
             //最后的id
             var lastid = targets.length - 1;
