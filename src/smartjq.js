@@ -262,14 +262,14 @@
     var transToEles = function(str) {
         var par = document.createElement('div');
         par.innerHTML = str;
-        var ch = makeArray(par.children);
+        var ch = makeArray(par.childNodes);
         par.innerHTML = "";
         return ch;
     };
 
     //main
-    function smartJQ(arg1, arg2) {
-        this.init(arg1, arg2);
+    function smartJQ(selector, context) {
+        return this.init(selector, context);
     };
 
     var prototypeObj = Object.create(Array.prototype);
@@ -298,6 +298,8 @@
                                 }
                             });
                         });
+                    } else if (arg2 instanceof Element) {
+                        eles = findEles(arg2, arg1);
                     } else if (!arg2) {
                         eles = findEles(document, arg1);
                     }
@@ -318,23 +320,20 @@
                     this.push(arg1);
                 }
         }
+        return this;
     }
-
-    smartJQ.fn = smartJQ.prototype = prototypeObj;
 
     //init
     var $ = function(selector, context) {
-        if (selector instanceof smartJQ) {
-            return selector;
-        }
         if (!selector) {
             return $([]);
         }
         return new smartJQ(selector, context);
     };
-    $.fn = $.prototype = smartJQ.fn;
+    $.fn = $.prototype = smartJQ.fn = smartJQ.prototype = prototypeObj;
 
-    glo.smartJQ = glo.$ = $;
+    glo.$ = $;
+    // glo.smartJQ = smartJQ;
 
     //在$上的方法
     //随框架附赠的方法
@@ -343,7 +342,7 @@
     //@must---$.merge
     //@must---$.type
     extend($, {
-        // expando: SMARTKEY,
+        expando: SMARTKEY,
         extend: extend,
         makearray: makeArray,
         merge: merge,
@@ -464,7 +463,8 @@
             switch (getType(name)) {
                 case STR_string:
                     if (value == UNDEFINED) {
-                        return _this[0].getAttribute(name);
+                        var tar = _this[0];
+                        return tar.getAttribute && tar.getAttribute(name);
                     } else {
                         arrayEach(_this, function(tar) {
                             tar.setAttribute(name, value);
@@ -573,6 +573,9 @@
                     return this;
                 case STR_undefined:
                     var tar = this[0];
+                    if (!tar) {
+                        return;
+                    }
                     if (tar.multiple) {
                         var rearr = [];
                         arrayEach(tar, function(e) {
@@ -607,7 +610,10 @@
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
             targets = $(targets);
-            ele = $(ele);
+            // ele = $(ele);
+            if (getType(ele) == "string") {
+                ele = transToEles(ele);
+            }
             //最后的id
             var lastid = targets.length - 1;
 
@@ -678,6 +684,7 @@
         },
         replaceWith: function(newContent) {
             //@use---$.fn.before
+            newContent = $(newContent);
             return this.before(newContent).remove();
         },
         replaceAll: function(tar) {
@@ -1380,7 +1387,7 @@
         //     return JSON.parse(str);
         // },
         each: function(obj, func) {
-            if (obj.length && getType(obj) != STR_function) {
+            if ("length" in obj && getType(obj) != STR_function) {
                 return arrayEach(obj, function(e, i) {
                     func(i, e);
                 });
