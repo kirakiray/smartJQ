@@ -684,7 +684,7 @@
         },
         replaceWith: function(newContent) {
             //@use---$.fn.before
-            newContent = $(newContent);
+            // newContent = $(newContent);
             return this.before(newContent).remove();
         },
         replaceAll: function(tar) {
