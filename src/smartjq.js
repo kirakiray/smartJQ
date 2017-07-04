@@ -316,6 +316,8 @@
                     return arg1;
                 } else if (arg1 instanceof Array) {
                     merge(this, arg1);
+                } else if (!arg1) {
+                    return $([]);
                 } else {
                     this.push(arg1);
                 }
@@ -325,9 +327,9 @@
 
     //init
     var $ = function(selector, context) {
-        if (!selector) {
-            return $([]);
-        }
+        // if (!selector) {
+        //     return $([]);
+        // }
         return new smartJQ(selector, context);
     };
     $.fn = $.prototype = smartJQ.fn = smartJQ.prototype = prototypeObj;
@@ -610,15 +612,29 @@
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
             targets = $(targets);
-            // ele = $(ele);
-            if (getType(ele) == "string") {
+            var ele_type = getType(ele);
+            if (ele_type == "string") {
                 ele = transToEles(ele);
+            } else if (ele instanceof Element) {
+                ele = [ele];
+            } else if (ele_type == STR_function) {
+                arrayEach(targets, function(tar, i) {
+                    var reobj = ele.call(tar, i, tar.innerHTML);
+                    if (getType(reobj) == STR_string) {
+                        reobj = transToEles(reobj);
+                        arrayEach(reobj, function(e) {
+                            func(e, tar);
+                        });
+                    };
+                });
+                return;
             }
+
             //最后的id
             var lastid = targets.length - 1;
 
-            arrayEach(ele, function(e) {
-                arrayEach(targets, function(tar, i) {
+            arrayEach(targets, function(tar, i) {
+                arrayEach(ele, function(e) {
                     if (i == lastid) {
                         func(e, tar);
                     } else {
@@ -684,7 +700,6 @@
         },
         replaceWith: function(newContent) {
             //@use---$.fn.before
-            newContent = $(newContent);
             return this.before(newContent).remove();
         },
         replaceAll: function(tar) {
@@ -694,50 +709,41 @@
             return this;
         },
         wrap: function(val) {
-            var valtype = getType(val);
-            arrayEach(this, function(tar, i) {
-                var reval = val;
-                if (valtype == STR_function) {
-                    reval = val.call(tar, i);
-                }
-                if (reval) {
-                    reval = $(reval)[0];
-                    tar.parentNode.insertBefore(reval, tar);
-                    reval.appendChild(tar);
-                }
+            //@use---$.fn._ec
+            prototypeObj._ec(val, this, function(e, tar) {
+                tar.parentNode.insertBefore(e, tar);
+                e.appendChild(tar);
             });
+            return this;
         },
         unwrap: function() {
             //@use---$.fn.parent
             //@use---$.fn.replaceWith
+            //@use---$.fn.each
             this.parent().each(function(i, tar) {
                 $(tar).replaceWith(makeArray(this.childNodes))
             })
             return this
         },
-        wrapAll: function(structure) {
-            //@use---$.fn.children
-            if (this[0]) {
-                $(this[0]).before(structure = $(structure))
-                var children
-                while ((children = structure.children()).length) structure = $(children[0])
-                $(structure).append(this)
-            }
-            return this
-        },
-        wrapInner: function(content) {
+        wrapAll: function(val) {
+            //@use---$.fn.before
             //@use---$.fn.append
-            return arrayEach(this, function(tar, i) {
-                var c = content;
-                if (getType(content) == STR_function) {
-                    c = content.call(tar, i);
-                }
-                c = $(c)[0];
-                arrayEach(tar.childNodes, function(tar) {
-                    c.appendChild(tar);
+            //在第一个前面添加该元素
+            if (this[0]) {
+                $(this[0]).before(val = $(val));
+                arrayEach(this, function(e) {
+                    val.append(e);
                 });
-                // c = $(c).append(makeArray(tar.childNodes));
-                tar.appendChild(c);
+            }
+            return this;
+        },
+        wrapInner: function(val) {
+            //@use---$.fn._ec
+            prototypeObj._ec(val, this, function(e, tar) {
+                arrayEach(tar.childNodes, function(e2) {
+                    e.appendChild(e2);
+                    tar.appendChild(e);
+                });
             });
         },
         empty: function() {
