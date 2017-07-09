@@ -654,7 +654,7 @@
         },
         appendTo: function(tars) {
             //@use---$.fn.append
-            this.append.call(tars, this);
+            this.append.call($(tars), this);
             return this;
         },
         prepend: function(ele) {
@@ -666,7 +666,7 @@
         },
         prependTo: function(tars) {
             //@use---$.fn.prepend
-            this.prepend.call(tars, this);
+            this.prepend.call($(tars), this);
             return this;
         },
         after: function(ele) {
@@ -683,7 +683,7 @@
         },
         insertAfter: function(tars) {
             //@use---$.fn.after
-            this.after.call(tars, this);
+            this.after.call($(tars), this);
             return this;
         },
         before: function(ele) {
@@ -695,7 +695,7 @@
         },
         insertBefore: function(tars) {
             //@use---$.fn.before
-            this.before.call(tars, this);
+            this.before.call($(tars), this);
             return this;
         },
         replaceWith: function(newContent) {
