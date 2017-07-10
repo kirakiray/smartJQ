@@ -554,8 +554,10 @@
                             }
                             if ("selected" in option) {
                                 option.selected = bool;
-                            } else if ("checked" in option) {
+                            } else if ("checked" in option && (option.type == "checkbox" || option.type == "radio")) {
                                 option.checked = bool;
+                            } else {
+                                option.value = val;
                             }
                             if (bool) {
                                 return false;
