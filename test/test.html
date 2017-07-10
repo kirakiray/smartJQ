@@ -250,6 +250,7 @@
             <input type="checkbox" value="check2" /> check2<br>
             <input type="radio" value="radio1" /> radio1<br>
             <input type="radio" value="radio2" /> radio2<br>
+            <input type="text" id="tar3d_textinput">
         </div>
         <script>
             QUnit.test("val", function(assert) {
@@ -262,6 +263,9 @@
                 assert.ok($("#tar3d_multiple").val().toString() == ["Multiple2", "Multiple3"].toString(), 'Multiple2 select val ok');
                 assert.ok($('#tar3d [type=checkbox]').eq(1).prop('checked'), 'checkbox ok');
                 assert.ok($('#tar3d [type=radio]').eq(0).prop('checked'), 'radio ok');
+
+                $('#tar3d_textinput').val('hahahahahahaha');
+                assert.ok($("#tar3d_textinput").val() == "hahahahahahaha", 'value ok');
             });
         </script>
     </div>
