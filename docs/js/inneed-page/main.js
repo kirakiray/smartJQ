@@ -7,7 +7,7 @@ require('inneed-page/setCheck', 'compatable').done(function() {
     window.exportMethodsDatas = [];
 
     //总体数据映射
-    var smartJQTextData = {};
+    smartJQTextData = {};
 
     $('#main_list').on("change", 'input', function(e) {
         //点解选中后，查看页面是否有同样名的也勾选上（主要解决is勾选）
@@ -115,7 +115,9 @@ require('inneed-page/setCheck', 'compatable').done(function() {
         });
 
         //在fn上的
-        $.each($.fn, function(k, v) {
+        var k, v;
+        for (k in $.fn) {
+            v = $.fn[k];
             var intext = $.fn[k].toString();
             var relydata = findRely(intext);
 
@@ -126,7 +128,8 @@ require('inneed-page/setCheck', 'compatable').done(function() {
                     rely: relydata
                 };
             }
-        });
+        }
+        // $.each($.fn, function(k, v) {});
 
         console.log(smartJQTextData);
     };
