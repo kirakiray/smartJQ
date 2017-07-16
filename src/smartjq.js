@@ -613,7 +613,7 @@
         },
         //添加元素公用的方法
         _ec: function(ele, targets, func) {
-            targets = $(targets);
+            // targets = $(targets);
             var ele_type = getType(ele);
             if (ele_type == "string") {
                 ele = transToEles(ele);
@@ -744,8 +744,8 @@
             prototypeObj._ec(val, this, function(e, tar) {
                 arrayEach(tar.childNodes, function(e2) {
                     e.appendChild(e2);
-                    tar.appendChild(e);
                 });
+                tar.appendChild(e);
             });
         },
         empty: function() {
@@ -1223,7 +1223,7 @@
                         //没有阻止冒泡就继续往上触发
                         if (!event.cancelBubble) {
                             var parentNode = ele.parentNode;
-                            if (parentNode != document) { popTriggerEle(parentNode); }
+                            if (parentNode && parentNode != document) { popTriggerEle(parentNode); }
                         }
                     };
 
