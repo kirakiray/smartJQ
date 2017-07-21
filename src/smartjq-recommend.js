@@ -720,12 +720,18 @@
         },
         unwrap: function() {
             //@use---$.fn.parent
-            //@use---$.fn.replaceWith
-            //@use---$.fn.each
-            this.parent().each(function(i, tar) {
-                $(tar).replaceWith(makeArray(this.childNodes))
-            })
-            return this
+            //@use---$.fn.after
+            //@use---$.fn.remove
+            var arr = [];
+            arrayEach(this, function(e) {
+                var par = $(e).parent();
+                par.after(e);
+                if (arr.indexOf(par[0]) == -1) {
+                    arr.push(par[0]);
+                }
+            });
+            $(arr).remove();
+            return this;
         },
         wrapAll: function(val) {
             //@use---$.fn.before
