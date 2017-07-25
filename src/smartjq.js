@@ -223,8 +223,11 @@
                 }
             }
         } else {
-            //没有的话直接查找元素
-            if (owner.length) {
+            //是否是Text节点
+            if (owner instanceof Text) {
+                redata = [owner];
+            } else if (owner.length && owner instanceof Element) {
+                //没有的话直接查找元素
                 owner.forEach(function(e) {
                     merge(redata, findEles(e, expr));
                 });
@@ -469,14 +472,14 @@
                         return tar.getAttribute && tar.getAttribute(name);
                     } else {
                         arrayEach(_this, function(tar) {
-                            tar.setAttribute(name, value);
+                            tar.setAttribute && tar.setAttribute(name, value);
                         });
                     }
                     break;
                 case STR_object:
                     objEach(name, function(k, v) {
                         arrayEach(_this, function(tar) {
-                            tar.setAttribute(k, v);
+                            tar.setAttribute && tar.setAttribute(k, v);
                         });
                     });
                     break
