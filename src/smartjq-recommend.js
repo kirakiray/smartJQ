@@ -45,7 +45,7 @@
     var objEach = function(obj, func) {
         var i;
         for (i in obj) {
-            if (func(i, obj[i]) == false) {
+            if (func(i, obj[i]) === false) {
                 break;
             };
         }
@@ -91,7 +91,7 @@
                 break;
             case ":hidden":
                 beforeData.forEach(function(e) {
-                    if (getComputedStyle(e).display == "none" || e.type == "hidden") {
+                    if (getComputedStyle(e).display === "none" || e.type === "hidden") {
                         redata.push(e);
                     }
                 });
@@ -190,9 +190,9 @@
                         } else if (e.search(/\)/) > -1) {
                             nCount--;
                         }
-                        if (nAction == 1 && !nCount) {
+                        if (nAction === 1 && !nCount) {
                             nAction = 2;
-                        } else if (nAction == 2) {
+                        } else if (nAction === 2) {
                             afterStr += e;
                         } else {
                             targetStr += e;
@@ -204,7 +204,7 @@
                 var ruleInEle = findEles(owner, beforestr);
                 var ruleOutEle = findEles(owner, beforestr + targetStr);
                 ruleInEle.forEach(function(e) {
-                    ruleOutEle.indexOf(e) == -1 && redata.push(e);
+                    ruleOutEle.indexOf(e) === -1 && redata.push(e);
                 }, this);
 
                 //查找后续元素
@@ -254,7 +254,7 @@
     //判断元素是否符合条件
     var judgeEle = function(ele, expr) {
         var fadeParent = document.createElement('div');
-        if (ele == document) {
+        if (ele === document) {
             return false;
         }
         fadeParent.appendChild(ele.cloneNode(false));
@@ -290,13 +290,13 @@
                     //查找元素
                     var eles = [];
                     var arg2type = getType(arg2);
-                    if (arg2type == STR_string) {
+                    if (arg2type === STR_string) {
                         //参数2有的情况下
                         var parnodes = findEles(document, arg2);
                         arrayEach(parnodes, function(e) {
                             var tareles = findEles(e, arg1);
                             arrayEach(tareles, function(e) {
-                                if (eles.indexOf(e) == -1) {
+                                if (eles.indexOf(e) === -1) {
                                     eles.push(e);
                                 }
                             });
@@ -360,21 +360,21 @@
         //设置样式
         css: function(name, value) {
             //第一个是对象类型
-            if (getType(name) == STR_object) {
+            if (getType(name) === STR_object) {
                 arrayEach(this, function(e) {
                     objEach(name, function(n, v) {
                         var psv = parseFloat(v);
-                        if (psv && psv == v) {
+                        if (psv && psv === v) {
                             v += "px";
                         }
                         e.style[n] = v;
                     });
                 });
-            } else if (getType(name) == STR_string && value != UNDEFINED) {
+            } else if (getType(name) === STR_string && value != UNDEFINED) {
                 arrayEach(this, function(e) {
                     e.style[name] = value;
                 });
-            } else if (getType(name) == STR_string && !value) {
+            } else if (getType(name) === STR_string && !value) {
                 return getComputedStyle(this[0])[name];
             }
             return this;
@@ -412,7 +412,7 @@
             };
         },
         _sc: function(key, val) {
-            return val == UNDEFINED ? this[0][key] : arrayEach(this, function(tar) {
+            return val === UNDEFINED ? this[0][key] : arrayEach(this, function(tar) {
                 tar[key] = val;
             });
         },
@@ -467,7 +467,7 @@
             var _this = this;
             switch (getType(name)) {
                 case STR_string:
-                    if (value == UNDEFINED) {
+                    if (value === UNDEFINED) {
                         var tar = _this[0];
                         return tar.getAttribute && tar.getAttribute(name);
                     } else {
@@ -494,10 +494,10 @@
         prop: function(name, value) {
             switch (getType(name)) {
                 case STR_string:
-                    if (value == UNDEFINED) {
+                    if (value === UNDEFINED) {
                         var tar = this[0];
                         return tar[name];
-                    } else if (getType(value) == STR_function) {
+                    } else if (getType(value) === STR_function) {
                         arrayEach(this, function(e, i) {
                             var revalue = value.call(e, i, e[name]);
                             (revalue != UNDEFINED) && (e[name] = revalue);
@@ -552,12 +552,12 @@
                     var mapvals = function(option) {
                         arrayEach(vals, function(val) {
                             var bool = false;
-                            if (option.value == val) {
+                            if (option.value === val) {
                                 bool = true;
                             }
                             if ("selected" in option) {
                                 option.selected = bool;
-                            } else if ("checked" in option && (option.type == "checkbox" || option.type == "radio")) {
+                            } else if ("checked" in option && (option.type === "checkbox" || option.type === "radio")) {
                                 option.checked = bool;
                             } else {
                                 option.value = val;
@@ -618,14 +618,14 @@
         _ec: function(ele, targets, func) {
             // targets = $(targets);
             var ele_type = getType(ele);
-            if (ele_type == "string") {
+            if (ele_type === "string") {
                 ele = transToEles(ele);
             } else if (ele instanceof Element) {
                 ele = [ele];
-            } else if (ele_type == STR_function) {
+            } else if (ele_type === STR_function) {
                 arrayEach(targets, function(tar, i) {
                     var reobj = ele.call(tar, i, tar.innerHTML);
-                    if (getType(reobj) == STR_string) {
+                    if (getType(reobj) === STR_string) {
                         reobj = transToEles(reobj);
                         arrayEach(reobj, function(e) {
                             func(e, tar);
@@ -640,7 +640,7 @@
 
             arrayEach(targets, function(tar, i) {
                 arrayEach(ele, function(e) {
-                    if (i == lastid) {
+                    if (i === lastid) {
                         func(e, tar);
                     } else {
                         func(e.cloneNode(true), tar);
@@ -678,7 +678,7 @@
             //@use---$.fn._ec
             prototypeObj._ec(ele, this, function(e, tar) {
                 var parnode = tar.parentNode;
-                if (parnode.lastChild == tar) {
+                if (parnode.lastChild === tar) {
                     parnode.appendChild(e);
                 } else {
                     parnode.insertBefore(e, tar.nextSibling);
@@ -729,7 +729,7 @@
             arrayEach(this, function(e) {
                 var par = $(e).parent();
                 par.after(e);
-                if (arr.indexOf(par[0]) == -1) {
+                if (arr.indexOf(par[0]) === -1) {
                     arr.push(par[0]);
                 }
             });
@@ -838,12 +838,12 @@
                     if (expr instanceof smartJQ) {
                         arrayEach(this, function(e) {
                             arrayEach(expr, function(tar) {
-                                (e == tar) && arr.push(e);
+                                (e === tar) && arr.push(e);
                             });
                         });
                     } else if (expr.nodeType) {
                         arrayEach(this, function(e) {
-                            (e == expr) && arr.push(e);
+                            (e === expr) && arr.push(e);
                         });
                     }
             }
@@ -889,11 +889,11 @@
                 var nextEle = tar[key];
                 if (nextEle) {
                     if (lastExpr) {
-                        if ((getType(lastExpr) == STR_string && judgeEle(nextEle, lastExpr)) || lastExpr == nextEle || (lastExpr instanceof Array && lastExpr.indexOf(nextEle) > -1)) {
+                        if ((getType(lastExpr) === STR_string && judgeEle(nextEle, lastExpr)) || lastExpr === nextEle || (lastExpr instanceof Array && lastExpr.indexOf(nextEle) > -1)) {
                             return;
                         }
                     }
-                    if ((!filter || judgeEle(nextEle, filter)) && arr.indexOf(nextEle) == -1) {
+                    if ((!filter || judgeEle(nextEle, filter)) && arr.indexOf(nextEle) === -1) {
                         arr.push(nextEle);
                     }
                     getEle(nextEle);
@@ -942,17 +942,17 @@
             //@use---$.fn.map
             var _this = this;
             return this.parent().children(expr).map(function() {
-                if (_this.indexOf(this) == -1) return this
+                if (_this.indexOf(this) === -1) return this
             });
         },
         find: function(arg) {
             //@use---$.fn.parentsUntil
             var eles = [];
-            if (getType(arg) == STR_string) {
+            if (getType(arg) === STR_string) {
                 arrayEach(this, function(e) {
                     var arr = findEles(e, arg);
                     arrayEach(arr, function(e) {
-                        if (eles.indexOf(e) == -1) {
+                        if (eles.indexOf(e) === -1) {
                             eles.push(e);
                         }
                     });
@@ -995,7 +995,7 @@
             } else if (ele instanceof smartJQ) {
                 tar = ele[0];
                 owner = this;
-            } else if (getType(ele) == STR_string) {
+            } else if (getType(ele) === STR_string) {
                 tar = this[0];
                 owner = $(ele);
             }
@@ -1027,7 +1027,7 @@
             var smartData;
             switch (getType(name)) {
                 case STR_string:
-                    if (value == UNDEFINED) {
+                    if (value === UNDEFINED) {
                         var tar = this[0];
                         if (!tar) {
                             return;
@@ -1130,8 +1130,8 @@
             //@use---$.Event
             var selectors, data, _this = this;
 
-            if (getType(arg1) == STR_object) {
-                if (getType(arg2) == STR_string) {
+            if (getType(arg1) === STR_object) {
+                if (getType(arg2) === STR_string) {
                     selectors = arg2;
                     data = arg3;
                 } else {
@@ -1152,7 +1152,7 @@
                     break;
                 case STR_string:
                     selectors = arg2;
-                    if (getType(arg3) == STR_function) {
+                    if (getType(arg3) === STR_function) {
                         callback = arg3;
                     } else {
                         data = arg3;
@@ -1266,18 +1266,18 @@
                             var smartEventData_eventName = smartEventData[eventName];
                             if (!selector) {
                                 delete smartEventData[eventName];
-                            } else if (arg2Type == STR_function) {
+                            } else if (arg2Type === STR_function) {
                                 smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
-                                    return e.f == selector ? 0 : 1;
+                                    return e.f === selector ? 0 : 1;
                                 });
-                            } else if (arg2Type == STR_string) {
+                            } else if (arg2Type === STR_string) {
                                 if (!fn) {
                                     smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
-                                        return e.s == selector ? 0 : 1;
+                                        return e.s === selector ? 0 : 1;
                                     });
                                 } else {
                                     smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
-                                        return (e.s == selector && e.f == fn) ? 0 : 1;
+                                        return (e.s === selector && e.f === fn) ? 0 : 1;
                                     });
                                 }
                             }
@@ -1366,7 +1366,7 @@
         add: function(expr, content) {
             var $this = this;
             arrayEach($(expr, content), function(e) {
-                if ($this.indexOf(e) == -1) {
+                if ($this.indexOf(e) === -1) {
                     $this.push(e);
                 }
             });
@@ -1440,7 +1440,7 @@
                 } else if (e._tasks) {
                     //拥有_task属性（animate之类的）
                     e._task.push(okfun);
-                } else if (typeof e == STR_object) {
+                } else if (typeof e === STR_object) {
                     //自带对象
                     datas[i] = e;
                     setTimeout(okfun, 0);
@@ -1486,7 +1486,7 @@
     //主体event对象
     $.Event.prototype = {
         isDefaultPrevented: function() {
-            return this.returnValue == false;
+            return this.returnValue === false;
         },
         isPropagationStopped: function() {
             return this.cancelBubble;
@@ -1555,7 +1555,7 @@
         switch (getType(arg2)) {
             case "number":
                 animateTime = arg2
-                if (getType(arg3) == STR_string) {
+                if (getType(arg3) === STR_string) {
                     easing = arg3
                     callback = arg4;
                 } else {
@@ -1623,7 +1623,7 @@
             //筛选到最后，使用盛金公式法求解t
             //区间在0-1之间，t绝对不会出现负数或大于1的情况
             getFrame = function(tt) {
-                if (tt == 0 || tt == 1) {
+                if (tt === 0 || tt === 1) {
                     return tt;
                 }
                 var a = 1 + 3 * p1x - 3 * p2x;
