@@ -496,6 +496,9 @@
                 case STR_string:
                     if (value === UNDEFINED) {
                         var tar = this[0];
+                        if (!tar) {
+                            return UNDEFINED;
+                        }
                         return tar[name];
                     } else if (getType(value) === STR_function) {
                         arrayEach(this, function(e, i) {
