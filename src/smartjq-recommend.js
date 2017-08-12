@@ -321,8 +321,11 @@
                     merge(this, arg1);
                 } else if (!arg1) {
                     return $([]);
-                } else {
+                } else if (!arg2) {
                     this.push(arg1);
+                } else if (arg2) {
+                    eles = findEles(arg1, arg2);
+                    merge(this, eles);
                 }
         }
         return this;
