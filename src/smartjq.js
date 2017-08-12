@@ -9,6 +9,7 @@
     var STR_object = "object";
     var STR_undefined = "undefined";
     var UNDEFINED = undefined;
+    var DOCUMENT = document;
 
     //function
     var arrlyslice = Array.prototype.slice;
@@ -253,8 +254,8 @@
 
     //判断元素是否符合条件
     var judgeEle = function(ele, expr) {
-        var fadeParent = document.createElement('div');
-        if (ele === document) {
+        var fadeParent = DOCUMENT.createElement('div');
+        if (ele === DOCUMENT) {
             return false;
         }
         fadeParent.appendChild(ele.cloneNode(false));
@@ -263,7 +264,7 @@
 
     //转换字符串到html对象
     var transToEles = function(str) {
-        var par = document.createElement('div');
+        var par = DOCUMENT.createElement('div');
         par.innerHTML = str;
         var ch = makeArray(par.childNodes);
         par.innerHTML = "";
@@ -292,7 +293,7 @@
                     var arg2type = getType(arg2);
                     if (arg2type === STR_string) {
                         //参数2有的情况下
-                        var parnodes = findEles(document, arg2);
+                        var parnodes = findEles(DOCUMENT, arg2);
                         arrayEach(parnodes, function(e) {
                             var tareles = findEles(e, arg1);
                             arrayEach(tareles, function(e) {
@@ -304,15 +305,19 @@
                     } else if (arg2 instanceof Element) {
                         eles = findEles(arg2, arg1);
                     } else if (!arg2) {
-                        eles = findEles(document, arg1);
+                        eles = findEles(DOCUMENT, arg1);
                     }
                     merge(this, eles);
                 }
                 break;
             case STR_function:
-                document.addEventListener('DOMContentLoaded', function() {
+                if (DOCUMENT.readyState === "complete") {
                     arg1($)
-                }, false);
+                } else {
+                    DOCUMENT.addEventListener('DOMContentLoaded', function() {
+                        arg1($)
+                    }, false);
+                }
                 break;
             default:
                 if (arg1 instanceof smartJQ) {
@@ -779,7 +784,7 @@
         offsetParent: function() {
             var arr = [];
             arrayEach(this, function(e) {
-                arr.push(e.offsetParent || document.body);
+                arr.push(e.offsetParent || DOCUMENT.body);
             });
             return $(arr);
         },
@@ -933,7 +938,7 @@
         },
         parents: function(filter) {
             //@use---$.fn._nu
-            return this._nu('parentNode', filter, document);
+            return this._nu('parentNode', filter, DOCUMENT);
         },
         closest: function(selector, context) {
             //@use---$.fn.parentsUntil
@@ -968,7 +973,7 @@
                 var $this = this;
                 arrayEach(arg, function(tar) {
                     var lastele = [].pop.call($(tar).parentsUntil($this));
-                    if (lastele != document) {
+                    if (lastele != DOCUMENT) {
                         eles.push(lastele);
                     }
                 });
@@ -1238,7 +1243,7 @@
                         //没有阻止冒泡就继续往上触发
                         if (!event.cancelBubble) {
                             var parentNode = ele.parentNode;
-                            if (parentNode && parentNode != document) { popTriggerEle(parentNode); }
+                            if (parentNode && parentNode != DOCUMENT) { popTriggerEle(parentNode); }
                         }
                     };
 
