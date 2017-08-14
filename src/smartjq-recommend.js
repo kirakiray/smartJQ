@@ -371,9 +371,12 @@
             if (getType(name) === STR_object) {
                 arrayEach(this, function(e) {
                     objEach(name, function(n, v) {
-                        var psv = parseFloat(v);
-                        if (psv && psv === v) {
-                            v += "px";
+                        // 判断单位是否px
+                        var orival = String(getComputedStyle(e)[n]);
+                        if (orival.search('px') > -1) {
+                            if (String(v).search('px') == -1) {
+                                orival += "px";
+                            }
                         }
                         e.style[n] = v;
                     });
