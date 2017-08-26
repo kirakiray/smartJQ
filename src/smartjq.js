@@ -266,7 +266,7 @@
     var transToEles = function(str) {
         var par = DOCUMENT.createElement('div');
         par.innerHTML = str;
-        var ch = makeArray(par.childNodes);
+        var ch = makeArray(par.children);
         par.innerHTML = "";
         return ch;
     };
