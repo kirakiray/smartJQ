@@ -266,9 +266,14 @@
     var transToEles = function(str) {
         var par = DOCUMENT.createElement('div');
         par.innerHTML = str;
-        var ch = makeArray(par.children);
+        var ch = makeArray(par.childNodes);
         par.innerHTML = "";
-        return ch;
+        return ch.filter(function(e) {
+            var isInText = e instanceof Text;
+            if ((isInText && e.textContent) || !isInText) {
+                return e;
+            }
+        });
     };
 
     //main
