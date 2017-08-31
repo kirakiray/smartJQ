@@ -270,7 +270,7 @@
         par.innerHTML = "";
         return ch.filter(function(e) {
             var isInText = e instanceof Text;
-            if ((isInText && e.textContent) || !isInText) {
+            if ((isInText && e.textContent.trim()) || !isInText) {
                 return e;
             }
         });
