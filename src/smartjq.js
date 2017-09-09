@@ -1166,6 +1166,7 @@
 
             //判断第二个参数是否字符串，是的话就是目标
             switch (getType(arg2)) {
+                case "asyncfunction":
                 case STR_function:
                     callback = arg2;
                     break;
