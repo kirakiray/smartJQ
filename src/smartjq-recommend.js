@@ -1285,19 +1285,38 @@
                         case STR_string:
                             var smartEventData_eventName = smartEventData[eventName];
                             if (!selector) {
+                                // 全部置空
+                                arrayEach(smartEventData[eventName], function(e) {
+                                    e.o = 1;
+                                });
                                 delete smartEventData[eventName];
                             } else if (arg2Type === STR_function) {
                                 smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
-                                    return e.f === selector ? 0 : 1;
+                                    var rdata = 1;
+                                    if (e.f === selector) {
+                                        rdata = 0;
+                                        e.o = 1;
+                                    }
+                                    return rdata;
                                 });
                             } else if (arg2Type === STR_string) {
                                 if (!fn) {
                                     smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
-                                        return e.s === selector ? 0 : 1;
+                                        var rdata = 1;
+                                        if (e.s === selector) {
+                                            rdata = 0;
+                                            e.o = 1;
+                                        }
+                                        return rdata;
                                     });
                                 } else {
                                     smartEventData[eventName] = smartEventData_eventName.filter(function(e) {
-                                        return (e.s === selector && e.f === fn) ? 0 : 1;
+                                        var rdata = 1;
+                                        if (e.s === selector && e.f === fn) {
+                                            rdata = 0;
+                                            e.o = 1;
+                                        }
+                                        return rdata;
                                     });
                                 }
                             }
