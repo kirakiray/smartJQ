@@ -1064,6 +1064,29 @@
                 $('.tar18_ele1').off('haha');
                 $('.tar18_ele1').trigger('haha');
 
+                var aa = 0;
+                $('.tar18_ele1').on('haha', function() {
+                    if (aa) {
+                        throw "haha3";
+                    }
+                    aa = 1;
+                    $('.tar18_ele1').off('haha');
+                });
+                $('.tar18_ele1').trigger('haha');
+                $('.tar18_ele1').trigger('haha');
+
+                var bb = 0;
+                var ofun = function() {
+                    if (bb) {
+                        throw "haha3";
+                    }
+                    bb = 1;
+                    $('.tar18_ele1').off('haha', ofun);
+                };
+                $('.tar18_ele1').on('haha', ofun);
+                $('.tar18_ele1').trigger('haha');
+                $('.tar18_ele1').trigger('haha');
+
 
                 var callfun = function() {
                     throw "haha3";
