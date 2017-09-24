@@ -153,6 +153,15 @@
             return owner.length ? owner : [owner];
         }
 
+        // 判断是否是数组
+        if (0 in owner) {
+            arrayEach(owner, function(e) {
+                var arr = findEles(e, expr);
+                merge(redata, arr);
+            });
+            return redata;
+        }
+
         //判断是否有专属选择器
         var speMatch = expr.match(spe_expr);
 
@@ -307,7 +316,7 @@
                                 }
                             });
                         });
-                    } else if (arg2 instanceof Element) {
+                    } else if (arg2 instanceof Element || arg2 instanceof smartJQ) {
                         eles = findEles(arg2, arg1);
                     } else if (!arg2) {
                         eles = findEles(DOCUMENT, arg1);
