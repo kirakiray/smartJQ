@@ -3,7 +3,7 @@ dragin_area.addEventListener('drop', function(e) {
     e.preventDefault();
     var jsFile = e.dataTransfer.files[0];
 
-    if (jsFile.type !== "text/javascript" && jsFile.type != "application/x-javascript") {
+    if (jsFile.type && jsFile.type.indexOf('javascript') == -1) {
         alert('只能读取javascript文件');
         return;
     }
